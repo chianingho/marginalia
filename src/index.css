@@ -1,0 +1,565 @@
+:root {
+  --font-serif: 'Noto Serif TC', 'Georgia', serif;
+  --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --color-bg: #e6e2dc;
+  --color-surface: #fffdfa;
+  --color-text: #3a332c;
+  --color-text-muted: #9c8f80;
+  --color-accent: #8a6d4b;
+  --color-border: #e9e1d4;
+
+  --shadow-card: 0 10px 28px rgba(91, 70, 54, 0.1), 0 2px 6px rgba(91, 70, 54, 0.05);
+  --shadow-card-hover: 0 16px 36px rgba(91, 70, 54, 0.14), 0 4px 10px rgba(91, 70, 54, 0.07);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+  border-radius: 999px;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  padding: 10px 22px;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(138, 109, 75, 0.28);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.btn-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+button.btn-secondary:hover:not(:disabled) {
+  background: var(--color-border);
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+button.icon-btn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  padding: 4px 8px;
+  font-size: 1rem;
+}
+
+button.icon-btn:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+input,
+textarea {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-text);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(138, 109, 75, 0.12);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: center;
+  padding: 26px 32px;
+  background: var(--color-bg);
+  box-shadow: 0 1px 0 rgba(58, 51, 44, 0.08);
+}
+
+.app-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.app-name {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  color: var(--color-text);
+}
+
+.app-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+}
+
+.local-mode-banner {
+  background: #f4ebd9;
+  color: #6b5410;
+  font-size: 0.83rem;
+  padding: 10px 32px;
+  line-height: 1.6;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.local-mode-banner code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.app-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* Bookshelf */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+  margin-bottom: 56px;
+}
+
+.page-header h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+}
+
+/* 標題的螢光筆掃過效果：用一個奶茶黃色的色塊從左到右展開到文字底下 */
+.highlight-text {
+  position: relative;
+  display: inline-block;
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  left: -0.06em;
+  right: 100%;
+  bottom: 0.1em;
+  height: 0.4em;
+  background: rgba(232, 196, 138, 0.55);
+  border-radius: 2px;
+  z-index: -1;
+  animation: highlight-sweep 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards;
+}
+
+@keyframes highlight-sweep {
+  to {
+    right: -0.06em;
+  }
+}
+
+.empty-hint {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 36px 28px;
+}
+
+@keyframes book-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 書架格位：在書封下方鋪一層柔和的接觸陰影，讓書看起來像放在架上而不是漂浮的卡片 */
+.shelf-slot {
+  position: relative;
+}
+
+.shelf-slot::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -12px;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(58, 51, 44, 0.24), transparent 72%);
+  filter: blur(7px);
+  z-index: -1;
+}
+
+.book-card {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  animation: book-card-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.book-card:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-card);
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  background: #efe7da;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  color: #b8a78f;
+}
+
+/* 液態玻璃資訊牌：浮在書封下緣，毛玻璃模糊 + 高光邊框模擬玻璃質感 */
+.book-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16px 16px 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.4) 55%,
+    rgba(255, 255, 255, 0.52) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.book-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.4);
+}
+
+.book-author {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  opacity: 0.62;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 51, 44, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: 18px;
+  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.search-form {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.search-form input {
+  flex: 1;
+}
+
+.search-results {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.search-result {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.search-result:last-child {
+  border-bottom: none;
+}
+
+.search-result:hover {
+  background: var(--color-bg);
+}
+
+.search-result.selected {
+  background: #f1e7d8;
+}
+
+.search-result img {
+  width: 48px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(91, 70, 54, 0.15);
+}
+
+.search-result-noimg {
+  width: 48px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.search-result-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.search-result-author,
+.search-result-date {
+  margin: 3px 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.manual-form h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  margin-top: 0;
+}
+
+.form-error {
+  color: #b3432f;
+  font-size: 0.85rem;
+}
+
+/* Book detail */
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--color-accent);
+}
+
+.book-detail-header {
+  display: flex;
+  gap: 28px;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.book-detail-header h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin: 0;
+}
+
+.book-detail-cover {
+  width: 130px;
+  height: 195px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.book-detail-author {
+  color: var(--color-text-muted);
+  margin: 8px 0 0;
+}
+
+.note-form {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-card);
+}
+
+.note-form h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  margin-top: 0;
+}
+
+.note-form textarea {
+  resize: vertical;
+}
+
+.notes-heading {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.note-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.note-card {
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.note-date {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.note-screenshot {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.note-content {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
