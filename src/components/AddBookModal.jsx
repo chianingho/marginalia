@@ -1,16 +1,17 @@
-import { useState } from 'react'
-import { searchGoogleBooks } from '../api/googleBooks.js'
+import { useEffect, useState } from 'react'
+import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
 
 const initialState = {
   query: '',
   results: [],
+  searching: false,
+  hasSearched: false,
   selected: null,
   manualTitle: '',
   manualAuthor: '',
   coverFile: null,
-  status: 'idle', // idle | searching | submitting
-  searchError: '',
+  status: 'idle', // idle | submitting
   formError: '',
 }
 
@@ -19,26 +20,30 @@ export default function AddBookModal({ onClose, onCreated }) {
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
 
-  async function handleSearch(e) {
-    e.preventDefault()
-    if (!state.query.trim()) return
-
-    update({ status: 'searching', searchError: '', results: [], selected: null })
-    try {
-      const results = await searchGoogleBooks(state.query)
-      update({
-        status: 'idle',
-        results,
-        manualTitle: state.query,
-        searchError: results.length === 0 ? '找不到符合的書籍，可以手動輸入資訊與上傳封面' : '',
-      })
-    } catch (err) {
-      update({ status: 'idle', searchError: err.message })
+  useEffect(() => {
+    const query = state.query.trim()
+    if (!query) {
+      update({ results: [], searching: false, hasSearched: false })
+      return
     }
-  }
+
+    update({ searching: true })
+    const timer = setTimeout(async () => {
+      const results = await searchBooks(query)
+      update({ results, searching: false, hasSearched: true })
+    }, 300)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.query])
 
   function selectResult(result) {
-    update({ selected: result, manualTitle: result.title, manualAuthor: result.author, coverFile: null })
+    update({
+      selected: result,
+      manualTitle: result.title,
+      manualAuthor: result.authors === '作者不詳' ? '' : result.authors,
+      coverFile: null,
+    })
   }
 
   function handleFileChange(e) {
@@ -60,8 +65,8 @@ export default function AddBookModal({ onClose, onCreated }) {
         title,
         author: state.manualAuthor.trim(),
         coverFile: state.coverFile,
-        coverUrl: state.selected?.coverUrl,
-        googleBooksId: state.selected?.googleBooksId,
+        coverUrl: state.selected?.thumbnail,
+        googleBooksId: state.selected?.id,
       })
       onCreated(book)
     } catch (err) {
@@ -79,36 +84,37 @@ export default function AddBookModal({ onClose, onCreated }) {
           </button>
         </div>
 
-        <form onSubmit={handleSearch} className="search-form">
+        <div className="search-form">
           <input
             type="text"
             placeholder="輸入書名搜尋封面與資訊"
             value={state.query}
             onChange={(e) => update({ query: e.target.value })}
+            style={{ fontSize: '16px' }}
           />
-          <button type="submit" disabled={state.status === 'searching'}>
-            {state.status === 'searching' ? '搜尋中…' : '搜尋'}
-          </button>
-        </form>
+        </div>
 
-        {state.searchError && <p className="form-error">{state.searchError}</p>}
+        {state.searching && <p className="form-error">搜尋中…</p>}
+        {!state.searching && state.hasSearched && state.results.length === 0 && (
+          <p className="form-error">找不到相關書籍</p>
+        )}
 
         {state.results.length > 0 && (
           <ul className="search-results">
             {state.results.map((result) => (
               <li
-                key={result.googleBooksId}
-                className={`search-result ${state.selected?.googleBooksId === result.googleBooksId ? 'selected' : ''}`}
+                key={result.id}
+                className={`search-result ${state.selected?.id === result.id ? 'selected' : ''}`}
                 onClick={() => selectResult(result)}
               >
-                {result.coverUrl ? (
-                  <img src={result.coverUrl} alt={result.title} />
+                {result.thumbnail ? (
+                  <img src={result.thumbnail} alt={result.title} />
                 ) : (
-                  <div className="search-result-noimg">無封面</div>
+                  <div className="search-result-noimg">{result.title.slice(0, 1)}</div>
                 )}
                 <div>
                   <p className="search-result-title">{result.title}</p>
-                  {result.author && <p className="search-result-author">{result.author}</p>}
+                  <p className="search-result-author">{result.authors}</p>
                   {result.publishedDate && <p className="search-result-date">{result.publishedDate}</p>}
                 </div>
               </li>
@@ -124,6 +130,7 @@ export default function AddBookModal({ onClose, onCreated }) {
               type="text"
               value={state.manualTitle}
               onChange={(e) => update({ manualTitle: e.target.value })}
+              style={{ fontSize: '16px' }}
               required
             />
           </label>
@@ -133,6 +140,7 @@ export default function AddBookModal({ onClose, onCreated }) {
               type="text"
               value={state.manualAuthor}
               onChange={(e) => update({ manualAuthor: e.target.value })}
+              style={{ fontSize: '16px' }}
             />
           </label>
           <label>
