@@ -612,6 +612,22 @@ label {
   position: relative;
   display: flex;
   flex-direction: column;
+  /* S 型筆刷會刻意畫到頁面寬度外，這裡擋掉，不讓它產生橫向捲動 */
+  overflow-x: hidden;
+}
+
+/* S 型螢光筆刷：頁面層級的裝飾，隨頁面捲動（非 fixed）。
+   疊放順序：標題文字（z-index 0）< 筆刷（z-index 1）< 篩選 icon／書架內容（z-index 2+）。
+   mix-blend-mode: multiply 讓黃色只染白底，文字黑色維持全黑不糊。 */
+.bookshelf-brush-s {
+  position: absolute;
+  top: -20px;
+  left: -90px;
+  width: 560px;
+  height: 480px;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .bookshelf-header {
@@ -619,6 +635,11 @@ label {
   flex-shrink: 0;
   padding: 22px var(--shelf-inset) 14px;
   text-align: center;
+}
+
+.bookshelf-header-titles {
+  position: relative;
+  z-index: 0;
 }
 
 .bookshelf-eyebrow {
@@ -634,14 +655,7 @@ label {
   margin-top: 4px;
 }
 
-.bookshelf-title-wrap {
-  position: relative;
-  display: inline-block;
-}
-
 .bookshelf-title {
-  position: relative;
-  z-index: 1;
   margin: 4px 0 0;
   font-family: var(--font-serif);
   font-size: 50px;
@@ -650,23 +664,11 @@ label {
   letter-spacing: 0.01em;
 }
 
-/* 螢光筆刷：疊在「Books」文字後方，mix-blend-mode 讓底色透出來，不影響點擊與排版 */
-.bookshelf-title-brush {
-  position: absolute;
-  left: 50%;
-  top: 56%;
-  width: 136%;
-  aspect-ratio: 140 / 50;
-  transform: translate(-50%, -50%) rotate(-1.5deg);
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .bookshelf-filter-btn {
   position: absolute;
   top: 18px;
   right: var(--shelf-inset);
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -686,11 +688,15 @@ button.bookshelf-filter-btn:hover {
 }
 
 .bookshelf-status {
+  position: relative;
+  z-index: 2;
   padding: 8px var(--shelf-inset) 0;
   font-size: 0.9rem;
 }
 
 .shelf-rows {
+  position: relative;
+  z-index: 2;
   flex: 1;
   display: flex;
   flex-direction: column;

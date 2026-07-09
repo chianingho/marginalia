@@ -4,7 +4,7 @@ import AddBookModal from '../components/AddBookModal.jsx'
 import { fetchBooks } from '../api/books.js'
 import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
 
-const GROUP_BY_SUBTITLE = { year: 'by year', category: 'by category' }
+const GROUP_BY_SUBTITLE = { year: 'year', category: 'category' }
 
 function FilterIcon() {
   return (
@@ -19,21 +19,45 @@ function FilterIcon() {
   )
 }
 
-// 螢光筆刷背景：疊 4 條粗橫筆畫 + feTurbulence/feDisplacementMap 做出毛邊墨感，純 SVG，不用外部圖檔
-function BrushHighlight() {
+// 螢光筆刷背景：大 S 型，從右上斜切過 Books 標題再往左下掃過第一排書架。
+// 3 條筆畫故意錯開位置（不是同心疊放）、粗細不同、透明度遞減，
+// 讀起來像來回劃了 2-3 筆，而不是一塊實心色塊；加 feTurbulence/feDisplacementMap 做毛邊。
+function BooksBrushS() {
   return (
-    <svg className="bookshelf-title-brush" viewBox="0 0 140 50" preserveAspectRatio="none" aria-hidden="true">
+    <svg className="bookshelf-brush-s" viewBox="0 0 560 480" aria-hidden="true">
       <defs>
-        <filter id="brush-rough" x="-30%" y="-60%" width="160%" height="220%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.85 0.4" numOctaves="2" seed="7" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+        <filter id="brush-rough-s" x="-25%" y="-25%" width="150%" height="150%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.014 0.05" numOctaves="2" seed="11" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="24" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </defs>
-      <g filter="url(#brush-rough)">
-        <path d="M6,12 Q45,4 82,10 T134,8" stroke="#F5C842" strokeWidth="22" strokeLinecap="round" fill="none" opacity="0.4" />
-        <path d="M10,22 Q50,15 88,20 T130,19" stroke="#F5C842" strokeWidth="19" strokeLinecap="round" fill="none" opacity="0.32" />
-        <path d="M4,32 Q46,25 84,30 T132,29" stroke="#F5C842" strokeWidth="24" strokeLinecap="round" fill="none" opacity="0.42" />
-        <path d="M12,41 Q52,36 90,39 T126,38" stroke="#F5C842" strokeWidth="18" strokeLinecap="round" fill="none" opacity="0.3" />
+      <g filter="url(#brush-rough-s)">
+        <path
+          d="M 526,-42 C 461,194 127,69 56,308"
+          stroke="#FAFF00"
+          strokeWidth="42"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.3"
+          transform="rotate(1.5 280 140)"
+        />
+        <path
+          d="M 492,-16 C 427,220 93,95 22,334"
+          stroke="#FAFF00"
+          strokeWidth="54"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.38"
+          transform="rotate(-2 280 140)"
+        />
+        <path
+          d="M 510,-30 C 445,206 111,81 40,320"
+          stroke="#FAFF00"
+          strokeWidth="78"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.6"
+        />
       </g>
     </svg>
   )
@@ -132,13 +156,12 @@ export default function Bookshelf() {
 
   return (
     <div className="bookshelf-page">
+      <BooksBrushS />
+
       <header className="bookshelf-header">
         <div className="bookshelf-header-titles">
           <p className="bookshelf-eyebrow">Marginalia</p>
-          <div className="bookshelf-title-wrap">
-            <BrushHighlight />
-            <h1 className="bookshelf-title">Books</h1>
-          </div>
+          <h1 className="bookshelf-title">Books</h1>
           {GROUP_BY_SUBTITLE[groupBy] && (
             <p className="bookshelf-eyebrow bookshelf-groupby">{GROUP_BY_SUBTITLE[groupBy]}</p>
           )}
