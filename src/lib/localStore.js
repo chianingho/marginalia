@@ -4,6 +4,8 @@
 // 注意：這只適合「先看畫面」的暫時測試，localStorage 容量有限（通常 5~10MB），
 // 圖片放多了可能會超出容量。正式使用請改回 Supabase（見 README）。
 
+import { deriveStatusDates } from './bookStatus.js'
+
 const BOOKS_KEY = 'reading-notes:books'
 const NOTES_KEY = 'reading-notes:notes'
 const SEEDED_FLAG_KEY = 'reading-notes:seeded'
@@ -101,14 +103,19 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
     finalCoverUrl = await fileToDataUrl(coverFile)
   }
 
+  const finalStatus = status || 'to_read'
+  const { started_at, finished_at } = deriveStatusDates(finalStatus, {})
+
   const book = {
     id: crypto.randomUUID(),
     title,
     author: author || null,
     cover_url: finalCoverUrl,
     google_books_id: googleBooksId || null,
-    status: status || 'to_read',
+    status: finalStatus,
     category: category || null,
+    started_at,
+    finished_at,
     created_at: new Date().toISOString(),
   }
 
@@ -116,6 +123,40 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
   books.unshift(book)
   writeAll(BOOKS_KEY, books)
   return book
+}
+
+export async function updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category }) {
+  const books = readAll(BOOKS_KEY)
+  const index = books.findIndex((b) => b.id === bookId)
+  if (index === -1) throw new Error('找不到這本書')
+
+  const existing = books[index]
+
+  let finalCoverUrl = existing.cover_url
+  if (coverFile) {
+    finalCoverUrl = await fileToDataUrl(coverFile)
+  } else if (coverUrl) {
+    finalCoverUrl = coverUrl
+  }
+
+  const finalStatus = status || existing.status
+  const { started_at, finished_at } = deriveStatusDates(finalStatus, existing)
+
+  const updated = {
+    ...existing,
+    title: title ?? existing.title,
+    author: author !== undefined ? author || null : existing.author,
+    cover_url: finalCoverUrl,
+    google_books_id: googleBooksId || existing.google_books_id,
+    status: finalStatus,
+    category: category !== undefined ? category || null : existing.category,
+    started_at,
+    finished_at,
+  }
+
+  books[index] = updated
+  writeAll(BOOKS_KEY, books)
+  return updated
 }
 
 export async function deleteBook(bookId) {

@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import NoteForm from '../components/NoteForm.jsx'
 import NoteCard from '../components/NoteCard.jsx'
+import EditBookModal from '../components/EditBookModal.jsx'
 import { fetchBookById } from '../api/books.js'
 import { fetchNotesByBook, deleteNote } from '../api/notes.js'
 
 export default function BookNotes() {
   const { bookId } = useParams()
+  const navigate = useNavigate()
   const [book, setBook] = useState(null)
   const [notes, setNotes] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
+  const [showEdit, setShowEdit] = useState(false)
 
   useEffect(() => {
     load()
@@ -58,10 +61,27 @@ export default function BookNotes() {
       <div className="book-detail-header">
         {book.cover_url && <img src={book.cover_url} alt={book.title} className="book-detail-cover" />}
         <div>
-          <h1>{book.title}</h1>
+          <div className="book-detail-title-row">
+            <h1>{book.title}</h1>
+            <button type="button" className="book-edit-btn" onClick={() => setShowEdit(true)}>
+              Edit
+            </button>
+          </div>
           {book.author && <p className="book-detail-author">{book.author}</p>}
         </div>
       </div>
+
+      {showEdit && (
+        <EditBookModal
+          book={book}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => {
+            setBook(updated)
+            setShowEdit(false)
+          }}
+          onDeleted={() => navigate('/')}
+        />
+      )}
 
       <NoteForm bookId={bookId} onCreated={handleNoteCreated} />
 

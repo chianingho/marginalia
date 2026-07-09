@@ -2,12 +2,11 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookNotes from './pages/BookNotes.jsx'
 import ShelfDetail from './pages/ShelfDetail.jsx'
-import AddBook from './pages/AddBook.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
 function isFlushRoute(pathname) {
-  return pathname === '/' || pathname === '/add' || pathname.startsWith('/shelf/')
+  return pathname === '/' || pathname.startsWith('/shelf/')
 }
 
 export default function App() {
@@ -36,8 +35,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Bookshelf />} />
           <Route path="/books/:bookId" element={<BookNotes />} />
-          <Route path="/shelf/:status" element={<ShelfDetail />} />
-          <Route path="/add" element={<AddBook />} />
+          <Route path="/shelf/:groupBy/:slug" element={<ShelfDetail />} />
         </Routes>
       </main>
     </div>

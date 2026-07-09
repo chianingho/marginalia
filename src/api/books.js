@@ -1,5 +1,6 @@
 import { supabase, COVERS_BUCKET, hasSupabaseConfig } from '../lib/supabaseClient.js'
 import * as localStore from '../lib/localStore.js'
+import { deriveStatusDates } from '../lib/bookStatus.js'
 
 export async function fetchBooks() {
   if (!hasSupabaseConfig) return localStore.fetchBooks()
@@ -38,6 +39,9 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
     finalCoverUrl = await uploadCoverFile(coverFile)
   }
 
+  const finalStatus = status || 'to_read'
+  const { started_at, finished_at } = deriveStatusDates(finalStatus, {})
+
   const { data, error } = await supabase
     .from('books')
     .insert({
@@ -45,9 +49,52 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
       author: author || null,
       cover_url: finalCoverUrl,
       google_books_id: googleBooksId || null,
-      status: status || 'to_read',
+      status: finalStatus,
       category: category || null,
+      started_at,
+      finished_at,
     })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * 編輯既有書籍。status 變更時的 started_at / finished_at 自動記錄邏輯與 createBook 共用同一份規則，
+ * 已經有值的日期不會被清除（例如手動把 Finished 改回 Reading）。
+ */
+export async function updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category }) {
+  if (!hasSupabaseConfig) {
+    return localStore.updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category })
+  }
+
+  const existing = await fetchBookById(bookId)
+
+  let finalCoverUrl = existing.cover_url
+  if (coverFile) {
+    finalCoverUrl = await uploadCoverFile(coverFile)
+  } else if (coverUrl) {
+    finalCoverUrl = coverUrl
+  }
+
+  const finalStatus = status || existing.status
+  const { started_at, finished_at } = deriveStatusDates(finalStatus, existing)
+
+  const { data, error } = await supabase
+    .from('books')
+    .update({
+      title: title ?? existing.title,
+      author: author !== undefined ? author || null : existing.author,
+      cover_url: finalCoverUrl,
+      google_books_id: googleBooksId || existing.google_books_id,
+      status: finalStatus,
+      category: category !== undefined ? category || null : existing.category,
+      started_at,
+      finished_at,
+    })
+    .eq('id', bookId)
     .select()
     .single()
 

@@ -1,40 +1,50 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import AddBookModal from '../components/AddBookModal.jsx'
 import { fetchBooks } from '../api/books.js'
-import { SHELF_DEFS, resolveShelfKey } from '../lib/shelves.js'
+import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
 
-function groupByShelf(books) {
-  const groups = { to_read: [], reading: [], finished: [] }
-  for (const book of books) {
-    groups[resolveShelfKey(book)].push(book)
-  }
-  return groups
-}
+const GROUP_BY_SUBTITLE = { year: 'by year', category: 'by category' }
 
-function matchesQuery(book, query) {
-  const q = query.trim().toLowerCase()
-  if (!q) return true
-  return (
-    book.title.toLowerCase().includes(q) ||
-    (book.author || '').toLowerCase().includes(q)
-  )
-}
-
-function SearchIcon() {
+function FilterIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="9" cy="7" r="2" fill="#fdfcfa" stroke="currentColor" strokeWidth="2" />
+      <circle cx="16" cy="12" r="2" fill="#fdfcfa" stroke="currentColor" strokeWidth="2" />
+      <circle cx="10" cy="17" r="2" fill="#fdfcfa" stroke="currentColor" strokeWidth="2" />
     </svg>
   )
 }
 
-function ShelfRow({ label, slug, books }) {
+// 螢光筆刷背景：疊 4 條粗橫筆畫 + feTurbulence/feDisplacementMap 做出毛邊墨感，純 SVG，不用外部圖檔
+function BrushHighlight() {
+  return (
+    <svg className="bookshelf-title-brush" viewBox="0 0 140 50" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <filter id="brush-rough" x="-30%" y="-60%" width="160%" height="220%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85 0.4" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+      <g filter="url(#brush-rough)">
+        <path d="M6,12 Q45,4 82,10 T134,8" stroke="#F5C842" strokeWidth="22" strokeLinecap="round" fill="none" opacity="0.4" />
+        <path d="M10,22 Q50,15 88,20 T130,19" stroke="#F5C842" strokeWidth="19" strokeLinecap="round" fill="none" opacity="0.32" />
+        <path d="M4,32 Q46,25 84,30 T132,29" stroke="#F5C842" strokeWidth="24" strokeLinecap="round" fill="none" opacity="0.42" />
+        <path d="M12,41 Q52,36 90,39 T126,38" stroke="#F5C842" strokeWidth="18" strokeLinecap="round" fill="none" opacity="0.3" />
+      </g>
+    </svg>
+  )
+}
+
+function ShelfRow({ label, href, books }) {
   return (
     <div className="shelf-row">
       <div className="shelf-row-header">
         <span className="shelf-row-label">{label}</span>
-        <Link to={`/shelf/${slug}`} className="shelf-row-see-all">
+        <Link to={href} className="shelf-row-see-all">
           See all ›
         </Link>
       </div>
@@ -67,12 +77,12 @@ function ShelfRow({ label, slug, books }) {
 }
 
 export default function Bookshelf() {
-  const navigate = useNavigate()
   const [books, setBooks] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [query, setQuery] = useState('')
+  const [groupBy, setGroupBy] = useState(loadGroupBy)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [scrimVisible, setScrimVisible] = useState(false)
   const scrimTimer = useRef(null)
 
@@ -107,47 +117,40 @@ export default function Bookshelf() {
     }
   }
 
-  function toggleSearch() {
-    setSearchOpen((open) => {
-      if (open) setQuery('')
-      return !open
-    })
+  function handleGroupByChange(value) {
+    setGroupBy(value)
+    saveGroupBy(value)
+    setFilterOpen(false)
   }
 
-  const filteredBooks = useMemo(
-    () => books.filter((book) => matchesQuery(book, query)),
-    [books, query],
-  )
-  const groups = useMemo(() => groupByShelf(filteredBooks), [filteredBooks])
+  function handleCreated(book) {
+    setBooks((prev) => [book, ...prev])
+    setShowAddModal(false)
+  }
+
+  const rows = buildShelfRows(books, groupBy)
 
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
         <div className="bookshelf-header-titles">
           <p className="bookshelf-eyebrow">Marginalia</p>
-          <h1 className="bookshelf-title">Books</h1>
+          <div className="bookshelf-title-wrap">
+            <BrushHighlight />
+            <h1 className="bookshelf-title">Books</h1>
+          </div>
+          {GROUP_BY_SUBTITLE[groupBy] && (
+            <p className="bookshelf-eyebrow bookshelf-groupby">{GROUP_BY_SUBTITLE[groupBy]}</p>
+          )}
         </div>
         <button
           type="button"
-          className="bookshelf-search-btn"
-          onClick={toggleSearch}
-          aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
-          aria-expanded={searchOpen}
+          className="bookshelf-filter-btn"
+          onClick={() => setFilterOpen(true)}
+          aria-label="Group by"
         >
-          <SearchIcon />
+          <FilterIcon />
         </button>
-        {searchOpen && (
-          <div className="bookshelf-search-row">
-            <input
-              type="text"
-              autoFocus
-              placeholder="搜尋書名或作者"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={{ fontSize: '16px' }}
-            />
-          </div>
-        )}
       </header>
 
       {status === 'loading' && <p className="bookshelf-status">載入中…</p>}
@@ -159,17 +162,41 @@ export default function Bookshelf() {
 
       {status === 'ready' && books.length > 0 && (
         <div className="shelf-rows">
-          {SHELF_DEFS.map((def) => (
-            <ShelfRow key={def.key} label={def.label} slug={def.slug} books={groups[def.key]} />
+          {rows.map((row) => (
+            <ShelfRow key={row.key} label={row.label} href={`/shelf/${groupBy}/${row.slug}`} books={row.books} />
           ))}
         </div>
       )}
 
       <div className={`bottom-scrim ${scrimVisible ? 'is-visible' : ''}`} aria-hidden="true" />
-      <button type="button" className="add-book-btn" onClick={() => navigate('/add')}>
+      <button type="button" className="add-book-btn" onClick={() => setShowAddModal(true)}>
         <span className="add-book-btn-icon">＋</span>
         Add Book
       </button>
+
+      {showAddModal && <AddBookModal onClose={() => setShowAddModal(false)} onCreated={handleCreated} />}
+
+      {filterOpen && (
+        <div className="action-sheet-backdrop" onClick={() => setFilterOpen(false)}>
+          <div className="action-sheet" onClick={(e) => e.stopPropagation()}>
+            <p className="action-sheet-title">Group by</p>
+            {GROUP_BY_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="action-sheet-option"
+                onClick={() => handleGroupByChange(option.value)}
+              >
+                {option.label}
+                {groupBy === option.value && <span className="action-sheet-check">✓</span>}
+              </button>
+            ))}
+            <button type="button" className="action-sheet-cancel" onClick={() => setFilterOpen(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

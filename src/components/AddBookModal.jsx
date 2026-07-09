@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
 
@@ -24,11 +23,29 @@ const initialState = {
   formError: '',
 }
 
-export default function AddBook() {
-  const navigate = useNavigate()
+export default function AddBookModal({ onClose, onCreated }) {
   const [state, setState] = useState(initialState)
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
+
+  // 鎖住背景頁面滾動：iOS Safari 上單靠 body overflow:hidden 不夠，改用 position:fixed
+  // 並記錄/還原 scrollY，避免關閉 modal 後畫面跳掉
+  useEffect(() => {
+    const scrollY = window.scrollY
+    const { body } = document
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+
+    return () => {
+      body.style.position = ''
+      body.style.top = ''
+      body.style.left = ''
+      body.style.right = ''
+      window.scrollTo(0, scrollY)
+    }
+  }, [])
 
   useEffect(() => {
     const query = state.query.trim()
@@ -84,7 +101,7 @@ export default function AddBook() {
 
     update({ submitStatus: 'submitting', formError: '' })
     try {
-      await createBook({
+      const book = await createBook({
         title,
         author: state.manualAuthor.trim(),
         coverFile: state.coverFile,
@@ -93,23 +110,23 @@ export default function AddBook() {
         status: state.manualStatus,
         category: category || null,
       })
-      navigate('/')
+      onCreated(book)
     } catch (err) {
       update({ submitStatus: 'idle', formError: err.message })
     }
   }
 
   return (
-    <div className="add-page">
-      <header className="add-page-header">
-        <button type="button" className="add-page-back" onClick={() => navigate('/')} aria-label="Back">
-          ‹
-        </button>
-        <h1 className="add-page-title">Add Book</h1>
-      </header>
+    <div className="add-modal-backdrop" onClick={onClose}>
+      <div className="add-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Add Book</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
 
-      <div className="add-page-body">
-        <div className="add-page-search">
+        <div className="add-modal-search">
           <input
             type="text"
             placeholder="Search by title…"
@@ -147,10 +164,10 @@ export default function AddBook() {
           </ul>
         )}
 
-        <form onSubmit={handleSubmit} className="add-page-form">
-          <h2 className="add-page-section-title">Details</h2>
+        <form onSubmit={handleSubmit} className="add-modal-form">
+          <h3 className="add-modal-section-title">Details</h3>
 
-          <label className="add-page-label">
+          <label className="add-modal-label">
             Title
             <input
               type="text"
@@ -161,7 +178,7 @@ export default function AddBook() {
             />
           </label>
 
-          <label className="add-page-label">
+          <label className="add-modal-label">
             Author (optional)
             <input
               type="text"
@@ -171,7 +188,7 @@ export default function AddBook() {
             />
           </label>
 
-          <label className="add-page-label">
+          <label className="add-modal-label">
             Status
             <select
               value={state.manualStatus}
@@ -185,7 +202,7 @@ export default function AddBook() {
             </select>
           </label>
 
-          <label className="add-page-label">
+          <label className="add-modal-label">
             Category (optional)
             <select value={state.manualCategory} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
               <option value="">None</option>
@@ -207,31 +224,31 @@ export default function AddBook() {
             )}
           </label>
 
-          <div className="add-page-field">
-            <label htmlFor="add-page-file-input" className="add-page-label-text">
+          <div className="add-modal-field">
+            <label htmlFor="add-modal-file-input" className="add-modal-label-text">
               Upload cover (optional, replaces search result)
             </label>
-            <div className="add-page-file-row">
-              <label htmlFor="add-page-file-input" className="add-page-file-btn">
+            <div className="add-modal-file-row">
+              <label htmlFor="add-modal-file-input" className="add-modal-file-btn">
                 Choose file
               </label>
-              <span className="add-page-file-name">
+              <span className="add-modal-file-name">
                 {state.coverFile ? state.coverFile.name : 'No file chosen'}
               </span>
             </div>
             <input
-              id="add-page-file-input"
+              id="add-modal-file-input"
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="add-page-file-input"
+              className="add-modal-file-input"
             />
           </div>
 
           {state.formError && <p className="form-error">{state.formError}</p>}
 
-          <div className="add-page-actions">
-            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={() => navigate('/')}>
+          <div className="modal-actions">
+            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={onClose}>
               Cancel
             </button>
             <button
