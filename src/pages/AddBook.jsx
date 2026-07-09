@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
 
 const CUSTOM_CATEGORY_VALUE = '__custom__'
 
+// 這幾個選項值刻意維持中文：它們是使用者資料層（存進 category 欄位），不是介面文案
 const CATEGORY_OPTIONS = ['小說', '散文', '心理', '設計', '商業', '歷史', '其他']
 
 const initialState = {
@@ -18,11 +20,12 @@ const initialState = {
   manualCategory: '',
   manualCustomCategory: '',
   coverFile: null,
-  status: 'idle', // idle | submitting
+  submitStatus: 'idle', // idle | submitting
   formError: '',
 }
 
-export default function AddBookModal({ onClose, onCreated }) {
+export default function AddBook() {
+  const navigate = useNavigate()
   const [state, setState] = useState(initialState)
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
@@ -58,36 +61,6 @@ export default function AddBookModal({ onClose, onCreated }) {
     update({ coverFile: file })
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const title = state.manualTitle.trim()
-    if (!title) {
-      update({ formError: '請輸入書名' })
-      return
-    }
-
-    const category =
-      state.manualCategory === CUSTOM_CATEGORY_VALUE
-        ? state.manualCustomCategory.trim()
-        : state.manualCategory
-
-    update({ status: 'submitting', formError: '' })
-    try {
-      const book = await createBook({
-        title,
-        author: state.manualAuthor.trim(),
-        coverFile: state.coverFile,
-        coverUrl: state.selected?.thumbnail,
-        googleBooksId: state.selected?.id,
-        status: state.manualStatus,
-        category: category || null,
-      })
-      onCreated(book)
-    } catch (err) {
-      update({ status: 'idle', formError: err.message })
-    }
-  }
-
   function handleCategoryChange(e) {
     const value = e.target.value
     update({
@@ -96,29 +69,59 @@ export default function AddBookModal({ onClose, onCreated }) {
     })
   }
 
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>新增書籍</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="關閉">
-            ✕
-          </button>
-        </div>
+  async function handleSubmit(e) {
+    e.preventDefault()
+    const title = state.manualTitle.trim()
+    if (!title) {
+      update({ formError: 'Please enter a title' })
+      return
+    }
 
-        <div className="search-form">
+    const category =
+      state.manualCategory === CUSTOM_CATEGORY_VALUE
+        ? state.manualCustomCategory.trim()
+        : state.manualCategory
+
+    update({ submitStatus: 'submitting', formError: '' })
+    try {
+      await createBook({
+        title,
+        author: state.manualAuthor.trim(),
+        coverFile: state.coverFile,
+        coverUrl: state.selected?.thumbnail,
+        googleBooksId: state.selected?.id,
+        status: state.manualStatus,
+        category: category || null,
+      })
+      navigate('/')
+    } catch (err) {
+      update({ submitStatus: 'idle', formError: err.message })
+    }
+  }
+
+  return (
+    <div className="add-page">
+      <header className="add-page-header">
+        <button type="button" className="add-page-back" onClick={() => navigate('/')} aria-label="Back">
+          ‹
+        </button>
+        <h1 className="add-page-title">Add Book</h1>
+      </header>
+
+      <div className="add-page-body">
+        <div className="add-page-search">
           <input
             type="text"
-            placeholder="輸入書名搜尋封面與資訊"
+            placeholder="Search by title…"
             value={state.query}
             onChange={(e) => update({ query: e.target.value })}
             style={{ fontSize: '16px' }}
           />
         </div>
 
-        {state.searching && <p className="form-error">搜尋中…</p>}
+        {state.searching && <p className="form-error">Searching…</p>}
         {!state.searching && state.hasSearched && state.results.length === 0 && (
-          <p className="form-error">找不到相關書籍</p>
+          <p className="form-error">No books found</p>
         )}
 
         {state.results.length > 0 && (
@@ -144,10 +147,11 @@ export default function AddBookModal({ onClose, onCreated }) {
           </ul>
         )}
 
-        <form onSubmit={handleSubmit} className="manual-form">
-          <h3>確認 / 手動填寫資訊</h3>
-          <label>
-            書名
+        <form onSubmit={handleSubmit} className="add-page-form">
+          <h2 className="add-page-section-title">Details</h2>
+
+          <label className="add-page-label">
+            Title
             <input
               type="text"
               value={state.manualTitle}
@@ -156,8 +160,9 @@ export default function AddBookModal({ onClose, onCreated }) {
               required
             />
           </label>
-          <label>
-            作者（選填）
+
+          <label className="add-page-label">
+            Author (optional)
             <input
               type="text"
               value={state.manualAuthor}
@@ -165,8 +170,9 @@ export default function AddBookModal({ onClose, onCreated }) {
               style={{ fontSize: '16px' }}
             />
           </label>
-          <label>
-            狀態
+
+          <label className="add-page-label">
+            Status
             <select
               value={state.manualStatus}
               onChange={(e) => update({ manualStatus: e.target.value })}
@@ -178,40 +184,62 @@ export default function AddBookModal({ onClose, onCreated }) {
               <option value="finished">Finished</option>
             </select>
           </label>
-          <label>
-            類別（選填）
+
+          <label className="add-page-label">
+            Category (optional)
             <select value={state.manualCategory} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
-              <option value="">不指定</option>
+              <option value="">None</option>
               {CATEGORY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
               ))}
-              <option value={CUSTOM_CATEGORY_VALUE}>自訂...</option>
+              <option value={CUSTOM_CATEGORY_VALUE}>Custom…</option>
             </select>
             {state.manualCategory === CUSTOM_CATEGORY_VALUE && (
               <input
                 type="text"
-                placeholder="輸入自訂類別"
+                placeholder="Enter a category"
                 value={state.manualCustomCategory}
                 onChange={(e) => update({ manualCustomCategory: e.target.value })}
                 style={{ fontSize: '16px' }}
               />
             )}
           </label>
-          <label>
-            手動上傳封面（選填，會覆蓋搜尋到的封面）
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-          </label>
+
+          <div className="add-page-field">
+            <label htmlFor="add-page-file-input" className="add-page-label-text">
+              Upload cover (optional, replaces search result)
+            </label>
+            <div className="add-page-file-row">
+              <label htmlFor="add-page-file-input" className="add-page-file-btn">
+                Choose file
+              </label>
+              <span className="add-page-file-name">
+                {state.coverFile ? state.coverFile.name : 'No file chosen'}
+              </span>
+            </div>
+            <input
+              id="add-page-file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="add-page-file-input"
+            />
+          </div>
 
           {state.formError && <p className="form-error">{state.formError}</p>}
 
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              取消
+          <div className="add-page-actions">
+            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={() => navigate('/')}>
+              Cancel
             </button>
-            <button type="submit" disabled={state.status === 'submitting'}>
-              {state.status === 'submitting' ? '新增中…' : '新增書籍'}
+            <button
+              type="submit"
+              className="add-page-btn add-page-btn-primary"
+              disabled={state.submitStatus === 'submitting'}
+            >
+              {state.submitStatus === 'submitting' ? 'Adding…' : 'Add Book'}
             </button>
           </div>
         </form>

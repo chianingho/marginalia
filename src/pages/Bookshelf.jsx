@@ -1,21 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import AddBookModal from '../components/AddBookModal.jsx'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { fetchBooks } from '../api/books.js'
+import { SHELF_DEFS, resolveShelfKey } from '../lib/shelves.js'
 
-const SHELF_DEFS = [
-  { key: 'to_read', label: 'To Read' },
-  { key: 'reading', label: 'Reading' },
-  { key: 'finished', label: 'Finished' },
-]
-
-// 狀態欄位還沒實作，暫時把所有書都歸在 Reading 排，
-// 但版面照三排（To Read / Reading / Finished）做，之後接上 book.status 就直接吃得到。
 function groupByShelf(books) {
   const groups = { to_read: [], reading: [], finished: [] }
   for (const book of books) {
-    const key = groups[book.status] ? book.status : 'reading'
-    groups[key].push(book)
+    groups[resolveShelfKey(book)].push(book)
   }
   return groups
 }
@@ -38,12 +29,14 @@ function SearchIcon() {
   )
 }
 
-function ShelfRow({ label, books }) {
+function ShelfRow({ label, slug, books }) {
   return (
     <div className="shelf-row">
       <div className="shelf-row-header">
         <span className="shelf-row-label">{label}</span>
-        <span className="shelf-row-count">{books.length}</span>
+        <Link to={`/shelf/${slug}`} className="shelf-row-see-all">
+          See all ›
+        </Link>
       </div>
       <div className="shelf-scroll">
         <div className="shelf-track">
@@ -74,15 +67,32 @@ function ShelfRow({ label, books }) {
 }
 
 export default function Bookshelf() {
+  const navigate = useNavigate()
   const [books, setBooks] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
-  const [showModal, setShowModal] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [scrimVisible, setScrimVisible] = useState(false)
+  const scrimTimer = useRef(null)
 
   useEffect(() => {
     load()
+  }, [])
+
+  // 滾動時淡入 scrim，停止滾動 600ms 後淡出；已到頁面最底部時保持隱藏
+  useEffect(() => {
+    function handleScroll() {
+      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 8
+      setScrimVisible(!atBottom)
+      clearTimeout(scrimTimer.current)
+      scrimTimer.current = setTimeout(() => setScrimVisible(false), 600)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(scrimTimer.current)
+    }
   }, [])
 
   async function load() {
@@ -95,11 +105,6 @@ export default function Bookshelf() {
       setError(err.message)
       setStatus('error')
     }
-  }
-
-  function handleCreated(book) {
-    setBooks((prev) => [book, ...prev])
-    setShowModal(false)
   }
 
   function toggleSearch() {
@@ -155,18 +160,16 @@ export default function Bookshelf() {
       {status === 'ready' && books.length > 0 && (
         <div className="shelf-rows">
           {SHELF_DEFS.map((def) => (
-            <ShelfRow key={def.key} label={def.label} books={groups[def.key]} />
+            <ShelfRow key={def.key} label={def.label} slug={def.slug} books={groups[def.key]} />
           ))}
         </div>
       )}
 
-      <div className="bookshelf-bottom-fade" aria-hidden="true" />
-      <button type="button" className="add-book-btn" onClick={() => setShowModal(true)}>
+      <div className={`bottom-scrim ${scrimVisible ? 'is-visible' : ''}`} aria-hidden="true" />
+      <button type="button" className="add-book-btn" onClick={() => navigate('/add')}>
         <span className="add-book-btn-icon">＋</span>
         Add Book
       </button>
-
-      {showModal && <AddBookModal onClose={() => setShowModal(false)} onCreated={handleCreated} />}
     </div>
   )
 }
