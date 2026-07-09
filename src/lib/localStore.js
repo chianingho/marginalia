@@ -95,7 +95,7 @@ export async function fetchBookById(bookId) {
   return book
 }
 
-export async function createBook({ title, author, coverFile, coverUrl, googleBooksId }) {
+export async function createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category }) {
   let finalCoverUrl = coverUrl || null
   if (coverFile) {
     finalCoverUrl = await fileToDataUrl(coverFile)
@@ -107,6 +107,8 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
     author: author || null,
     cover_url: finalCoverUrl,
     google_books_id: googleBooksId || null,
+    status: status || 'to_read',
+    category: category || null,
     created_at: new Date().toISOString(),
   }
 

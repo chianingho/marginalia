@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
 
+const CUSTOM_CATEGORY_VALUE = '__custom__'
+
+const CATEGORY_OPTIONS = ['小說', '散文', '心理', '設計', '商業', '歷史', '其他']
+
 const initialState = {
   query: '',
   results: [],
@@ -10,6 +14,9 @@ const initialState = {
   selected: null,
   manualTitle: '',
   manualAuthor: '',
+  manualStatus: 'to_read',
+  manualCategory: '',
+  manualCustomCategory: '',
   coverFile: null,
   status: 'idle', // idle | submitting
   formError: '',
@@ -59,6 +66,11 @@ export default function AddBookModal({ onClose, onCreated }) {
       return
     }
 
+    const category =
+      state.manualCategory === CUSTOM_CATEGORY_VALUE
+        ? state.manualCustomCategory.trim()
+        : state.manualCategory
+
     update({ status: 'submitting', formError: '' })
     try {
       const book = await createBook({
@@ -67,11 +79,21 @@ export default function AddBookModal({ onClose, onCreated }) {
         coverFile: state.coverFile,
         coverUrl: state.selected?.thumbnail,
         googleBooksId: state.selected?.id,
+        status: state.manualStatus,
+        category: category || null,
       })
       onCreated(book)
     } catch (err) {
       update({ status: 'idle', formError: err.message })
     }
+  }
+
+  function handleCategoryChange(e) {
+    const value = e.target.value
+    update({
+      manualCategory: value,
+      manualCustomCategory: value === CUSTOM_CATEGORY_VALUE ? state.manualCustomCategory : '',
+    })
   }
 
   return (
@@ -142,6 +164,40 @@ export default function AddBookModal({ onClose, onCreated }) {
               onChange={(e) => update({ manualAuthor: e.target.value })}
               style={{ fontSize: '16px' }}
             />
+          </label>
+          <label>
+            狀態
+            <select
+              value={state.manualStatus}
+              onChange={(e) => update({ manualStatus: e.target.value })}
+              style={{ fontSize: '16px' }}
+              required
+            >
+              <option value="to_read">To Read</option>
+              <option value="reading">Reading</option>
+              <option value="finished">Finished</option>
+            </select>
+          </label>
+          <label>
+            類別（選填）
+            <select value={state.manualCategory} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
+              <option value="">不指定</option>
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+              <option value={CUSTOM_CATEGORY_VALUE}>自訂...</option>
+            </select>
+            {state.manualCategory === CUSTOM_CATEGORY_VALUE && (
+              <input
+                type="text"
+                placeholder="輸入自訂類別"
+                value={state.manualCustomCategory}
+                onChange={(e) => update({ manualCustomCategory: e.target.value })}
+                style={{ fontSize: '16px' }}
+              />
+            )}
           </label>
           <label>
             手動上傳封面（選填，會覆蓋搜尋到的封面）

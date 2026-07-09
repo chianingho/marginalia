@@ -27,9 +27,9 @@ export async function fetchBookById(bookId) {
  * coverUrl 是從 Google Books 取得的封面網址（可省略）。
  * 若兩者都有，優先使用手動上傳的檔案。
  */
-export async function createBook({ title, author, coverFile, coverUrl, googleBooksId }) {
+export async function createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category }) {
   if (!hasSupabaseConfig) {
-    return localStore.createBook({ title, author, coverFile, coverUrl, googleBooksId })
+    return localStore.createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category })
   }
 
   let finalCoverUrl = coverUrl || null
@@ -45,6 +45,8 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
       author: author || null,
       cover_url: finalCoverUrl,
       google_books_id: googleBooksId || null,
+      status: status || 'to_read',
+      category: category || null,
     })
     .select()
     .single()

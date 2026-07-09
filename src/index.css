@@ -84,7 +84,8 @@ button.icon-btn:hover {
 }
 
 input,
-textarea {
+textarea,
+select {
   font: inherit;
   padding: 9px 12px;
   border: 1px solid var(--color-border);
@@ -94,7 +95,8 @@ textarea {
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(138, 109, 75, 0.12);
@@ -692,6 +694,8 @@ button.bookshelf-search-btn:hover {
   gap: 14px;
   width: max-content;
   min-width: 100%;
+  /* 92px 書封（2:3）+ 上下 padding，固定住高度，讓空排也撐出完整的排版，不會跟有書的排高度不一致 */
+  min-height: 158px;
   padding: 6px var(--shelf-inset) 14px var(--shelf-inset);
 }
 
