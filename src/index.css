@@ -623,8 +623,8 @@ label {
   position: absolute;
   top: -20px;
   left: -90px;
-  width: 560px;
-  height: 480px;
+  width: 620px;
+  height: 920px;
   mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 1;

@@ -19,46 +19,90 @@ function FilterIcon() {
   )
 }
 
-// 螢光筆刷背景：大 S 型，從右上斜切過 Books 標題再往左下掃過第一排書架。
-// 3 條筆畫故意錯開位置（不是同心疊放）、粗細不同、透明度遞減，
-// 讀起來像來回劃了 2-3 筆，而不是一塊實心色塊；加 feTurbulence/feDisplacementMap 做毛邊。
+// 螢光筆刷背景：貫穿全頁的長 S/Z 型 —— 上半段（右上斜切過 Books 標題、彎向左掃過第一排書架）
+// 維持不動，下半段接長：沿左緣往下 → 在第二排書架區域向右彎、斜切穿過 → 經過 Add Book 按鈕右側 → 收出右下角。
+//
+// 質感：6 條獨立 stroke 沿同一條主曲線做法線方向偏移，粗細（30–70px）、長短（有的只覆蓋一段）、
+// opacity（各自 0.25–0.4，刻意不在外層統一設定，靠疊加處自然變濃做出層次）都不同；
+// 每條各用不同 seed 的 feTurbulence + feDisplacementMap 讓邊緣毛糙不規則。
+// mix-blend-mode: multiply 設在最外層 svg，讓黃色只染白底、黑字保持銳利。
 function BooksBrushS() {
+  const filters = [
+    { id: 'brush-rough-1', freq: '0.025 0.045', seed: 11, scale: 18 },
+    { id: 'brush-rough-2', freq: '0.03 0.02', seed: 23, scale: 22 },
+    { id: 'brush-rough-3', freq: '0.02 0.05', seed: 37, scale: 20 },
+    { id: 'brush-rough-4', freq: '0.035 0.025', seed: 47, scale: 16 },
+    { id: 'brush-rough-5', freq: '0.045 0.03', seed: 59, scale: 24 },
+    { id: 'brush-rough-6', freq: '0.028 0.048', seed: 61, scale: 19 },
+  ]
+
+  const strokes = [
+    // 全長（上半段起點到右下角出口），偏移 (0,0)
+    {
+      filter: 'brush-rough-1',
+      width: 62,
+      opacity: 0.35,
+      d: 'M 510,-30 C 445,206 111,81 40,320 C 5,420 60,460 90,520 C 160,600 280,560 340,660 C 400,730 430,760 520,860',
+    },
+    // 全長，偏移 (-18,+8)
+    {
+      filter: 'brush-rough-2',
+      width: 48,
+      opacity: 0.3,
+      d: 'M 492,-22 C 427,214 93,89 22,328 C -13,428 42,468 72,528 C 142,608 262,568 322,668 C 382,738 412,768 502,868',
+    },
+    // 只覆蓋上半段（起點到第二排書架起點），偏移 (+14,-16)
+    {
+      filter: 'brush-rough-3',
+      width: 68,
+      opacity: 0.32,
+      d: 'M 524,-46 C 459,190 125,65 54,304 C 19,404 74,444 104,504',
+    },
+    // 只覆蓋下半段（第二排書架起點到出口），偏移 (-10,+18)
+    {
+      filter: 'brush-rough-4',
+      width: 40,
+      opacity: 0.28,
+      d: 'M 80,538 C 150,618 270,578 330,678 C 390,748 420,778 510,878',
+    },
+    // 短筆觸，只在標題附近起筆，偏移 (+20,+6)
+    {
+      filter: 'brush-rough-5',
+      width: 34,
+      opacity: 0.26,
+      d: 'M 530,-24 C 465,212 131,87 60,326',
+    },
+    // 短筆觸，只在出口附近收筆，偏移 (-14,-10)
+    {
+      filter: 'brush-rough-6',
+      width: 36,
+      opacity: 0.27,
+      d: 'M 326,650 C 386,720 416,750 506,850',
+    },
+  ]
+
   return (
-    <svg className="bookshelf-brush-s" viewBox="0 0 560 480" aria-hidden="true">
+    <svg className="bookshelf-brush-s" viewBox="0 0 620 920" aria-hidden="true">
       <defs>
-        <filter id="brush-rough-s" x="-25%" y="-25%" width="150%" height="150%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.014 0.05" numOctaves="2" seed="11" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="24" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
+        {filters.map((f) => (
+          <filter key={f.id} id={f.id} x="-30%" y="-30%" width="160%" height="160%">
+            <feTurbulence type="fractalNoise" baseFrequency={f.freq} numOctaves="3" seed={f.seed} result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale={f.scale} xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        ))}
       </defs>
-      <g filter="url(#brush-rough-s)">
+      {strokes.map((s, i) => (
         <path
-          d="M 526,-42 C 461,194 127,69 56,308"
+          key={i}
+          d={s.d}
           stroke="#FAFF00"
-          strokeWidth="42"
+          strokeWidth={s.width}
           strokeLinecap="round"
           fill="none"
-          opacity="0.3"
-          transform="rotate(1.5 280 140)"
+          opacity={s.opacity}
+          filter={`url(#${s.filter})`}
         />
-        <path
-          d="M 492,-16 C 427,220 93,95 22,334"
-          stroke="#FAFF00"
-          strokeWidth="54"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.38"
-          transform="rotate(-2 280 140)"
-        />
-        <path
-          d="M 510,-30 C 445,206 111,81 40,320"
-          stroke="#FAFF00"
-          strokeWidth="78"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.6"
-        />
-      </g>
+      ))}
     </svg>
   )
 }
