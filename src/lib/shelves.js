@@ -48,7 +48,11 @@ function resolveYear(book) {
   return Number.isFinite(year) ? String(year) : 'Unknown'
 }
 
-// 依目前分組模式把書分成一排一排，每排附上該排的網址 slug，供首頁跟 See all 共用
+// 依目前分組模式把書分成一排一排，每排附上該排的網址 slug，供首頁跟 See all 共用。
+// 注意：slug 一律回傳「原始未編碼」的值（例如中文類別直接是「心理」，不是 encodeURIComponent 後的字串）。
+// React Router 的 useParams() 會自動把網址的百分比編碼解碼回原始字串，
+// 所以拿來跟這裡的 slug 比對時兩邊都要是「未編碼」狀態才會對上；
+// 真正組網址（<Link to=...>）時才需要另外 encodeURIComponent。
 export function buildShelfRows(books, groupBy) {
   if (groupBy === 'year') {
     const map = new Map()
@@ -63,7 +67,7 @@ export function buildShelfRows(books, groupBy) {
         if (b[0] === 'Unknown') return -1
         return b[0].localeCompare(a[0]) // 新到舊
       })
-      .map(([year, list]) => ({ key: year, slug: encodeURIComponent(year), label: year, books: list }))
+      .map(([year, list]) => ({ key: year, slug: year, label: year, books: list }))
   }
 
   if (groupBy === 'category') {
@@ -81,7 +85,7 @@ export function buildShelfRows(books, groupBy) {
       })
       .map(([category, list]) => ({
         key: category,
-        slug: category === UNCATEGORIZED_LABEL ? UNCATEGORIZED_SLUG : encodeURIComponent(category),
+        slug: category === UNCATEGORIZED_LABEL ? UNCATEGORIZED_SLUG : category,
         label: category,
         books: list,
       }))

@@ -14,7 +14,7 @@ function ShelfGridRow({ books }) {
     <div className="shelf-grid-row">
       <div className="shelf-grid-track">
         {books.map((book) => (
-          <Link to={`/books/${book.id}`} className="shelf-grid-book" key={book.id}>
+          <Link to={`/book/${book.id}`} className="shelf-grid-book" key={book.id}>
             <span className="shelf-grid-book-cover">
               {book.cover_url ? (
                 <img src={book.cover_url} alt={book.title} loading="lazy" />
@@ -59,7 +59,7 @@ export default function ShelfDetail() {
     }
   }
 
-  const title = row?.label ?? ''
+  const title = row?.label ?? '找不到這一排'
   const rowsOf4 = row ? chunk(row.books, 4) : []
 
   return (

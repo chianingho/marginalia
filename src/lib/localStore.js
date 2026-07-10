@@ -165,32 +165,40 @@ export async function deleteBook(bookId) {
 }
 
 // ---- notes ----
+// 單書筆記流：id / book_id / content / created_at / updated_at。
+// 8 月「全部筆記時間牆」會直接重用這幾支函式（跨書撈全部筆記、按 created_at 排序即可）。
 
-export async function fetchNotesByBook(bookId) {
+export async function getNotesByBook(bookId) {
   return readAll(NOTES_KEY)
     .filter((n) => n.book_id === bookId)
-    .sort((a, b) => b.read_date.localeCompare(a.read_date))
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
 }
 
-export async function createNote({ bookId, readDate, content, screenshotFile }) {
-  let screenshotUrl = null
-  if (screenshotFile) {
-    screenshotUrl = await fileToDataUrl(screenshotFile)
-  }
-
+export async function addNote({ bookId, content }) {
+  const now = new Date().toISOString()
   const note = {
     id: crypto.randomUUID(),
     book_id: bookId,
-    read_date: readDate,
-    content: content || null,
-    screenshot_url: screenshotUrl,
-    created_at: new Date().toISOString(),
+    content,
+    created_at: now,
+    updated_at: now,
   }
 
   const notes = readAll(NOTES_KEY)
   notes.unshift(note)
   writeAll(NOTES_KEY, notes)
   return note
+}
+
+export async function updateNote(noteId, { content }) {
+  const notes = readAll(NOTES_KEY)
+  const index = notes.findIndex((n) => n.id === noteId)
+  if (index === -1) throw new Error('找不到這則筆記')
+
+  const updated = { ...notes[index], content, updated_at: new Date().toISOString() }
+  notes[index] = updated
+  writeAll(NOTES_KEY, notes)
+  return updated
 }
 
 export async function deleteNote(noteId) {
