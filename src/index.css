@@ -1020,12 +1020,13 @@ button.add-book-btn:active {
   display: inline-block;
 }
 
-/* 一痕螢光筆：疊在標題文字之上（DOM 順序在後 = 疊在上面），multiply 讓黑字透出 */
+/* 一痕螢光筆：疊在標題文字之上（DOM 順序在後 = 疊在上面），multiply 讓黑字透出。
+   top:45% + translateY(-50%) = 置中略偏上；rotate(-1.5deg) = 近水平微傾斜（落在 -2°~+2° 之間）。 */
 .shelf-detail-title-brush {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 45%;
+  transform: translate(-50%, -50%) rotate(-1.5deg);
   pointer-events: none;
   z-index: 1;
 }

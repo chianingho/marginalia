@@ -10,13 +10,14 @@ function chunk(list, size) {
 }
 
 // 一痕螢光筆劃過標題文字：寬度依實際量到的文字寬度計算（不寫死），
-// 左右各外擴 8–12px；只有一條，不做纖維束、不做乾段。wobble 濾鏡參數沿用首頁同款（scale ≤3）。
-function TitleStroke({ textWidth }) {
+// 左右各外擴 8–12px；只有一條，不做纖維束、不做乾段。
+// 顏色 #F2FF00、wobble 濾鏡參數（scale ≤3）都直接讀自首頁 Bookshelf.jsx 的 TitleBrush，取同一個值。
+function TitleStroke({ textWidth, titleFontSize = 22 }) {
   if (!textWidth) return null
   const overhang = 10
   const w = Math.round(textWidth + overhang * 2)
-  const h = 20
-  const points = `2,5 ${w - 3},2 ${w - 4},${h - 3} 3,${h}`
+  const h = Math.round(titleFontSize * 0.7) // 標題字高的 0.6–0.8 倍
+  const points = `1,3 ${w - 1},1 ${w - 2},${h - 2} 2,${h - 1}`
 
   return (
     <svg
