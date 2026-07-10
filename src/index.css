@@ -675,31 +675,40 @@ button.book-page-note:hover {
   margin-top: 4px;
 }
 
-.bookshelf-title-wrap {
+.bookshelf-marginalia-wrap {
   position: relative;
   display: inline-block;
 }
 
-.bookshelf-title {
+/* 跟 Books 共用同一個字體變數（--font-serif），字重用該字體目前有載入的最輕字重（500） */
+.bookshelf-marginalia {
   position: relative;
-  margin: 4px 0 0;
+  z-index: 0;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  color: #000;
+}
+
+/* 一痕螢光筆：疊在 Marginalia 之上（DOM 順序在後 = 疊在上面），multiply 讓黑字透出 */
+.bookshelf-marginalia-brush {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-2deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bookshelf-title {
+  margin: 12px 0 0;
   font-family: var(--font-serif);
   font-size: 50px;
   font-weight: 700;
   color: #000;
   letter-spacing: 0.01em;
-}
-
-/* 螢光黃纖維筆刷束：置中掛在 Books 下方，往下延伸碰到維度小字字頂（見 Bookshelf.jsx 的
-   TitleBrush，座標沿用 True Marker 回合校準好的比例）。non-interactive，不影響點擊。 */
-.bookshelf-title-brush {
-  position: absolute;
-  left: 50%;
-  top: -19px;
-  width: 250px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 1;
 }
 
 /* 搜尋（放大鏡）+ 篩選 icon 並排：共用一個 wrapper 定位，z-index 3 保證
