@@ -8,8 +8,16 @@ export async function getNotesByBook(bookId) {
     .from('notes')
     .select('*')
     .eq('book_id', bookId)
-    .order('note_date', { ascending: false })
     .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data
+}
+
+export async function getNoteById(noteId) {
+  if (!hasSupabaseConfig) return localStore.getNoteById(noteId)
+
+  const { data, error } = await supabase.from('notes').select('*').eq('id', noteId).maybeSingle()
 
   if (error) throw error
   return data
@@ -25,7 +33,7 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
       book_id: bookId,
       content: content || null,
       image_key: imageKey || null,
-      note_date: noteDate,
+      note_date: noteDate || new Date().toISOString().slice(0, 10),
       page: page ?? null,
     })
     .select()
@@ -38,18 +46,16 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
 export async function updateNote(noteId, { content, imageKey, noteDate, page }) {
   if (!hasSupabaseConfig) return localStore.updateNote(noteId, { content, imageKey, noteDate, page })
 
-  const { data, error } = await supabase
-    .from('notes')
-    .update({
-      content: content || null,
-      image_key: imageKey || null,
-      note_date: noteDate,
-      page: page ?? null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', noteId)
-    .select()
-    .single()
+  const patch = {
+    content: content || null,
+    image_key: imageKey || null,
+    page: page ?? null,
+    updated_at: new Date().toISOString(),
+  }
+  // noteDate 沒帶就不動這個欄位，保留既有值（跟 localStore 的行為一致）
+  if (noteDate !== undefined) patch.note_date = noteDate
+
+  const { data, error } = await supabase.from('notes').update(patch).eq('id', noteId).select().single()
 
   if (error) throw error
   return data

@@ -1,12 +1,13 @@
 import { Routes, Route, Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetail from './pages/BookDetail.jsx'
+import NoteDetail from './pages/NoteDetail.jsx'
 import ShelfDetail from './pages/ShelfDetail.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
 function isFlushRoute(pathname) {
-  return pathname === '/' || pathname.startsWith('/shelf/') || pathname.startsWith('/book/')
+  return pathname === '/' || pathname.startsWith('/shelf/') || pathname.startsWith('/book/') || pathname.startsWith('/note/')
 }
 
 // 舊版路由 /books/:bookId 殘留連結導去新路由 /book/:id
@@ -41,6 +42,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Bookshelf />} />
           <Route path="/book/:id" element={<BookDetail />} />
+          <Route path="/note/:id" element={<NoteDetail />} />
           <Route path="/books/:bookId" element={<LegacyBookRedirect />} />
           <Route path="/shelf/:groupBy/:slug" element={<ShelfDetail />} />
           {/* 舊版單段狀態制路由（/shelf/:status）殘留連結一律導回首頁 */}

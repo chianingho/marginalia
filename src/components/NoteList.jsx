@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { compressImage, getNoteImage, saveNoteImage } from '../lib/noteImages.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
-function formatNoteMeta(note) {
-  const parts = []
-  if (note.note_date) parts.push(note.note_date)
-  if (note.page != null && note.page !== '') parts.push(`p.${note.page}`)
-  return parts.join(' · ')
+// 全 app 時間顯示統一以 created_at 為單一事實來源（不再用 note_date）
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+
+function formatTimelineDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return `${MONTHS[d.getMonth()]} ${d.getDate()}`
+}
+
+function formatTimelineTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const hours24 = d.getHours()
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const ampm = hours24 >= 12 ? 'PM' : 'AM'
+  const hours12 = hours24 % 12 || 12
+  return `${hours12}:${minutes} ${ampm}`
 }
 
 // 從 IndexedDB 撈截圖 blob 轉成縮圖，離開時自己 revoke object URL。
@@ -35,7 +48,7 @@ function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
     <img
       src={url}
       alt=""
-      className="book-page-note-thumb"
+      className="note-timeline-thumb"
       onClick={(e) => {
         e.stopPropagation()
         onOpen(imageKey, url)
@@ -44,16 +57,22 @@ function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
   )
 }
 
-// 純渲染元件：吃 notes 陣列畫時間流。showBookTitle 給未來「全部筆記時間牆」用
+// 純渲染元件：吃 notes 陣列畫時間軸。showBookTitle 給未來「全部筆記時間牆」用
 // （單書頁不需要，時間牆會把 note.bookTitle 一起塞進 notes 陣列再傳進來）。
-export default function NoteList({ notes, showBookTitle = false, onNoteClick }) {
+// 顯示排序固定為 created_at 由舊到新（由上往下），跟資料層 getNotesByBook 回傳的
+// 新到舊順序無關——這裡只重排「顯示用」的副本，不動 notes prop、不動資料層。
+// 卡片點擊 = 導頁進 /note/:id 詳情頁（縮圖點擊另外 stopPropagation，走既有 lightbox）。
+export default function NoteList({ notes, showBookTitle = false }) {
+  const navigate = useNavigate()
   const [lightbox, setLightbox] = useState(null) // { imageKey, url } | null
   const [showAnnotator, setShowAnnotator] = useState(false)
   const [refreshTokens, setRefreshTokens] = useState({})
 
   if (notes.length === 0) {
-    return <p className="book-page-notes-empty">No notes yet</p>
+    return <p className="note-timeline-empty">No notes yet</p>
   }
+
+  const sortedNotes = [...notes].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''))
 
   function openLightbox(imageKey, url) {
     setLightbox({ imageKey, url })
@@ -73,21 +92,32 @@ export default function NoteList({ notes, showBookTitle = false, onNoteClick }) 
 
   return (
     <>
-      <div className="book-page-note-list">
-        {notes.map((note) => (
-          <button
-            key={note.id}
-            type="button"
-            className="book-page-note"
-            onClick={() => onNoteClick?.(note)}
-          >
-            {showBookTitle && note.bookTitle && <p className="book-page-note-book">{note.bookTitle}</p>}
-            {note.image_key && (
-              <NoteThumbnail imageKey={note.image_key} refreshToken={refreshTokens[note.image_key]} onOpen={openLightbox} />
-            )}
-            {note.content && <p className="book-page-note-content">{note.content}</p>}
-            <p className="book-page-note-date">{formatNoteMeta(note)}</p>
-          </button>
+      <div className="note-timeline">
+        {sortedNotes.map((note, index) => (
+          <div className="note-timeline-row" key={note.id}>
+            <div className="note-timeline-col">
+              <span className="note-timeline-date">{formatTimelineDate(note.created_at)}</span>
+              <span className="note-timeline-time">{formatTimelineTime(note.created_at)}</span>
+              <span className="note-timeline-dot" />
+              {index < sortedNotes.length - 1 && <span className="note-timeline-line" />}
+            </div>
+
+            <div className="note-timeline-card-wrap">
+              <button
+                type="button"
+                className="note-timeline-card"
+                onClick={() => navigate(`/note/${note.id}`)}
+              >
+                {showBookTitle && note.bookTitle && <p className="note-timeline-book">{note.bookTitle}</p>}
+                {note.image_key && (
+                  <NoteThumbnail imageKey={note.image_key} refreshToken={refreshTokens[note.image_key]} onOpen={openLightbox} />
+                )}
+                {note.page != null && note.page !== '' && <p className="note-timeline-page">page.{note.page}</p>}
+                {note.content && <p className="note-timeline-content">{note.content}</p>}
+              </button>
+              {index < sortedNotes.length - 1 && <div className="note-timeline-divider" />}
+            </div>
+          </div>
         ))}
       </div>
 

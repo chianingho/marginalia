@@ -170,17 +170,20 @@ export async function deleteBook(bookId) {
 
 // ---- notes ----
 // 單書筆記流：id / book_id / content / image_key / note_date / page / created_at / updated_at。
-// 圖片本體不在這裡：image_key 只是指到 IndexedDB（見 noteImages.js）的參照，
-// 8 月「全部筆記時間牆」會直接重用這幾支函式（跨書撈全部筆記、按 note_date 排序即可）。
+// 圖片本體不在這裡：image_key 只是指到 IndexedDB（見 noteImages.js）的參照。
+// note_date 不再是使用者輸入欄位：新增時自動 = created_at 的日期（8 月接 Supabase 時 schema
+// 對齊照舊保留這個欄位，但寫入邏輯改成自動衍生）。全 app 排序／時間顯示一律以 created_at 為準；
+// 舊筆記既有的 note_date 值不會被這次改動動到，只是不再拿來排序或顯示。
 
 export async function getNotesByBook(bookId) {
   return readAll(NOTES_KEY)
     .filter((n) => n.book_id === bookId)
-    .sort((a, b) => {
-      const byDate = (b.note_date || '').localeCompare(a.note_date || '')
-      if (byDate !== 0) return byDate
-      return (b.created_at || '').localeCompare(a.created_at || '')
-    })
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+}
+
+// /note/:id 詳情頁用：單筆撈取，找不到回傳 null（不 throw，讓呼叫端決定要不要導回首頁）。
+export async function getNoteById(noteId) {
+  return readAll(NOTES_KEY).find((n) => n.id === noteId) || null
 }
 
 export async function addNote({ id, bookId, content, imageKey, noteDate, page }) {
@@ -190,7 +193,7 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
     book_id: bookId,
     content: content || null,
     image_key: imageKey || null,
-    note_date: noteDate,
+    note_date: noteDate || now.slice(0, 10),
     page: page ?? null,
     created_at: now,
     updated_at: now,
@@ -211,7 +214,7 @@ export async function updateNote(noteId, { content, imageKey, noteDate, page }) 
     ...notes[index],
     content: content || null,
     image_key: imageKey || null,
-    note_date: noteDate,
+    note_date: noteDate !== undefined ? noteDate : notes[index].note_date,
     page: page ?? null,
     updated_at: new Date().toISOString(),
   }

@@ -3,17 +3,13 @@ import { addNote, updateNote, deleteNote } from '../api/notes.js'
 import { compressImage, deleteNoteImage, getNoteImage, noteImageKey, saveNoteImage } from '../lib/noteImages.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10)
-}
-
 // New Note 跟 Edit Note 共用同一顆 modal（note 有值 = 編輯模式，帶 Delete；沒有 = 新增模式）。
 // modal 外殼（尺寸、背景滾動鎖定、內部自捲）直接重用 Add Book modal 的 .add-modal* CSS，不重寫。
-// 版面刻意壓緊（截圖列壓扁、日期+頁數併一行、textarea 3 行）：四欄位要在一屏內放完，
-// 不然內容高度逼近 85dvh 上限，選圖前後高度差太大，modal 重新置中時就會看起來在「晃」。
+// 三欄位（截圖／頁數／note）要在一屏內放完，不然內容高度逼近 85dvh 上限，
+// 選圖前後高度差太大，modal 重新置中時就會看起來在「晃」。
+// 日期欄位已移除：note_date 由資料層依 created_at 自動帶入，不再讓使用者手動輸入。
 export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted }) {
   const [content, setContent] = useState(note?.content || '')
-  const [noteDate, setNoteDate] = useState(note?.note_date || todayISO())
   const [page, setPage] = useState(note?.page != null ? String(note.page) : '')
   const [imageFile, setImageFile] = useState(null)
   const [newFilePreviewUrl, setNewFilePreviewUrl] = useState(null)
@@ -103,10 +99,6 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
       setFormError('請至少上傳截圖或寫點筆記')
       return
     }
-    if (!noteDate) {
-      setFormError('請選擇日期')
-      return
-    }
 
     setSubmitStatus('submitting')
     try {
@@ -127,7 +119,6 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
       const payload = {
         content: content.trim() || null,
         imageKey,
-        noteDate,
         page: page.trim() ? Number(page) : null,
       }
 
@@ -204,30 +195,17 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
             />
           </div>
 
-          <div className="add-modal-row-2col">
-            <label className="add-modal-label">
-              Date
-              <input
-                type="date"
-                value={noteDate}
-                onChange={(e) => setNoteDate(e.target.value)}
-                style={{ fontSize: '16px' }}
-                required
-              />
-            </label>
-
-            <label className="add-modal-label">
-              Page (optional)
-              <input
-                type="number"
-                inputMode="numeric"
-                min="0"
-                value={page}
-                onChange={(e) => setPage(e.target.value)}
-                style={{ fontSize: '16px' }}
-              />
-            </label>
-          </div>
+          <label className="add-modal-label">
+            Page (optional)
+            <input
+              type="number"
+              inputMode="numeric"
+              min="0"
+              value={page}
+              onChange={(e) => setPage(e.target.value)}
+              style={{ fontSize: '16px' }}
+            />
+          </label>
 
           <label className="add-modal-label">
             Note (optional)
