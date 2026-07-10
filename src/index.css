@@ -713,7 +713,7 @@ button.book-page-note:hover {
 }
 
 .bookshelf-title {
-  margin: 6px 0 0;
+  margin: 3px 0 0;
   font-family: var(--font-serif);
   font-size: 50px;
   font-weight: 700;
@@ -1236,41 +1236,72 @@ button.add-book-btn:active {
   margin-bottom: 6px;
 }
 
-.note-image-preview {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
+/* 選圖後改成壓扁的單行列（縮圖 ≤72px），不要撐開一大塊，避免選圖前後 modal 高度差太多 */
+.note-image-selected-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.note-image-preview img {
+.note-image-thumb-sm {
   display: block;
-  max-width: 100%;
-  max-height: 220px;
-  border-radius: 10px;
+  width: 72px;
+  height: 72px;
+  max-height: 96px;
+  object-fit: cover;
+  border-radius: 8px;
   border: 1px solid #1a1a1a;
+  flex-shrink: 0;
 }
 
-.note-image-remove {
-  position: absolute;
-  top: 6px;
-  right: 6px;
+.note-image-annotate-link {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #1a1a1a;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-align: left;
+}
+
+button.note-image-annotate-link:hover {
+  background: transparent;
+  color: #555;
+  box-shadow: none;
+}
+
+.note-image-remove-sm {
+  flex-shrink: 0;
   width: 26px;
   height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  border: none;
-  font-size: 13px;
+  background: #fff;
+  border: 1px solid #1a1a1a;
+  color: #1a1a1a;
+  font-size: 12px;
   padding: 0;
 }
 
-button.note-image-remove:hover {
-  background: #000;
+button.note-image-remove-sm:hover {
+  background: #1a1a1a;
   color: #fff;
   box-shadow: none;
+}
+
+/* Date + Page 併成一行兩欄，各半寬，讓四欄位能在一屏內放完 */
+.add-modal-row-2col {
+  display: flex;
+  gap: 12px;
+}
+
+.add-modal-row-2col .add-modal-label {
+  flex: 1;
+  min-width: 0;
 }
 
 .note-lightbox {
@@ -1279,15 +1310,149 @@ button.note-image-remove:hover {
   z-index: 300;
   background: rgba(0, 0, 0, 0.92);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   padding: 20px;
 }
 
 .note-lightbox img {
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(100% - 60px);
   border-radius: 4px;
+}
+
+.note-lightbox-annotate {
+  flex-shrink: 0;
+  background: #fff;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+button.note-lightbox-annotate:hover {
+  background: #fff;
+  color: #1a1a1a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- 截圖標注（全螢幕，MVP） ---- */
+
+.annotator-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.annotator-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: calc(env(safe-area-inset-top) + 10px) 12px 8px;
+}
+
+.annotator-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+button.annotator-close:hover {
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  box-shadow: none;
+}
+
+.annotator-canvas-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.annotator-canvas {
+  max-width: 100%;
+  max-height: 100%;
+  touch-action: none;
+  background: #111;
+  border-radius: 4px;
+}
+
+.annotator-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px 12px calc(env(safe-area-inset-bottom) + 12px);
+  background: #111;
+}
+
+.annotator-tool {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+button.annotator-tool:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: none;
+}
+
+button.annotator-tool:disabled {
+  opacity: 0.35;
+}
+
+button.annotator-tool.is-active {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+button.annotator-tool.is-active:hover {
+  background: #fff;
+  color: #111;
+}
+
+.annotator-done {
+  flex: 1;
+  background: #f2ff00;
+  border: none;
+  border-radius: 10px;
+  color: #111;
+  padding: 10px 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+button.annotator-done:hover {
+  background: #f2ff00;
+  color: #111;
+  box-shadow: 0 0 0 2px rgba(242, 255, 0, 0.4);
 }
 
 input.add-modal-file-input {

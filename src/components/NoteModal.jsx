@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { addNote, updateNote, deleteNote } from '../api/notes.js'
 import { compressImage, deleteNoteImage, getNoteImage, noteImageKey, saveNoteImage } from '../lib/noteImages.js'
+import ImageAnnotator from './ImageAnnotator.jsx'
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10)
@@ -8,6 +9,8 @@ function todayISO() {
 
 // New Note 跟 Edit Note 共用同一顆 modal（note 有值 = 編輯模式，帶 Delete；沒有 = 新增模式）。
 // modal 外殼（尺寸、背景滾動鎖定、內部自捲）直接重用 Add Book modal 的 .add-modal* CSS，不重寫。
+// 版面刻意壓緊（截圖列壓扁、日期+頁數併一行、textarea 3 行）：四欄位要在一屏內放完，
+// 不然內容高度逼近 85dvh 上限，選圖前後高度差太大，modal 重新置中時就會看起來在「晃」。
 export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted }) {
   const [content, setContent] = useState(note?.content || '')
   const [noteDate, setNoteDate] = useState(note?.note_date || todayISO())
@@ -18,6 +21,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
   const [imageRemoved, setImageRemoved] = useState(false)
   const [submitStatus, setSubmitStatus] = useState('idle') // idle | submitting
   const [formError, setFormError] = useState('')
+  const [showAnnotator, setShowAnnotator] = useState(false)
   const fileInputRef = useRef(null)
 
   // 鎖住背景頁面滾動：iOS Safari 上單靠 body overflow:hidden 不夠，改用 position:fixed
@@ -83,6 +87,14 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
     setImageRemoved(true)
     // 清掉原生 input 的值，這樣使用者重選同一張圖也會正常觸發 change
     if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  // 標注完成：拿到 flatten 過的 PNG blob，當成「新選的檔案」取代原圖，
+  // 存檔時會走跟一般選圖一樣的壓縮流程（compressImage），不在這裡重複壓縮。
+  function handleAnnotateDone(blob) {
+    setImageFile(blob)
+    setImageRemoved(false)
+    setShowAnnotator(false)
   }
 
   async function handleSubmit(e) {
@@ -156,11 +168,18 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
               Screenshot (optional)
             </label>
             {previewUrl ? (
-              <div className="note-image-preview">
-                <img src={previewUrl} alt="" />
+              <div className="note-image-selected-row">
+                <img src={previewUrl} alt="" className="note-image-thumb-sm" />
                 <button
                   type="button"
-                  className="note-image-remove"
+                  className="note-image-annotate-link"
+                  onClick={() => setShowAnnotator(true)}
+                >
+                  Annotate
+                </button>
+                <button
+                  type="button"
+                  className="note-image-remove-sm"
                   onClick={handleRemoveImage}
                   aria-label="Remove image"
                 >
@@ -185,33 +204,35 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
             />
           </div>
 
-          <label className="add-modal-label">
-            Date
-            <input
-              type="date"
-              value={noteDate}
-              onChange={(e) => setNoteDate(e.target.value)}
-              style={{ fontSize: '16px' }}
-              required
-            />
-          </label>
+          <div className="add-modal-row-2col">
+            <label className="add-modal-label">
+              Date
+              <input
+                type="date"
+                value={noteDate}
+                onChange={(e) => setNoteDate(e.target.value)}
+                style={{ fontSize: '16px' }}
+                required
+              />
+            </label>
 
-          <label className="add-modal-label">
-            Page (optional)
-            <input
-              type="number"
-              inputMode="numeric"
-              min="0"
-              value={page}
-              onChange={(e) => setPage(e.target.value)}
-              style={{ fontSize: '16px' }}
-            />
-          </label>
+            <label className="add-modal-label">
+              Page (optional)
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={page}
+                onChange={(e) => setPage(e.target.value)}
+                style={{ fontSize: '16px' }}
+              />
+            </label>
+          </div>
 
           <label className="add-modal-label">
             Note (optional)
             <textarea
-              rows={5}
+              rows={3}
               placeholder="Write your note…"
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -241,6 +262,14 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
           )}
         </form>
       </div>
+
+      {showAnnotator && previewUrl && (
+        <ImageAnnotator
+          imageUrl={previewUrl}
+          onDone={handleAnnotateDone}
+          onCancel={() => setShowAnnotator(false)}
+        />
+      )}
     </div>
   )
 }
