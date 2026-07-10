@@ -616,6 +616,16 @@ button.book-page-note:hover {
   letter-spacing: 0.04em;
 }
 
+.book-page-note-thumb {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: zoom-in;
+}
+
 .book-page-note-content {
   margin: 0;
   font-size: 0.92rem;
@@ -1224,6 +1234,60 @@ button.add-book-btn:active {
   font-size: 0.88rem;
   color: #555;
   margin-bottom: 6px;
+}
+
+.note-image-preview {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.note-image-preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 10px;
+  border: 1px solid #1a1a1a;
+}
+
+.note-image-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  padding: 0;
+}
+
+button.note-image-remove:hover {
+  background: #000;
+  color: #fff;
+  box-shadow: none;
+}
+
+.note-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.note-lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 4px;
 }
 
 input.add-modal-file-input {

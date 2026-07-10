@@ -56,7 +56,11 @@ export default function BookDetail() {
     setNotes((prev) => {
       const exists = prev.some((n) => n.id === saved.id)
       const next = exists ? prev.map((n) => (n.id === saved.id ? saved : n)) : [saved, ...prev]
-      return [...next].sort((a, b) => b.created_at.localeCompare(a.created_at))
+      return [...next].sort((a, b) => {
+        const byDate = (b.note_date || '').localeCompare(a.note_date || '')
+        if (byDate !== 0) return byDate
+        return (b.created_at || '').localeCompare(a.created_at || '')
+      })
     })
     closeNoteModal()
   }

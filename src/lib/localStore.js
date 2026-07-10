@@ -5,6 +5,7 @@
 // 圖片放多了可能會超出容量。正式使用請改回 Supabase（見 README）。
 
 import { deriveStatusDates } from './bookStatus.js'
+import { deleteNoteImage } from './noteImages.js'
 
 const BOOKS_KEY = 'reading-notes:books'
 const NOTES_KEY = 'reading-notes:notes'
@@ -160,26 +161,37 @@ export async function updateBook(bookId, { title, author, coverFile, coverUrl, g
 }
 
 export async function deleteBook(bookId) {
+  const notesToDelete = readAll(NOTES_KEY).filter((n) => n.book_id === bookId)
+  await Promise.all(notesToDelete.filter((n) => n.image_key).map((n) => deleteNoteImage(n.image_key)))
+
   writeAll(BOOKS_KEY, readAll(BOOKS_KEY).filter((b) => b.id !== bookId))
   writeAll(NOTES_KEY, readAll(NOTES_KEY).filter((n) => n.book_id !== bookId))
 }
 
 // ---- notes ----
-// 單書筆記流：id / book_id / content / created_at / updated_at。
-// 8 月「全部筆記時間牆」會直接重用這幾支函式（跨書撈全部筆記、按 created_at 排序即可）。
+// 單書筆記流：id / book_id / content / image_key / note_date / page / created_at / updated_at。
+// 圖片本體不在這裡：image_key 只是指到 IndexedDB（見 noteImages.js）的參照，
+// 8 月「全部筆記時間牆」會直接重用這幾支函式（跨書撈全部筆記、按 note_date 排序即可）。
 
 export async function getNotesByBook(bookId) {
   return readAll(NOTES_KEY)
     .filter((n) => n.book_id === bookId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .sort((a, b) => {
+      const byDate = (b.note_date || '').localeCompare(a.note_date || '')
+      if (byDate !== 0) return byDate
+      return (b.created_at || '').localeCompare(a.created_at || '')
+    })
 }
 
-export async function addNote({ bookId, content }) {
+export async function addNote({ id, bookId, content, imageKey, noteDate, page }) {
   const now = new Date().toISOString()
   const note = {
-    id: crypto.randomUUID(),
+    id: id || crypto.randomUUID(),
     book_id: bookId,
-    content,
+    content: content || null,
+    image_key: imageKey || null,
+    note_date: noteDate,
+    page: page ?? null,
     created_at: now,
     updated_at: now,
   }
@@ -190,17 +202,29 @@ export async function addNote({ bookId, content }) {
   return note
 }
 
-export async function updateNote(noteId, { content }) {
+export async function updateNote(noteId, { content, imageKey, noteDate, page }) {
   const notes = readAll(NOTES_KEY)
   const index = notes.findIndex((n) => n.id === noteId)
   if (index === -1) throw new Error('找不到這則筆記')
 
-  const updated = { ...notes[index], content, updated_at: new Date().toISOString() }
+  const updated = {
+    ...notes[index],
+    content: content || null,
+    image_key: imageKey || null,
+    note_date: noteDate,
+    page: page ?? null,
+    updated_at: new Date().toISOString(),
+  }
   notes[index] = updated
   writeAll(NOTES_KEY, notes)
   return updated
 }
 
 export async function deleteNote(noteId) {
-  writeAll(NOTES_KEY, readAll(NOTES_KEY).filter((n) => n.id !== noteId))
+  const notes = readAll(NOTES_KEY)
+  const target = notes.find((n) => n.id === noteId)
+  if (target?.image_key) {
+    await deleteNoteImage(target.image_key)
+  }
+  writeAll(NOTES_KEY, notes.filter((n) => n.id !== noteId))
 }
