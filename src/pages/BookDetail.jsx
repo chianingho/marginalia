@@ -71,10 +71,10 @@ export default function BookDetail() {
 
   return (
     <div className="book-page">
+      <Link to="/" className="book-page-back book-page-back--fixed" aria-label="回首頁">
+        ‹
+      </Link>
       <header className="book-page-header">
-        <Link to="/" className="book-page-back" aria-label="回首頁">
-          ‹
-        </Link>
         <div className="book-page-top">
           <div className="book-page-cover">
             {book.cover_url ? (
@@ -85,10 +85,12 @@ export default function BookDetail() {
           </div>
           <div className="book-page-info">
             <h1 className="book-page-title">{book.title}</h1>
-            {book.author && <p className="book-page-author">{book.author}</p>}
-            <button type="button" className="book-page-edit-btn" onClick={() => setShowEditBook(true)}>
-              Edit
-            </button>
+            <p className="book-page-author-row">
+              {book.author && <span className="book-page-author">{book.author}</span>}
+              <button type="button" className="book-page-edit-btn" onClick={() => setShowEditBook(true)}>
+                Edit
+              </button>
+            </p>
           </div>
         </div>
       </header>
