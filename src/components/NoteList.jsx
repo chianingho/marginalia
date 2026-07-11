@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { compressImage, getNoteImage, saveNoteImage } from '../lib/noteImages.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
@@ -20,6 +20,28 @@ function formatTimelineTime(iso) {
   const ampm = hours24 >= 12 ? 'PM' : 'AM'
   const hours12 = hours24 % 12 || 12
   return `${hours12}:${minutes} ${ampm}`
+}
+
+// note 文字最多顯示兩行，只有「真的有第二行」才套第二行淡出遮罩——單行 note 不受影響。
+// 用 Range.getClientRects() 數自然斷行數（不受 -webkit-line-clamp 影響，量到的是文字
+// 實際排版行數，不是裁切後的可視行數），>1 行才加 is-multiline。
+function NoteContent({ text }) {
+  const ref = useRef(null)
+  const [isMultiline, setIsMultiline] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    setIsMultiline(range.getClientRects().length > 1)
+  }, [text])
+
+  return (
+    <p ref={ref} className={`note-timeline-content ${isMultiline ? 'is-multiline' : ''}`}>
+      {text}
+    </p>
+  )
 }
 
 // 從 IndexedDB 撈截圖 blob 轉成縮圖，離開時自己 revoke object URL。
@@ -112,7 +134,7 @@ export default function NoteList({ notes, showBookTitle = false }) {
                   <NoteThumbnail imageKey={note.image_key} refreshToken={refreshTokens[note.image_key]} onOpen={openLightbox} />
                 )}
                 {note.page != null && note.page !== '' && <p className="note-timeline-page">page.{note.page}</p>}
-                {note.content && <p className="note-timeline-content">{note.content}</p>}
+                {note.content && <NoteContent text={note.content} />}
               </button>
             </div>
           </div>

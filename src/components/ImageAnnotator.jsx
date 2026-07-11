@@ -114,13 +114,7 @@ export default function ImageAnnotator({ imageUrl, onDone, onCancel }) {
     redraw()
   }
 
-  // 返回：已經畫了東西才二次確認，避免手滑丟掉標注
-  function handleBack() {
-    if (strokeCount > 0 && !confirm('捨棄這次的標注變更？')) return
-    onCancel()
-  }
-
-  // X：MVP 不加確認，直接捨棄未完成筆畫、離開（跟返回鍵是兩種退出路徑，各自獨立）
+  // X：不加確認，直接捨棄未完成筆畫、離開
   function handleExit() {
     onCancel()
   }
@@ -139,9 +133,6 @@ export default function ImageAnnotator({ imageUrl, onDone, onCancel }) {
       <div className="annotator-header">
         <button type="button" className="annotator-exit" onClick={handleExit} aria-label="Exit">
           ✕
-        </button>
-        <button type="button" className="annotator-back" onClick={handleBack} aria-label="Back">
-          ‹
         </button>
         <span className="annotator-tool-indicator">✎ Highlighter</span>
         <div className="annotator-spacer" />
