@@ -867,40 +867,13 @@ button.note-timeline-card:hover {
   margin-top: 4px;
 }
 
-.bookshelf-marginalia-wrap {
-  position: relative;
+/* 首頁 lockup：單張定稿 PNG（3x 輸出），寬高寫死防 layout shift。
+   水平位置沿用 .bookshelf-header 既有的 text-align:center──img 是 inline-level
+   置換元素，同一套置中規則就會套用，不用另外寫定位邏輯。 */
+.bookshelf-lockup {
   display: inline-block;
-}
-
-/* 跟 Books 共用同一個字體變數（--font-serif），字重用該字體目前有載入的最輕字重（500） */
-.bookshelf-marginalia {
-  position: relative;
-  z-index: 0;
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.4em;
-  color: #000;
-}
-
-/* 一痕螢光筆：疊在 Marginalia 之上（DOM 順序在後 = 疊在上面），multiply 讓黑字透出 */
-.bookshelf-marginalia-brush {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(-2deg);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.bookshelf-title {
-  margin: 3px 0 0;
-  font-family: var(--font-serif);
-  font-size: 50px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: 0.01em;
+  width: 150px;
+  height: 52px;
 }
 
 /* 搜尋（放大鏡）+ 篩選 icon 並排：共用一個 wrapper 定位，z-index 3 保證
