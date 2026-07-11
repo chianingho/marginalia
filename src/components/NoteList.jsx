@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { compressImage, getNoteImage, saveNoteImage } from '../lib/noteImages.js'
-import ImageAnnotator from './ImageAnnotator.jsx'
+import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
+import NoteImageLightbox from './NoteImageLightbox.jsx'
 
 // 全 app 時間顯示統一以 created_at 為單一事實來源（不再用 note_date）
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
@@ -91,15 +91,17 @@ function DayHeader({ label }) {
   )
 }
 
-// 從 IndexedDB 撈截圖 blob 轉成縮圖，離開時自己 revoke object URL。
-// refreshToken 變了就強制重撈一次（標注完成存回同一個 image_key 後用這個觸發縮圖更新）。
-function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
+// 撈顯示用截圖 blob（有標注就是合成快取，沒有就 fallback 原圖）轉成縮圖，
+// 離開時自己 revoke object URL。refreshToken 變了就強制重撈一次
+// （標注完成後用這個觸發縮圖更新，撈的時候一律走 getNoteDisplayBlob，
+// 不用擔心這裡的 note prop 是不是最新——顯示快取 key 是純 noteId 算出來的固定值）。
+function NoteThumbnail({ note, refreshToken, onOpen }) {
   const [url, setUrl] = useState(null)
 
   useEffect(() => {
     let objectUrl
     let cancelled = false
-    getNoteImage(imageKey).then((blob) => {
+    getNoteDisplayBlob(note).then((blob) => {
       if (cancelled || !blob) return
       objectUrl = URL.createObjectURL(blob)
       setUrl(objectUrl)
@@ -109,7 +111,7 @@ function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageKey, refreshToken])
+  }, [note.id, refreshToken])
 
   if (!url) return null
 
@@ -120,7 +122,7 @@ function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
       className="note-timeline-thumb"
       onClick={(e) => {
         e.stopPropagation()
-        onOpen(imageKey, url)
+        onOpen(url)
       }}
     />
   )
@@ -134,8 +136,7 @@ function NoteThumbnail({ imageKey, refreshToken, onOpen }) {
 // 卡片點擊 = 導頁進 /note/:id 詳情頁（縮圖點擊另外 stopPropagation，走既有 lightbox）。
 export default function NoteList({ notes, showBookTitle = false }) {
   const navigate = useNavigate()
-  const [lightbox, setLightbox] = useState(null) // { imageKey, url } | null
-  const [showAnnotator, setShowAnnotator] = useState(false)
+  const [lightbox, setLightbox] = useState(null) // { note, url } | null
   const [refreshTokens, setRefreshTokens] = useState({})
 
   if (notes.length === 0) {
@@ -145,20 +146,8 @@ export default function NoteList({ notes, showBookTitle = false }) {
   const sortedNotes = [...notes].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''))
   const dayGroups = groupNotesByDay(sortedNotes)
 
-  function openLightbox(imageKey, url) {
-    setLightbox({ imageKey, url })
-  }
-
-  // lightbox 的標注入口：完成後直接壓縮存回同一個 image_key（覆蓋原圖），
-  // 更新 lightbox 顯示 + 讓對應縮圖強制重撈一次。
-  async function handleAnnotateDone(blob) {
-    const key = lightbox.imageKey
-    const compressed = await compressImage(blob)
-    await saveNoteImage(key, compressed)
-    const newUrl = URL.createObjectURL(compressed)
-    setLightbox({ imageKey: key, url: newUrl })
-    setRefreshTokens((prev) => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
-    setShowAnnotator(false)
+  function openLightbox(note, url) {
+    setLightbox({ note, url })
   }
 
   return (
@@ -181,8 +170,8 @@ export default function NoteList({ notes, showBookTitle = false }) {
                     onClick={() => navigate(`/note/${note.id}`)}
                   >
                     {showBookTitle && note.bookTitle && <p className="note-timeline-book">{note.bookTitle}</p>}
-                    {note.image_key && (
-                      <NoteThumbnail imageKey={note.image_key} refreshToken={refreshTokens[note.image_key]} onOpen={openLightbox} />
+                    {getOriginalImageKey(note) && (
+                      <NoteThumbnail note={note} refreshToken={refreshTokens[note.id]} onOpen={(url) => openLightbox(note, url)} />
                     )}
                     {note.page != null && note.page !== '' && <p className="note-timeline-page">p. {note.page}</p>}
                     {note.content && <NoteContent text={note.content} />}
@@ -194,27 +183,15 @@ export default function NoteList({ notes, showBookTitle = false }) {
         ))}
       </div>
 
-      {lightbox && !showAnnotator && (
-        <div className="note-lightbox" onClick={() => setLightbox(null)}>
-          <img src={lightbox.url} alt="" />
-          <button
-            type="button"
-            className="note-lightbox-annotate"
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowAnnotator(true)
-            }}
-          >
-            Edit annotation
-          </button>
-        </div>
-      )}
-
-      {showAnnotator && lightbox && (
-        <ImageAnnotator
-          imageUrl={lightbox.url}
-          onDone={handleAnnotateDone}
-          onCancel={() => setShowAnnotator(false)}
+      {lightbox && (
+        <NoteImageLightbox
+          note={lightbox.note}
+          displayUrl={lightbox.url}
+          onClose={() => setLightbox(null)}
+          onAnnotated={(newUrl) => {
+            setLightbox((prev) => (prev ? { ...prev, url: newUrl } : prev))
+            setRefreshTokens((prev) => ({ ...prev, [lightbox.note.id]: (prev[lightbox.note.id] || 0) + 1 }))
+          }}
         />
       )}
     </>

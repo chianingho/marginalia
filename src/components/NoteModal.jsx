@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { addNote, updateNote, deleteNote } from '../api/notes.js'
-import { compressImage, deleteNoteImage, getNoteImage, noteImageKey, saveNoteImage } from '../lib/noteImages.js'
+import { compressImage, deleteNoteImage, noteOriginalImageKey, saveNoteImage } from '../lib/noteImages.js'
+import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
 // New Note 跟 Edit Note 共用同一顆 modal（note 有值 = 編輯模式，帶 Delete；沒有 = 新增模式）。
@@ -39,12 +40,12 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
     }
   }, [])
 
-  // 編輯模式：把既有截圖從 IndexedDB 撈出來做預覽縮圖
+  // 編輯模式：把既有截圖（顯示快取，有標注就是標注後版本）從 IndexedDB 撈出來做預覽縮圖
   useEffect(() => {
-    if (!note?.image_key) return
+    if (!getOriginalImageKey(note)) return
     let objectUrl
     let cancelled = false
-    getNoteImage(note.image_key).then((blob) => {
+    getNoteDisplayBlob(note).then((blob) => {
       if (cancelled || !blob) return
       objectUrl = URL.createObjectURL(blob)
       setExistingPreviewUrl(objectUrl)
@@ -68,7 +69,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
   }, [imageFile])
 
   const previewUrl = imageRemoved ? null : newFilePreviewUrl || existingPreviewUrl
-  const hasImage = !imageRemoved && (imageFile || note?.image_key)
+  const hasImage = !imageRemoved && (imageFile || getOriginalImageKey(note))
   const canSave = Boolean(hasImage || content.trim())
 
   function handleFileChange(e) {
@@ -87,6 +88,9 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
 
   // 標注完成：拿到 flatten 過的 PNG blob，當成「新選的檔案」取代原圖，
   // 存檔時會走跟一般選圖一樣的壓縮流程（compressImage），不在這裡重複壓縮。
+  // 這裡是存檔前的快速塗改（modal 內建版），不是 /note/:id 那套非破壞性標注畫面，
+  // 所以不追蹤 strokes（ImageAnnotator 的第二個參數在這裡用不到）——存檔時當成
+  // 全新原圖處理（resetAnnotation），之後要疊加筆畫一律走詳情頁的標注畫面。
   function handleAnnotateDone(blob) {
     setImageFile(blob)
     setImageRemoved(false)
@@ -103,7 +107,10 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
     setSubmitStatus('submitting')
     try {
       const noteId = note?.id || crypto.randomUUID()
-      let imageKey = note?.image_key || null
+      let imageKey = getOriginalImageKey(note)
+      // 圖真的換了（新選檔案，含 modal 內建標注塗改）或整張被移除，才需要重置非破壞性
+      // 標注狀態（image_display／strokes）——沒動圖片的話這個 update 只是改 content/page。
+      const resetAnnotation = Boolean(imageFile) || imageRemoved
 
       if (imageRemoved && imageKey) {
         await deleteNoteImage(imageKey)
@@ -112,7 +119,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
 
       if (imageFile) {
         const compressed = await compressImage(imageFile)
-        imageKey = noteImageKey(noteId)
+        imageKey = noteOriginalImageKey(noteId)
         await saveNoteImage(imageKey, compressed)
       }
 
@@ -120,6 +127,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
         content: content.trim() || null,
         imageKey,
         page: page.trim() ? Number(page) : null,
+        resetAnnotation,
       }
 
       const saved = note

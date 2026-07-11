@@ -1,22 +1,51 @@
-import { useState } from 'react'
-import { compressImage, saveNoteImage } from '../lib/noteImages.js'
+import { useEffect, useState } from 'react'
+import { updateNote } from '../api/notes.js'
+import { compressImage, getNoteImage, noteDisplayImageKey, saveNoteImage } from '../lib/noteImages.js'
+import { getNoteStrokes, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
-// 共用截圖 lightbox：點背景關閉，可進標注模式後直接壓縮存回同一個 image_key（覆蓋原圖）。
-// 跟 NoteList.jsx 裡那份是同一套視覺／行為，這裡獨立成元件給 NoteDetail 用，
-// 沒有動 NoteList 自己那份內嵌實作。
+// 共用截圖 lightbox：點背景關閉，可進標注模式（非破壞性——原圖 image_original 永遠
+// 不動，Done 只覆寫顯示快取 image_display 並把 strokes 寫回 note 記錄）。
 // initialAnnotate：詳情頁圖片右上的「標注」入口直接跳全螢幕標注畫面用，這種情況下不管是
-// 按返回還是完成，都要直接關閉整個 overlay（onClose），而不是掉回使用者根本沒點開過的 lightbox。
-export default function NoteImageLightbox({ imageKey, url, initialAnnotate = false, onClose, onAnnotated }) {
+// 按 X 還是完成，都要直接關閉整個 overlay（onClose），而不是掉回使用者根本沒點開過的 lightbox。
+export default function NoteImageLightbox({ note, displayUrl, initialAnnotate = false, onClose, onAnnotated }) {
   const [showAnnotator, setShowAnnotator] = useState(initialAnnotate)
-  const [currentUrl, setCurrentUrl] = useState(url)
+  const [currentDisplayUrl, setCurrentDisplayUrl] = useState(displayUrl)
+  const [originalUrl, setOriginalUrl] = useState(null)
 
-  async function handleAnnotateDone(blob) {
+  // 只有真的要進標注畫面才去撈原圖（單純看 lightbox 不需要）
+  useEffect(() => {
+    if (!showAnnotator) return
+    let objectUrl
+    let cancelled = false
+    const originalKey = getOriginalImageKey(note)
+    if (!originalKey) return
+    getNoteImage(originalKey).then((blob) => {
+      if (cancelled || !blob) return
+      objectUrl = URL.createObjectURL(blob)
+      setOriginalUrl(objectUrl)
+    })
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAnnotator])
+
+  async function handleAnnotateDone(blob, strokes) {
     const compressed = await compressImage(blob)
-    await saveNoteImage(imageKey, compressed)
+    const displayKey = noteDisplayImageKey(note.id)
+    await saveNoteImage(displayKey, compressed)
+    const updatedNote = await updateNote(note.id, {
+      content: note.content,
+      imageKey: getOriginalImageKey(note),
+      page: note.page,
+      imageDisplay: displayKey,
+      strokes,
+    })
     const newUrl = URL.createObjectURL(compressed)
-    setCurrentUrl(newUrl)
-    onAnnotated?.(newUrl)
+    setCurrentDisplayUrl(newUrl)
+    onAnnotated?.(newUrl, updatedNote)
     if (initialAnnotate) {
       onClose()
     } else {
@@ -36,7 +65,7 @@ export default function NoteImageLightbox({ imageKey, url, initialAnnotate = fal
     <>
       {!showAnnotator && (
         <div className="note-lightbox" onClick={onClose}>
-          <img src={currentUrl} alt="" />
+          <img src={currentDisplayUrl} alt="" />
           <button
             type="button"
             className="note-lightbox-annotate"
@@ -50,8 +79,13 @@ export default function NoteImageLightbox({ imageKey, url, initialAnnotate = fal
         </div>
       )}
 
-      {showAnnotator && (
-        <ImageAnnotator imageUrl={currentUrl} onDone={handleAnnotateDone} onCancel={handleAnnotatorCancel} />
+      {showAnnotator && originalUrl && (
+        <ImageAnnotator
+          imageUrl={originalUrl}
+          initialStrokes={getNoteStrokes(note)}
+          onDone={handleAnnotateDone}
+          onCancel={handleAnnotatorCancel}
+        />
       )}
     </>
   )

@@ -1556,6 +1556,7 @@ button.annotator-exit:hover {
   flex: 1;
 }
 
+.annotator-clear,
 .annotator-undo {
   flex-shrink: 0;
   background: transparent;
@@ -1567,12 +1568,14 @@ button.annotator-exit:hover {
   font-weight: 600;
 }
 
+button.annotator-clear:hover,
 button.annotator-undo:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   box-shadow: none;
 }
 
+button.annotator-clear:disabled,
 button.annotator-undo:disabled {
   opacity: 0.35;
 }

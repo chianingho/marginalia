@@ -2,8 +2,16 @@
 // 避免圖片把 localStorage 的容量上限（通常 5~10MB）塞爆。
 import { get, set, del } from 'idb-keyval'
 
-export function noteImageKey(noteId) {
+// 標注非破壞性改版：一則筆記的截圖現在有兩把 IndexedDB key——
+// 原圖（noteOriginalImageKey，標注前，永不覆寫）跟顯示快取
+// （noteDisplayImageKey，原圖+筆畫合成後的結果，每次 Done 覆寫）。
+// 兩把 key 都是純粹從 noteId 算出來的固定值，不用另外存在 note 記錄裡。
+export function noteOriginalImageKey(noteId) {
   return `note-img-${noteId}`
+}
+
+export function noteDisplayImageKey(noteId) {
+  return `note-img-display-${noteId}`
 }
 
 export async function saveNoteImage(key, blob) {

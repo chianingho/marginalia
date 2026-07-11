@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getNoteById } from '../api/notes.js'
-import { getNoteImage } from '../lib/noteImages.js'
+import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -46,10 +46,10 @@ export default function NoteDetail() {
   }, [id])
 
   useEffect(() => {
-    if (!note?.image_key) return
+    if (!getOriginalImageKey(note)) return
     let objectUrl
     let cancelled = false
-    getNoteImage(note.image_key).then((blob) => {
+    getNoteDisplayBlob(note).then((blob) => {
       if (cancelled || !blob) return
       objectUrl = URL.createObjectURL(blob)
       setImageUrl(objectUrl)
@@ -58,7 +58,8 @@ export default function NoteDetail() {
       cancelled = true
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [note?.image_key])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note?.id])
 
   // 深連結直開（沒有 in-app 上一頁）就 fallback 回所屬 /book/:id，
   // 否則走瀏覽器 history back（React Router 初始那筆 history entry 的 key 固定是 'default'）。
@@ -111,11 +112,14 @@ export default function NoteDetail() {
 
       {imageOverlay && imageUrl && (
         <NoteImageLightbox
-          imageKey={note.image_key}
-          url={imageUrl}
+          note={note}
+          displayUrl={imageUrl}
           initialAnnotate={imageOverlay === 'annotate'}
           onClose={() => setImageOverlay(null)}
-          onAnnotated={(newUrl) => setImageUrl(newUrl)}
+          onAnnotated={(newUrl, updatedNote) => {
+            setImageUrl(newUrl)
+            setNote(updatedNote)
+          }}
         />
       )}
     </div>

@@ -5,7 +5,8 @@
 // 圖片放多了可能會超出容量。正式使用請改回 Supabase（見 README）。
 
 import { deriveStatusDates } from './bookStatus.js'
-import { deleteNoteImage } from './noteImages.js'
+import { deleteNoteImage, noteDisplayImageKey } from './noteImages.js'
+import { getOriginalImageKey } from './noteAnnotation.js'
 
 const BOOKS_KEY = 'reading-notes:books'
 const NOTES_KEY = 'reading-notes:notes'
@@ -162,18 +163,34 @@ export async function updateBook(bookId, { title, author, coverFile, coverUrl, g
 
 export async function deleteBook(bookId) {
   const notesToDelete = readAll(NOTES_KEY).filter((n) => n.book_id === bookId)
-  await Promise.all(notesToDelete.filter((n) => n.image_key).map((n) => deleteNoteImage(n.image_key)))
+  await Promise.all(notesToDelete.map((n) => deleteNoteImages(n)))
 
   writeAll(BOOKS_KEY, readAll(BOOKS_KEY).filter((b) => b.id !== bookId))
   writeAll(NOTES_KEY, readAll(NOTES_KEY).filter((n) => n.book_id !== bookId))
 }
 
 // ---- notes ----
-// 單書筆記流：id / book_id / content / image_key / note_date / page / created_at / updated_at。
-// 圖片本體不在這裡：image_key 只是指到 IndexedDB（見 noteImages.js）的參照。
+// 單書筆記流：id / book_id / content / image_original / image_display / strokes /
+// note_date / page / created_at / updated_at。
+// 圖片本體不在這裡：image_original／image_display 只是指到 IndexedDB（見 noteImages.js）
+// 的參照。標注非破壞性改版：image_original 是標注前原圖、永不覆寫；strokes 是正規化
+// 0-1 座標的筆畫資料；image_display 是 original+strokes 合成後的顯示快取，每次 Done
+// 覆寫。舊資料（改版前建立）只有 image_key（當時的破壞性合成結果），沒有這三個新欄位
+// ——讀取時用 getOriginalImageKey／getNoteDisplayBlob（見 noteAnnotation.js）fallback
+// 處理，這裡不做一次性改寫遷移。
 // note_date 不再是使用者輸入欄位：新增時自動 = created_at 的日期（8 月接 Supabase 時 schema
 // 對齊照舊保留這個欄位，但寫入邏輯改成自動衍生）。全 app 排序／時間顯示一律以 created_at 為準；
 // 舊筆記既有的 note_date 值不會被這次改動動到，只是不再拿來排序或顯示。
+
+// 8 月接 Supabase 備忘：notes 表加 strokes (jsonb) 欄位；Storage 圖片兩把 key
+// （original / display），結構跟這裡的 IndexedDB key 平移，不需要另外設計。
+
+async function deleteNoteImages(note) {
+  const originalKey = getOriginalImageKey(note)
+  const displayKey = noteDisplayImageKey(note.id)
+  if (originalKey) await deleteNoteImage(originalKey)
+  await deleteNoteImage(displayKey) // 沒有的話 idb-keyval 刪不存在的 key 本來就是安全的 no-op
+}
 
 export async function getNotesByBook(bookId) {
   return readAll(NOTES_KEY)
@@ -192,7 +209,9 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
     id: id || crypto.randomUUID(),
     book_id: bookId,
     content: content || null,
-    image_key: imageKey || null,
+    image_original: imageKey || null,
+    image_display: null,
+    strokes: [],
     note_date: noteDate || now.slice(0, 10),
     page: page ?? null,
     created_at: now,
@@ -205,19 +224,30 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
   return note
 }
 
-export async function updateNote(noteId, { content, imageKey, noteDate, page }) {
+// resetAnnotation：換了一張全新的原圖（或整張截圖被移除）才傳 true——這時候舊的顯示
+// 快取跟舊圖的筆畫已經對不上了，要清掉 image_display／strokes，並把舊的顯示快取
+// blob 一併刪除（deterministic key，不刪的話下次撈圖會撈到跟新原圖對不上的舊合成結果）。
+// imageDisplay／strokes：標注畫面 Done 之後呼叫，只更新這兩個欄位，不動 content/page/原圖。
+export async function updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation }) {
   const notes = readAll(NOTES_KEY)
   const index = notes.findIndex((n) => n.id === noteId)
   if (index === -1) throw new Error('找不到這則筆記')
 
-  const updated = {
-    ...notes[index],
-    content: content || null,
-    image_key: imageKey || null,
-    note_date: noteDate !== undefined ? noteDate : notes[index].note_date,
-    page: page ?? null,
-    updated_at: new Date().toISOString(),
+  const existing = notes[index]
+  const updated = { ...existing, updated_at: new Date().toISOString() }
+  if (content !== undefined) updated.content = content || null
+  if (imageKey !== undefined) updated.image_original = imageKey || null
+  if (noteDate !== undefined) updated.note_date = noteDate
+  if (page !== undefined) updated.page = page ?? null
+
+  if (resetAnnotation) {
+    await deleteNoteImage(noteDisplayImageKey(noteId))
+    updated.image_display = null
+    updated.strokes = []
   }
+  if (imageDisplay !== undefined) updated.image_display = imageDisplay
+  if (strokes !== undefined) updated.strokes = strokes
+
   notes[index] = updated
   writeAll(NOTES_KEY, notes)
   return updated
@@ -226,8 +256,8 @@ export async function updateNote(noteId, { content, imageKey, noteDate, page }) 
 export async function deleteNote(noteId) {
   const notes = readAll(NOTES_KEY)
   const target = notes.find((n) => n.id === noteId)
-  if (target?.image_key) {
-    await deleteNoteImage(target.image_key)
+  if (target) {
+    await deleteNoteImages(target)
   }
   writeAll(NOTES_KEY, notes.filter((n) => n.id !== noteId))
 }
