@@ -682,6 +682,26 @@ button.note-detail-annotate-btn:hover {
   white-space: nowrap;
 }
 
+/* 視覺沿用既有的小字底線連結按鈕系統（跟 .book-page-edit-btn 同一套語言），
+   點擊熱區用 padding 撐大，視覺文字維持小字。 */
+.note-detail-edit-btn {
+  display: inline-block;
+  margin-top: 10px;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #666;
+  text-decoration: underline;
+}
+
+button.note-detail-edit-btn:hover {
+  background: transparent;
+  color: #1a1a1a;
+  box-shadow: none;
+}
+
 .note-detail-content {
   margin: 18px 0 0;
   font-size: 0.95rem;

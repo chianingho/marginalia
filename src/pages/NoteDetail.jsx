@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getNoteById } from '../api/notes.js'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
+import NoteModal from '../components/NoteModal.jsx'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -23,6 +24,7 @@ export default function NoteDetail() {
   const [imageUrl, setImageUrl] = useState(null)
   // null | 'lightbox' | 'annotate' — 圖片本身點擊開一般 lightbox，右上標注入口直接跳標注畫面
   const [imageOverlay, setImageOverlay] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -107,6 +109,10 @@ export default function NoteDetail() {
           <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
         </div>
 
+        <button type="button" className="note-detail-edit-btn" onClick={() => setShowEditModal(true)}>
+          Edit
+        </button>
+
         {note.content && <p className="note-detail-content">{note.content}</p>}
       </div>
 
@@ -120,6 +126,19 @@ export default function NoteDetail() {
             setImageUrl(newUrl)
             setNote(updatedNote)
           }}
+        />
+      )}
+
+      {showEditModal && (
+        <NoteModal
+          bookId={note.book_id}
+          note={note}
+          onClose={() => setShowEditModal(false)}
+          onSaved={(updated) => {
+            setNote(updated)
+            setShowEditModal(false)
+          }}
+          onDeleted={() => navigate(`/book/${note.book_id}`, { replace: true })}
         />
       )}
     </div>
