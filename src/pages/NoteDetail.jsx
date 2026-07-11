@@ -102,7 +102,7 @@ export default function NoteDetail() {
         )}
 
         <div className="note-detail-meta-row">
-          {note.page != null && note.page !== '' && <h1 className="note-detail-page">page.{note.page}</h1>}
+          {note.page != null && note.page !== '' && <h1 className="note-detail-page">p. {note.page}</h1>}
           <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
         </div>
 

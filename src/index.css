@@ -9,6 +9,7 @@
   --color-accent: #8a6d4b;
   --color-border: #e9e1d4;
   --color-text-secondary: #8a8a86;
+  --color-note-content: #333;
 
   --shadow-card: 0 10px 28px rgba(91, 70, 54, 0.1), 0 2px 6px rgba(91, 70, 54, 0.05);
   --shadow-card-hover: 0 16px 36px rgba(91, 70, 54, 0.14), 0 4px 10px rgba(91, 70, 54, 0.07);
@@ -668,9 +669,10 @@ button.note-detail-annotate-btn:hover {
 .note-detail-page {
   margin: 0;
   font-family: var(--font-serif);
+  font-style: italic;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #111;
 }
 
 .note-detail-date {
@@ -696,6 +698,37 @@ button.note-detail-annotate-btn:hover {
   padding: 4px var(--shelf-inset) 140px;
 }
 
+.note-timeline-day-group + .note-timeline-day-group {
+  margin-top: 8px;
+}
+
+.note-timeline-day-header {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 20px 0 14px;
+}
+
+.note-timeline-day-highlight {
+  position: absolute;
+  left: -5px;
+  top: 15%;
+  height: 70%;
+  background: #f2ff00;
+  opacity: 0.55;
+  transform: skewX(-8deg);
+  z-index: 0;
+}
+
+.note-timeline-day-label {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #111;
+}
+
 .note-timeline-row {
   display: flex;
   gap: 10px;
@@ -710,18 +743,8 @@ button.note-detail-annotate-btn:hover {
   padding-top: 33px;
 }
 
-.note-timeline-date {
-  text-align: center;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
 .note-timeline-time {
   text-align: center;
-  margin-top: 2px;
   font-size: 10px;
   font-weight: 400;
   color: var(--color-text-secondary);
@@ -766,16 +789,17 @@ button.note-timeline-card:hover {
 
 .note-timeline-page {
   margin: 8px 0 0;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #8a8078;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: #111;
 }
 
 .note-timeline-content {
   margin: 6px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: #1a1a1a;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--color-note-content);
   white-space: pre-wrap;
   word-break: break-word;
   display: -webkit-box;
@@ -787,20 +811,16 @@ button.note-timeline-card:hover {
 
 /* 只有真的有第二行（JS 判斷過）才套第二行淡出遮罩，單行 note 完全不受影響 */
 .note-timeline-content.is-multiline {
-  mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
 }
 
+/* 每張卡片上緣都有一條（含每組第一張），只切卡片欄，不橫穿時間欄
+   ——結構上本來就是 .note-timeline-card-wrap 的子元素，天生不會蓋到時間欄。 */
 .note-timeline-divider {
   height: 1px;
-  background: rgba(26, 26, 26, 0.12);
+  background: rgba(0, 0, 0, 0.07);
   margin: 16px 16px;
-}
-
-/* 第一張卡片上方沒有分隔線，但保留同樣的高度佔位，讓每列的日期時間跟卡片
-   維持一致的垂直節奏（日期時間對齊的是這個佔位/分隔線的位置，不是卡片頂）。 */
-.note-timeline-divider--spacer {
-  background: transparent;
 }
 
 .note-timeline-empty {
