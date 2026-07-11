@@ -11,7 +11,7 @@ function chunk(list, size) {
 
 // 一痕螢光筆劃過標題文字：寬度依實際量到的文字寬度計算（不寫死），
 // 左右各外擴 8–12px；只有一條，不做纖維束、不做乾段。
-// 顏色 #F2FF00、wobble 濾鏡參數（scale ≤3）都直接讀自首頁 Bookshelf.jsx 的 TitleBrush，取同一個值。
+// 顏色用全站共用的 --color-highlight（tokens.css），wobble 濾鏡參數（scale ≤3）維持既有值。
 function TitleStroke({ textWidth, titleFontSize = 22 }) {
   if (!textWidth) return null
   const overhang = 10
@@ -34,7 +34,7 @@ function TitleStroke({ textWidth, titleFontSize = 22 }) {
       </defs>
       <polygon
         points={points}
-        fill="#F2FF00"
+        fill="var(--color-highlight)"
         opacity="0.55"
         filter="url(#shelf-title-wobble)"
         style={{ mixBlendMode: 'multiply' }}

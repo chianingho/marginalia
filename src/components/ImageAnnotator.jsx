@@ -8,15 +8,25 @@ import { useEffect, useRef, useState } from 'react'
 // 本質上只是 push 了一份 []）。完成（Done）時把目前畫面 flatten 匯出成一張新圖，
 // 同時把目前的 strokes（正規化座標）一起回傳——呼叫端負責重新壓縮、存成顯示快取，
 // 並把 strokes 寫回 note 記錄，原圖（imageUrl 對應的來源）完全不動。
-const HIGHLIGHT_COLOR = '#F2FF00' // 全站共用值，跟首頁/書架頁書名刷色同一個常數
 const HIGHLIGHT_WIDTH_RATIO = 0.045 // 圖寬的 4.5%
+
+// Canvas 2D 的 strokeStyle 不吃 CSS var()，只能在執行時讀出 tokens.css 定義的實際值
+// （跟首頁/書架頁書名刷色同一個 --color-highlight 常數）。第一次呼叫後快取起來，
+// 這個值本來就是靜態設計常數，不會在執行期間變動。
+let cachedHighlightColor = null
+function getHighlightColor() {
+  if (!cachedHighlightColor) {
+    cachedHighlightColor = getComputedStyle(document.documentElement).getPropertyValue('--color-highlight').trim()
+  }
+  return cachedHighlightColor
+}
 
 // pixelPoints：畫布像素座標（不是正規化座標）
 function drawStroke(ctx, pixelPoints, canvasWidth) {
   if (pixelPoints.length < 2) return
   ctx.save()
   ctx.globalCompositeOperation = 'multiply'
-  ctx.strokeStyle = HIGHLIGHT_COLOR
+  ctx.strokeStyle = getHighlightColor()
   ctx.lineWidth = Math.max(4, canvasWidth * HIGHLIGHT_WIDTH_RATIO)
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'

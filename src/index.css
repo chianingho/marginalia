@@ -1,15 +1,19 @@
+@import './styles/tokens.css';
+
 :root {
   --font-serif: 'Noto Serif TC', 'Georgia', serif;
   --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --color-bg: #e6e2dc;
+  /* R-1：改名跟 tokens.css 的 --color-bg（實際內容背景）分開——這個是舊版非
+     flush 路由（.app-header/.app-main）殼層用的暖灰色，值不變，只是換名字避免
+     撞名。目前 App.jsx 的路由幾乎全是 flush route，這個殼層很少真的被看到，
+     但顏色本身沒有動過。 */
+  --color-shell-bg: #e6e2dc;
   --color-surface: #fffdfa;
   --color-text: #3a332c;
   --color-text-muted: #9c8f80;
   --color-accent: #8a6d4b;
   --color-border: #e9e1d4;
-  --color-text-secondary: #8a8a86;
-  --color-note-content: #333;
 
   --shadow-card: 0 10px 28px rgba(91, 70, 54, 0.1), 0 2px 6px rgba(91, 70, 54, 0.05);
   --shadow-card-hover: 0 16px 36px rgba(91, 70, 54, 0.14), 0 4px 10px rgba(91, 70, 54, 0.07);
@@ -27,7 +31,7 @@ body {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  background: var(--color-shell-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -123,7 +127,7 @@ label {
   display: flex;
   justify-content: center;
   padding: 26px 32px;
-  background: var(--color-bg);
+  background: var(--color-shell-bg);
   box-shadow: 0 1px 0 rgba(58, 51, 44, 0.08);
 }
 
@@ -423,7 +427,7 @@ label {
 }
 
 .search-result:hover {
-  background: var(--color-bg);
+  background: var(--color-shell-bg);
 }
 
 .search-result.selected {
@@ -480,10 +484,9 @@ label {
 /* ---- Book detail (/book/:id，單書筆記流) ---- */
 
 .book-page {
-  --shelf-inset: 20px;
   --cover-width: 84px;
   min-height: 100dvh;
-  background: #fdfcfa;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -491,7 +494,7 @@ label {
 
 .book-page-header {
   flex-shrink: 0;
-  padding: 16px var(--shelf-inset) 18px;
+  padding: 16px var(--content-left) 18px;
 }
 
 .book-page-back {
@@ -517,8 +520,8 @@ label {
    不動 .book-page-back 本身──/note/:id 那顆返回鍵沒有套這個 modifier，行為不變。 */
 .book-page-back--fixed {
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 10px);
-  left: var(--shelf-inset);
+  top: calc(var(--safe-top) + 10px);
+  left: var(--content-left);
   z-index: 20;
   width: 44px;
   height: 44px;
@@ -619,7 +622,7 @@ button.book-page-edit-btn:hover {
 
 .note-detail-body {
   flex: 1;
-  padding: 4px var(--shelf-inset) 60px;
+  padding: 4px var(--content-left) 60px;
 }
 
 .note-detail-image-wrap {
@@ -672,7 +675,7 @@ button.note-detail-annotate-btn:hover {
   font-style: italic;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #111;
+  color: var(--color-ink);
 }
 
 .note-detail-date {
@@ -715,7 +718,7 @@ button.note-detail-edit-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 4px var(--shelf-inset) 140px;
+  padding: 4px var(--content-left) 140px;
 }
 
 .note-timeline-day-group + .note-timeline-day-group {
@@ -734,7 +737,7 @@ button.note-detail-edit-btn:hover {
   left: -5px;
   top: 15%;
   height: 70%;
-  background: #f2ff00;
+  background: var(--color-highlight);
   opacity: 0.55;
   transform: skewX(-8deg);
   z-index: 0;
@@ -746,7 +749,7 @@ button.note-detail-edit-btn:hover {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.22em;
-  color: #111;
+  color: var(--color-ink);
 }
 
 .note-timeline-row {
@@ -793,7 +796,7 @@ button.note-timeline-card:hover {
   margin: 0 0 6px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #2a332a;
+  color: var(--color-green-edge);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -812,7 +815,7 @@ button.note-timeline-card:hover {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 13px;
-  color: #111;
+  color: var(--color-ink);
 }
 
 .note-timeline-content {
@@ -839,12 +842,12 @@ button.note-timeline-card:hover {
    ——結構上本來就是 .note-timeline-card-wrap 的子元素，天生不會蓋到時間欄。 */
 .note-timeline-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.07);
+  background: var(--color-hairline);
   margin: 16px 16px;
 }
 
 .note-timeline-empty {
-  padding: 12px var(--shelf-inset) 140px;
+  padding: 12px var(--content-left) 140px;
   color: #999;
   font-size: 0.9rem;
 }
@@ -852,9 +855,8 @@ button.note-timeline-card:hover {
 /* ---- Bookshelf (mobile, 390px baseline) ---- */
 
 .bookshelf-page {
-  --shelf-inset: 20px;
   min-height: 100dvh;
-  background: #fdfcfa;
+  background: var(--color-bg);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -865,7 +867,7 @@ button.note-timeline-card:hover {
 .bookshelf-header {
   position: relative;
   flex-shrink: 0;
-  padding: 22px var(--shelf-inset) 8px;
+  padding: 22px var(--content-left) 8px;
   text-align: center;
 }
 
@@ -901,7 +903,7 @@ button.note-timeline-card:hover {
 .bookshelf-header-icons {
   position: absolute;
   top: 14px;
-  right: calc(var(--shelf-inset) - 4px);
+  right: calc(var(--content-left) - 4px);
   z-index: 3;
   display: flex;
   align-items: center;
@@ -945,7 +947,7 @@ button.bookshelf-filter-btn:hover {
 .bookshelf-status {
   position: relative;
   z-index: 2;
-  padding: 8px var(--shelf-inset) 0;
+  padding: 8px var(--content-left) 0;
   font-size: 0.9rem;
 }
 
@@ -963,7 +965,7 @@ button.bookshelf-filter-btn:hover {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0 var(--shelf-inset);
+  padding: 0 var(--content-left);
   margin-bottom: 8px;
 }
 
@@ -1004,13 +1006,13 @@ button.bookshelf-filter-btn:hover {
   min-width: 100%;
   /* 92px 書封（2:3）+ 上下 padding，固定住高度，讓空排也撐出完整的排版，不會跟有書的排高度不一致 */
   min-height: 158px;
-  padding: 6px var(--shelf-inset) 14px var(--shelf-inset);
+  padding: 6px var(--content-left) 14px var(--content-left);
 }
 
 /* 書架層板：頂面（梯形，做出景深感）+ 前緣（垂直長條）+ 投影，隨書一起橫向滑動 */
 .shelf-plank {
   position: absolute;
-  left: var(--shelf-inset);
+  left: var(--content-left);
   right: 0;
   bottom: 0;
   height: 19px;
@@ -1024,7 +1026,7 @@ button.bookshelf-filter-btn:hover {
   left: 0;
   right: 0;
   height: 12px;
-  background: #3e4a3d;
+  background: var(--color-green);
   clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
 }
 
@@ -1034,7 +1036,7 @@ button.bookshelf-filter-btn:hover {
   left: 0;
   right: 0;
   height: 7px;
-  background: #2a332a;
+  background: var(--color-green-edge);
   border-top: 1px solid #55624f;
   border-bottom: 1px solid #10140f;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -1131,7 +1133,7 @@ button.bookshelf-filter-btn:hover {
 .add-book-btn {
   position: fixed;
   left: 50%;
-  bottom: calc(24px + env(safe-area-inset-bottom));
+  bottom: calc(24px + var(--safe-bottom));
   transform: translateX(-50%);
   z-index: 20;
   display: flex;
@@ -1167,9 +1169,8 @@ button.add-book-btn:active {
 /* ---- Shelf detail (/shelf/:status) ---- */
 
 .shelf-detail-page {
-  --shelf-inset: 20px;
   min-height: 100dvh;
-  background: #fdfcfa;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
 }
@@ -1177,7 +1178,7 @@ button.add-book-btn:active {
 .shelf-detail-header {
   position: relative;
   flex-shrink: 0;
-  padding: 20px var(--shelf-inset) 16px;
+  padding: 20px var(--content-left) 16px;
   text-align: center;
 }
 
@@ -1226,7 +1227,7 @@ button.add-book-btn:active {
 }
 
 .shelf-detail-status {
-  padding: 8px var(--shelf-inset) 0;
+  padding: 8px var(--content-left) 0;
   font-size: 0.9rem;
 }
 
@@ -1237,7 +1238,7 @@ button.add-book-btn:active {
   display: flex;
   flex-direction: column;
   gap: 26px;
-  padding: 8px var(--shelf-inset) 48px;
+  padding: 8px var(--content-left) 48px;
 }
 
 .shelf-grid-row {
@@ -1335,7 +1336,7 @@ button.add-book-btn:active {
   overflow-x: hidden;
   overscroll-behavior: contain;
   box-sizing: border-box;
-  background: #fdfcfa;
+  background: var(--color-bg);
   color: #1a1a1a;
   border-radius: 18px;
   padding: 24px;
@@ -1533,7 +1534,7 @@ button.note-lightbox-annotate:hover {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: calc(env(safe-area-inset-top) + 10px) 10px 10px;
+  padding: calc(var(--safe-top) + 10px) 10px 10px;
 }
 
 .annotator-exit {
@@ -1620,18 +1621,18 @@ button.annotator-undo:disabled {
 
 .annotator-done {
   flex-shrink: 0;
-  background: #f2ff00;
+  background: var(--color-highlight);
   border: none;
   border-radius: 999px;
-  color: #111;
+  color: var(--color-ink);
   padding: 9px 18px;
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 button.annotator-done:hover {
-  background: #f2ff00;
-  color: #111;
+  background: var(--color-highlight);
+  color: var(--color-ink);
   box-shadow: 0 0 0 2px rgba(242, 255, 0, 0.4);
 }
 
@@ -1724,9 +1725,9 @@ button.add-page-btn-primary:hover:not(:disabled) {
 
 .action-sheet {
   width: 100%;
-  background: #fdfcfa;
+  background: var(--color-bg);
   border-radius: 20px 20px 0 0;
-  padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+  padding: 10px 20px calc(20px + var(--safe-bottom));
   box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
 }
 

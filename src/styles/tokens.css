@@ -1,0 +1,19 @@
+/* 全站設計常數。新增畫面一律引用這裡的變數，不要再寫死 hex 值。
+   R-1（2026-07-11 重構批次）建立：把散落在各元件的寫死值集中到這裡，
+   純粹搬遷數值，沒有改任何實際顯示出來的顏色/尺寸。 */
+:root {
+  /* 色彩 */
+  --color-bg: #fdfcfa; /* 暖白舞台：書籍頁/筆記頁/時間軸等實際內容的背景 */
+  --color-ink: #111111; /* 內容近黑：日期標頭、頁數等強調用文字 */
+  --color-text-secondary: #8a8a86; /* 次要資訊灰：時間軸時間、次要說明文字 */
+  --color-note-content: #333333; /* 筆記內文 */
+  --color-green: #3e4a3d; /* 墨綠：書架層板／書的實體意象 */
+  --color-green-edge: #2a332a; /* 書架前緣、書名刷色等較深的墨綠 */
+  --color-highlight: #f2ff00; /* 螢光黃：閱讀痕跡（標注筆刷、標題刷色、日期標頭） */
+  --color-hairline: rgba(0, 0, 0, 0.07); /* 分隔線 */
+
+  /* 佈局 */
+  --content-left: 20px; /* 內容左邊界，書封左緣／時間軸欄共用（原 --shelf-inset） */
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
