@@ -1,26 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
+import { formatTimelineDate, formatTimelineTime } from '../lib/format.js'
 import NoteImageLightbox from './NoteImageLightbox.jsx'
-
-// 全 app 時間顯示統一以 created_at 為單一事實來源（不再用 note_date）
-const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-
-function formatTimelineDate(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return `${MONTHS[d.getMonth()]} ${d.getDate()}`
-}
-
-function formatTimelineTime(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  const hours24 = d.getHours()
-  const minutes = String(d.getMinutes()).padStart(2, '0')
-  const ampm = hours24 >= 12 ? 'PM' : 'AM'
-  const hours12 = hours24 % 12 || 12
-  return `${hours12}:${minutes} ${ampm}`
-}
 
 // 依本地日期（年/月/日）分組——notes 已經是 created_at 由舊到新排序，同一天一定
 // 連續出現，直接照順序累加分組即可，不需要另外排序。分組純粹是顯示層的事，

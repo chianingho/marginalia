@@ -2,16 +2,9 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getNoteById } from '../api/notes.js'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
+import { formatFullDate } from '../lib/format.js'
 import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
 import NoteModal from '../components/NoteModal.jsx'
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-function formatFullDate(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
-}
 
 // /note/:id — 筆記詳情頁，時間軸卡片點擊的導頁目標。
 export default function NoteDetail() {

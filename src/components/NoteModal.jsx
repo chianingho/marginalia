@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { addNote, updateNote, deleteNote } from '../api/notes.js'
-import { compressImage, deleteNoteImage, noteOriginalImageKey, saveNoteImage } from '../lib/noteImages.js'
+import { compressImage, deleteNoteImage, noteOriginalImageKey, saveNoteImage } from '../lib/imageStore.js'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
+import { useScrollLock } from '../lib/scrollLock.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
 // New Note 跟 Edit Note 共用同一顆 modal（note 有值 = 編輯模式，帶 Delete；沒有 = 新增模式）。
@@ -21,24 +22,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
   const [showAnnotator, setShowAnnotator] = useState(false)
   const fileInputRef = useRef(null)
 
-  // 鎖住背景頁面滾動：iOS Safari 上單靠 body overflow:hidden 不夠，改用 position:fixed
-  // 並記錄/還原 scrollY，避免關閉 modal 後畫面跳掉（跟 AddBookModal 同一套做法）
-  useEffect(() => {
-    const scrollY = window.scrollY
-    const { body } = document
-    body.style.position = 'fixed'
-    body.style.top = `-${scrollY}px`
-    body.style.left = '0'
-    body.style.right = '0'
-
-    return () => {
-      body.style.position = ''
-      body.style.top = ''
-      body.style.left = ''
-      body.style.right = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [])
+  useScrollLock()
 
   // 編輯模式：把既有截圖（顯示快取，有標注就是標注後版本）從 IndexedDB 撈出來做預覽縮圖
   useEffect(() => {

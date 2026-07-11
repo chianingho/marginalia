@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { updateNote } from '../api/notes.js'
-import { compressImage, getNoteImage, noteDisplayImageKey, saveNoteImage } from '../lib/noteImages.js'
+import { compressImage, getNoteImage, noteDisplayImageKey, saveNoteImage } from '../lib/imageStore.js'
 import { getNoteStrokes, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 

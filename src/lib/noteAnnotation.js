@@ -6,7 +6,7 @@
 // image_original / strokes / image_display 這三個欄位——完全用「讀取時」的
 // fallback 處理，不用一次性改寫 localStorage：image_key 直接當 image_original，
 // strokes 視為空陣列，image_display 視為沒有（回退讀 image_original）。
-import { getNoteImage, noteDisplayImageKey } from './noteImages.js'
+import { getNoteImage, noteDisplayImageKey } from './imageStore.js'
 
 export function getOriginalImageKey(note) {
   return note?.image_original || note?.image_key || null

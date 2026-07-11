@@ -1,3 +1,5 @@
+import { toSecureCoverUrl } from '../lib/bookCover.js'
+
 const GOOGLE_BOOKS_API = 'https://www.googleapis.com/books/v1/volumes'
 
 /**
@@ -20,9 +22,7 @@ export async function searchBooks(query) {
     return items.map((item) => {
       const info = item.volumeInfo || {}
       const imageLinks = info.imageLinks || {}
-      const thumbnail = imageLinks.thumbnail
-        ? imageLinks.thumbnail.replace('http://', 'https://')
-        : null
+      const thumbnail = toSecureCoverUrl(imageLinks.thumbnail) || null
 
       return {
         id: item.id,

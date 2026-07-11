@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useScrollLock } from '../lib/scrollLock.js'
 
 // 截圖標注：純 canvas + pointer events，不引入任何繪圖套件。
 // 唯一工具＝螢光筆，常駐啟用，沒有其他工具可切換。
@@ -64,22 +65,7 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     redraw()
   }
 
-  // 鎖住背景頁面滾動（跟其他 modal 同一套做法）
-  useEffect(() => {
-    const scrollY = window.scrollY
-    const { body } = document
-    body.style.position = 'fixed'
-    body.style.top = `-${scrollY}px`
-    body.style.left = '0'
-    body.style.right = '0'
-    return () => {
-      body.style.position = ''
-      body.style.top = ''
-      body.style.left = ''
-      body.style.right = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [])
+  useScrollLock()
 
   // 載入底圖（image_original），canvas 內部解析度對齊圖片原始像素尺寸
   useEffect(() => {

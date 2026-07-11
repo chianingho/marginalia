@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
+import { useScrollLock } from '../lib/scrollLock.js'
 
 const CUSTOM_CATEGORY_VALUE = '__custom__'
 
@@ -28,24 +29,7 @@ export default function AddBookModal({ onClose, onCreated }) {
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
 
-  // 鎖住背景頁面滾動：iOS Safari 上單靠 body overflow:hidden 不夠，改用 position:fixed
-  // 並記錄/還原 scrollY，避免關閉 modal 後畫面跳掉
-  useEffect(() => {
-    const scrollY = window.scrollY
-    const { body } = document
-    body.style.position = 'fixed'
-    body.style.top = `-${scrollY}px`
-    body.style.left = '0'
-    body.style.right = '0'
-
-    return () => {
-      body.style.position = ''
-      body.style.top = ''
-      body.style.left = ''
-      body.style.right = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [])
+  useScrollLock()
 
   useEffect(() => {
     const query = state.query.trim()

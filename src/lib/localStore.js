@@ -5,7 +5,7 @@
 // 圖片放多了可能會超出容量。正式使用請改回 Supabase（見 README）。
 
 import { deriveStatusDates } from './bookStatus.js'
-import { deleteNoteImage, noteDisplayImageKey } from './noteImages.js'
+import { deleteNoteImage, noteDisplayImageKey } from './imageStore.js'
 import { getOriginalImageKey } from './noteAnnotation.js'
 
 const BOOKS_KEY = 'reading-notes:books'
@@ -172,7 +172,7 @@ export async function deleteBook(bookId) {
 // ---- notes ----
 // 單書筆記流：id / book_id / content / image_original / image_display / strokes /
 // note_date / page / created_at / updated_at。
-// 圖片本體不在這裡：image_original／image_display 只是指到 IndexedDB（見 noteImages.js）
+// 圖片本體不在這裡：image_original／image_display 只是指到 IndexedDB（見 imageStore.js）
 // 的參照。標注非破壞性改版：image_original 是標注前原圖、永不覆寫；strokes 是正規化
 // 0-1 座標的筆畫資料；image_display 是 original+strokes 合成後的顯示快取，每次 Done
 // 覆寫。舊資料（改版前建立）只有 image_key（當時的破壞性合成結果），沒有這三個新欄位
