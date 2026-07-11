@@ -98,11 +98,10 @@ export default function NoteList({ notes, showBookTitle = false }) {
             <div className="note-timeline-col">
               <span className="note-timeline-date">{formatTimelineDate(note.created_at)}</span>
               <span className="note-timeline-time">{formatTimelineTime(note.created_at)}</span>
-              <span className="note-timeline-dot" />
-              {index < sortedNotes.length - 1 && <span className="note-timeline-line" />}
             </div>
 
             <div className="note-timeline-card-wrap">
+              <div className={`note-timeline-divider ${index === 0 ? 'note-timeline-divider--spacer' : ''}`} />
               <button
                 type="button"
                 className="note-timeline-card"
@@ -115,7 +114,6 @@ export default function NoteList({ notes, showBookTitle = false }) {
                 {note.page != null && note.page !== '' && <p className="note-timeline-page">page.{note.page}</p>}
                 {note.content && <p className="note-timeline-content">{note.content}</p>}
               </button>
-              {index < sortedNotes.length - 1 && <div className="note-timeline-divider" />}
             </div>
           </div>
         ))}

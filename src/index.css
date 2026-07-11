@@ -8,6 +8,7 @@
   --color-text-muted: #9c8f80;
   --color-accent: #8a6d4b;
   --color-border: #e9e1d4;
+  --color-text-secondary: #8a8a86;
 
   --shadow-card: 0 10px 28px rgba(91, 70, 54, 0.1), 0 2px 6px rgba(91, 70, 54, 0.05);
   --shadow-card-hover: 0 16px 36px rgba(91, 70, 54, 0.14), 0 4px 10px rgba(91, 70, 54, 0.07);
@@ -671,14 +672,12 @@ button.note-detail-annotate-btn:hover {
 }
 
 .note-timeline-col {
-  position: relative;
   width: 76px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 3px;
-  background: #F4F2EE;
+  padding-top: 8.5px;
 }
 
 .note-timeline-date {
@@ -686,41 +685,18 @@ button.note-detail-annotate-btn:hover {
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #3a332c;
+  color: var(--color-text-secondary);
 }
 
 .note-timeline-time {
   margin-top: 2px;
   font-size: 0.62rem;
-  color: #9c8f80;
-}
-
-.note-timeline-dot {
-  position: relative;
-  z-index: 1;
-  margin-top: 8px;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #3e4a3d;
-  flex-shrink: 0;
-}
-
-.note-timeline-line {
-  position: absolute;
-  left: 50%;
-  top: 42px;
-  bottom: 0;
-  width: 1.5px;
-  background: rgba(58, 51, 44, 0.15);
-  transform: translateX(-50%);
-  z-index: 0;
+  color: var(--color-text-secondary);
 }
 
 .note-timeline-card-wrap {
   flex: 1;
   min-width: 0;
-  margin-top: 45px;
 }
 
 .note-timeline-card {
@@ -781,6 +757,12 @@ button.note-timeline-card:hover {
   height: 1px;
   background: rgba(26, 26, 26, 0.12);
   margin: 16px 16px;
+}
+
+/* 第一張卡片上方沒有分隔線，但保留同樣的高度佔位，讓每列的日期時間跟卡片
+   維持一致的垂直節奏（日期時間對齊的是這個佔位/分隔線的位置，不是卡片頂）。 */
+.note-timeline-divider--spacer {
+  background: transparent;
 }
 
 .note-timeline-empty {
@@ -1491,25 +1473,28 @@ button.note-lightbox-annotate:hover {
   background: #000;
   display: flex;
   flex-direction: column;
+  touch-action: none;
+  overscroll-behavior: none;
 }
 
 .annotator-header {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: calc(env(safe-area-inset-top) + 10px) 12px 10px;
+  gap: 6px;
+  padding: calc(env(safe-area-inset-top) + 10px) 10px 10px;
 }
 
+.annotator-exit,
 .annotator-back {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   border: none;
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -1517,6 +1502,7 @@ button.note-lightbox-annotate:hover {
   padding: 0;
 }
 
+button.annotator-exit:hover,
 button.annotator-back:hover {
   background: rgba(255, 255, 255, 0.28);
   color: #fff;

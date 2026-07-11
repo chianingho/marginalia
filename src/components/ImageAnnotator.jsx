@@ -120,6 +120,11 @@ export default function ImageAnnotator({ imageUrl, onDone, onCancel }) {
     onCancel()
   }
 
+  // X：MVP 不加確認，直接捨棄未完成筆畫、離開（跟返回鍵是兩種退出路徑，各自獨立）
+  function handleExit() {
+    onCancel()
+  }
+
   function handleDone() {
     canvasRef.current.toBlob((blob) => {
       if (blob) onDone(blob)
@@ -132,6 +137,9 @@ export default function ImageAnnotator({ imageUrl, onDone, onCancel }) {
     // 外層 modal 的 backdrop onClick，把整個 modal 一起關掉。
     <div className="annotator-overlay" onClick={(e) => e.stopPropagation()}>
       <div className="annotator-header">
+        <button type="button" className="annotator-exit" onClick={handleExit} aria-label="Exit">
+          ✕
+        </button>
         <button type="button" className="annotator-back" onClick={handleBack} aria-label="Back">
           ‹
         </button>
