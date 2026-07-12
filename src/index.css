@@ -914,6 +914,30 @@ button.bookshelf-filter-btn:hover {
   background: #efe7da;
 }
 
+/* v2-E：Reading 排主角化，書封放大 1.25×（92px → 115px，2:3 比例自動跟著放大），
+   墨綠 3D 書架結構（梯形頂面/前緣厚度/投影）完全不拆不改，只有層板高度隨書封
+   等比放大，寬度本來就是撐滿整排、不用另外調。只影響依 status 分組時的
+   Reading 排，其他排（To Read/Finished）跟 year/category 分組模式完全不受影響。 */
+.shelf-row--hero .shelf-book {
+  width: 115px;
+}
+
+.shelf-row--hero .shelf-track {
+  min-height: 193px; /* 115px 書封（2:3 = 172.5px 高）+ 上下 padding 20px，等比推算 */
+}
+
+.shelf-row--hero .shelf-plank {
+  height: 23.75px; /* 19px * 1.25 */
+}
+
+.shelf-row--hero .shelf-plank-top {
+  height: 15px; /* 12px * 1.25 */
+}
+
+.shelf-row--hero .shelf-plank-front {
+  height: 8.75px; /* 7px * 1.25 */
+}
+
 /* .add-book-btn 是共用結構（位置/尺寸/fixed+safe-area），首頁「Add Book」跟
    /book/:id「+ New Note」共用同一個 class。v2-C 只改首頁那顆的外觀，New Note
    不在這批範圍內，所以外觀（背景/邊框/陰影/文字色）分離成 --frosted 修飾

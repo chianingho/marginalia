@@ -37,9 +37,11 @@ function FilterIcon() {
   )
 }
 
-function ShelfRow({ label, href, books }) {
+// v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整；
+// 只有依 status 分組時的 Reading 排會是 true，依 year/category 分組時完全不受影響。
+function ShelfRow({ label, href, books, isHero = false }) {
   return (
-    <div className="shelf-row">
+    <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
       <div className="shelf-row-header">
         <span className="shelf-row-label">{label}</span>
         <Link to={href} className="shelf-row-see-all">
@@ -189,6 +191,7 @@ export default function Bookshelf() {
               label={row.label}
               href={`/shelf/${groupBy}/${encodeURIComponent(row.slug)}`}
               books={row.books}
+              isHero={groupBy === 'status' && row.key === 'reading'}
             />
           ))}
         </div>

@@ -1,9 +1,10 @@
 // 書架分組邏輯：首頁（Bookshelf）跟 See all 詳細頁（ShelfDetail）共用同一套規則，
 // 確保「首頁怎麼分排」跟「點進某一排看到什麼書」永遠一致。
 
+// v2-E：Reading 排主角化，順序改成 Reading → To Read → Finished（原本 To Read 排最前）。
 export const SHELF_DEFS = [
-  { key: 'to_read', slug: 'to-read', label: 'To Read' },
   { key: 'reading', slug: 'reading', label: 'Reading' },
+  { key: 'to_read', slug: 'to-read', label: 'To Read' },
   { key: 'finished', slug: 'finished', label: 'Finished' },
 ]
 
