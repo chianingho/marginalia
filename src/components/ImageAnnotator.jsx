@@ -171,7 +171,7 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     pushHistory([])
   }
 
-  // X：不加確認，直接捨棄本次進入後的所有變動、離開（不合成、不存檔）
+  // Cancel：不加確認，直接捨棄本次進入後的所有變動、離開（不合成、不存檔）
   function handleExit() {
     onCancel()
   }
@@ -189,8 +189,8 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     // 外層 modal 的 backdrop onClick，把整個 modal 一起關掉。
     <div className="annotator-overlay" onClick={(e) => e.stopPropagation()}>
       <div className="annotator-header">
-        <button type="button" className="annotator-exit" onClick={handleExit} aria-label="Exit">
-          ✕
+        <button type="button" className="annotator-cancel" onClick={handleExit}>
+          Cancel
         </button>
         <div className="annotator-spacer" />
         <button type="button" className="annotator-done" onClick={handleDone}>

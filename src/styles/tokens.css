@@ -13,6 +13,7 @@
   --color-highlight: #f2ff00; /* 螢光黃：閱讀的痕跡——只能用在標注筆/日期標頭色塊/橫幅筆芯與書背，禁止用在純 UI 元件（按鈕/chips/badge/連結/focus ring） */
   --color-hairline: rgba(0, 0, 0, 0.07); /* 分隔線 */
   --color-ink-on-yellow: #1c231b; /* 黃痕上的字色 */
+  --color-darkroom: #16171a; /* 深暖黑，非純黑：詳情頁暗室照片區底色 */
 
   /* 字體 */
   --font-brand: 'Cormorant', 'Noto Serif TC', serif; /* 英文品牌層：日期標頭/p.{n}頁數/排標題等英數元素 */

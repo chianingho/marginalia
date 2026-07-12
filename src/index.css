@@ -288,58 +288,48 @@ label {
 
 /* ---- Book detail (/book/:id，單書筆記流) ---- */
 
+/* 總規格項目 3（批次 P 修訂版）：綠帶當檯面、書封跨界浮出（上半在綠帶、下半
+   浮在白底），呼應首頁 3D 書架「書從架上抽出」語意。書封跨界靠自然版面差
+   達成，不用另外量測絕對座標：.book-page-top 用 flex 對齊頂端，書封（144px）
+   比右側資訊欄（~86px）高，資訊欄留在綠帶內、書封自然探出綠帶下緣。 */
 .book-page {
+  /* 時間軸時間欄寬度（.note-timeline-col 用），跟書封新寬度（96px）無關，
+   * 時間軸這批「零變更」，維持原值。
+   */
   --cover-width: 84px;
   min-height: 100dvh;
   background: var(--color-bg);
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
 }
 
-.book-page-header {
-  flex-shrink: 0;
-  padding: 16px var(--content-left) 18px;
+.book-page-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 172px;
+  background: var(--color-green);
+  z-index: 0;
 }
 
+/* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵，位置上移到不擋書封
+   （書封頂緣 = safe-top + 58px，兩者間距 ≥ 8px）。 */
 .book-page-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin: -6px 0 4px -8px;
-  border-radius: 50%;
-  color: #1a1a1a;
-  font-size: 22px;
-  line-height: 1;
+  position: fixed;
+  top: calc(var(--safe-top) + 12px);
+  left: var(--content-left);
+  z-index: 20;
   text-decoration: none;
 }
 
-.book-page-back:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-/* /book/:id 專用：捲動時固定在左上角，霧化底避免蓋在卡片內容上看不清楚
-   （跟首頁 Add Book 膠囊同一套霧化語言）。疊加在共用的 .book-page-back 之上，
-   不動 .book-page-back 本身──/note/:id 那顆返回鍵沒有套這個 modifier，行為不變。 */
-.book-page-back--fixed {
-  position: fixed;
-  top: calc(var(--safe-top) + 10px);
-  left: var(--content-left);
-  z-index: 20;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  background: rgba(253, 252, 250, 0.7);
-  border: 1px solid rgba(26, 26, 26, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
-}
-
-.book-page-back--fixed:hover {
-  background: rgba(253, 252, 250, 0.85);
+.book-page-header {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding: calc(var(--safe-top) + 58px) var(--content-left) 16px;
 }
 
 .book-page-top {
@@ -350,13 +340,14 @@ label {
 
 .book-page-cover {
   display: block;
-  width: var(--cover-width);
+  width: 96px;
   flex-shrink: 0;
   aspect-ratio: 2 / 3;
-  border-radius: 4px 8px 8px 4px;
+  border-radius: 2px;
   overflow: hidden;
   background: #efe7da;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
 .book-page-cover img {
@@ -386,19 +377,23 @@ label {
 .book-page-title {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 1.35rem;
+  font-size: 19px;
   font-weight: 700;
-  line-height: 1.25;
-  color: #1a1a1a;
+  line-height: 1.35;
+  color: #fdfcfa;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .book-page-author-row {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
 }
 
 .book-page-author {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 11px;
+  color: rgba(253, 252, 250, 0.62);
 }
 
 /* Edit 位置只由作者名稱決定：跟作者文字同一個 inline flow，作者名換行時
@@ -413,21 +408,85 @@ label {
   padding: 15px 4px;
   font-size: 0.8rem;
   font-weight: 400;
-  color: #666;
+  color: rgba(253, 252, 250, 0.85);
   text-decoration: underline;
 }
 
 button.book-page-edit-btn:hover {
   background: transparent;
-  color: #1a1a1a;
+  color: #fdfcfa;
   box-shadow: none;
 }
 
-/* ---- Note detail (/note/:id，時間軸卡片點擊的導頁目標) ---- */
+.book-page-meta {
+  margin: 6px 0 0;
+  font-family: var(--font-brand);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 12px;
+  color: rgba(253, 252, 250, 0.72);
+}
 
-.note-detail-body {
+/* ---- Note detail (/note/:id，總規格項目 6・批次 N：獨立全螢幕三段式) ---- */
+
+.note-detail-screen {
+  min-height: 100dvh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* 段一：綠帶標頭，只放書名（找不到書 fallback 顯示 "Marginalia"），不放作者。
+   返回鍵走導航鐵則「預設」（無框無底色，深色底反白），不是 fixed 例外——
+   這顆跟著內容走，不需要跟捲動脫鉤。 */
+.note-detail-band {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-green);
+  padding: calc(var(--safe-top) + 18px) var(--content-left) 18px;
+}
+
+.note-detail-back {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  margin: -4px;
+  color: var(--color-bg);
+  font-size: 22px;
+  line-height: 1;
+}
+
+button.note-detail-back:hover {
+  background: rgba(253, 252, 250, 0.14);
+  color: var(--color-bg);
+  box-shadow: none;
+}
+
+.note-detail-title {
+  margin: 0;
+  min-width: 0;
   flex: 1;
-  padding: 4px var(--content-left) 60px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 段二：暗室照片區，#16171A（非純黑）。Edit annotation 用 .btn-frosted 小號
+   變體，貼照片右下角；照片本身不再是可點開全螢幕 lightbox 的縮放入口
+   （原本「整頁黑底 + 中央白膠囊」的一般 lightbox 分支，這個入口不會經過）。
+   純文字筆記（無圖）這整段不渲染，綠帶直接接紙面內文區。 */
+.note-detail-darkroom {
+  flex-shrink: 0;
+  background: var(--color-darkroom);
+  padding: 20px 26px;
 }
 
 .note-detail-image-wrap {
@@ -438,85 +497,92 @@ button.book-page-edit-btn:hover {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 12px;
-  cursor: zoom-in;
+  border-radius: 3px;
 }
 
 .note-detail-annotate-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(26, 26, 26, 0.55);
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  right: 12px;
+  bottom: 12px;
 }
 
-button.note-detail-annotate-btn:hover {
-  background: rgba(26, 26, 26, 0.7);
-  color: #fff;
-  box-shadow: none;
+/* 段三：紙面內文區 */
+.note-detail-paper {
+  flex: 1;
+  padding: 20px 24px 60px;
 }
 
 .note-detail-meta-row {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  margin-top: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+}
+
+.note-detail-meta-row--no-page {
+  justify-content: flex-end;
+}
+
+.note-detail-page-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.note-detail-page-highlight {
+  position: absolute;
+  left: -5px;
+  top: 15%;
+  height: 70%;
+  background: var(--color-highlight);
+  opacity: 0.55;
+  transform: skewX(-8deg);
+  z-index: 0;
 }
 
 .note-detail-page {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-family: var(--font-brand);
   font-style: italic;
-  font-size: 1.3rem;
   font-weight: 500;
-  color: var(--color-ink);
+  font-size: 17px;
+  color: #111;
 }
 
 .note-detail-date {
   margin-left: auto;
-  font-size: 0.8rem;
-  color: #999;
+  font-size: 11px;
+  color: #8a8a86;
   white-space: nowrap;
 }
 
-/* 視覺沿用既有的小字底線連結按鈕系統（跟 .book-page-edit-btn 同一套語言），
-   點擊熱區用 padding 撐大，視覺文字維持小字。 */
+.note-detail-content {
+  margin: 14px 0 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--color-note-content);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .note-detail-edit-btn {
-  display: inline-block;
-  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
   background: transparent;
   border: none;
   padding: 10px 0;
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #666;
-  text-decoration: underline;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-green);
 }
 
 button.note-detail-edit-btn:hover {
   background: transparent;
-  color: #1a1a1a;
+  color: var(--color-green);
   box-shadow: none;
-}
-
-.note-detail-content {
-  margin: 18px 0 0;
-  font-size: 0.95rem;
-  line-height: 1.75;
-  color: #1a1a1a;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 .note-timeline {
@@ -678,13 +744,23 @@ button.note-timeline-card:hover {
   text-align: center;
 }
 
-/* 品牌橫幅：SVG 靠 viewBox + width 定高，不設固定 height，避免 layout shift。
-   負 margin 抵銷 .bookshelf-header 的左右 padding，讓綠底滿版出血；
-   maxWidth 390 由元件內 inline style 控制，這裡只負責破格滿版。 */
+/* 總規格項目 1：橫幅改定稿點陣圖（/public/banner.png，圓角與構圖已烙在圖裡）。
+   容器透明底、無圓角、無邊框、無底色，左右邊距沿用 .bookshelf-header 既有 padding
+   （不再破格滿版）；img 只給 width:100%，靠圖片原生比例撐高度，不設固定 height，
+   不會有 layout shift。position:relative 給 Group by 疊字用 absolute 定位。 */
 .brand-banner {
+  position: relative;
   display: block;
-  margin: -22px calc(-1 * var(--content-left)) 0;
-  background: var(--color-green);
+}
+
+.brand-banner-subtitle {
+  position: absolute;
+  left: 7.5%;
+  top: 52%;
+  font-family: var(--font-brand);
+  font-weight: 500;
+  font-size: 19px;
+  color: #fdfcfa;
 }
 
 /* 搜尋（放大鏡）+ 篩選 icon 並排：共用一個 wrapper 定位，z-index 3 保證
@@ -983,6 +1059,31 @@ button.btn-frosted:hover {
     0 10px 28px rgba(62, 74, 61, 0.28),
     inset 0 1px 0 rgba(253, 252, 250, 0.25),
     inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* 總規格項目 4：.btn-frosted 修飾 class——圓形變體（fixed 浮動返回鍵，導航鐵則
+   例外 2）、小號變體（詳情頁 Edit annotation，icon+文字）。疊在 .btn-frosted
+   之上只加尺寸/形狀，磨砂質感（背景/邊/陰影/blur）繼續共用同一份。 */
+.btn-frosted--circle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.btn-frosted--sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
 }
 
 /* ---- Shelf detail (/shelf/:status) ---- */
@@ -1375,25 +1476,21 @@ button.note-lightbox-annotate:hover {
   padding: calc(var(--safe-top) + 10px) 10px 10px;
 }
 
-/* F-7：X 圖示白 #FDFCFA + 半透明白圓底，黑底上維持清晰可見。位置尺寸不動。 */
-.annotator-exit {
-  width: 44px;
-  height: 44px;
+/* 總規格項目 5（修訂：Cancel 取代 X）：畫面上不再有 X 或 ‹，離開一律走這顆
+   泡泡樣式膠囊——半透明白底 + 白字白邊，跟 Done 一起是上排唯二的動作按鈕。 */
+.annotator-cancel {
   flex-shrink: 0;
-  border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
   color: #fdfcfa;
-  border: none;
-  font-size: 20px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  padding: 9px 18px;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
-button.annotator-exit:hover {
-  background: rgba(255, 255, 255, 0.28);
+button.annotator-cancel:hover {
+  background: rgba(255, 255, 255, 0.24);
   color: #fdfcfa;
   box-shadow: none;
 }

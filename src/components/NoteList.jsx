@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import { formatTimelineDate, formatTimelineTime } from '../lib/format.js'
 import NoteImageLightbox from './NoteImageLightbox.jsx'
+import HighlightLabel from './HighlightLabel.jsx'
 
 // 依本地日期（年/月/日）分組——notes 已經是 created_at 由舊到新排序，同一天一定
 // 連續出現，直接照順序累加分組即可，不需要另外排序。分組純粹是顯示層的事，
@@ -46,30 +47,17 @@ function NoteContent({ text }) {
 
 // 日期分組標頭：一痕螢光黃貼著文字，寬度依實際量到的文字寬度計算（不寫死），
 // 左右各溢出約 5px。視覺語言呼應首頁 lockup 的 Marginalia 小字刷色，但這裡是
-// 純色小色塊（無 wobble 濾鏡），跟著文字內容變動即時重量。
+// 純色小色塊（無 wobble 濾鏡），跟著文字內容變動即時重量。量測邏輯抽到共用的
+// HighlightLabel（總規格項目 6：詳情頁 p.{n} 重用同一份，不另寫）。
 function DayHeader({ label }) {
-  const labelRef = useRef(null)
-  const [highlightWidth, setHighlightWidth] = useState(0)
-
-  useEffect(() => {
-    if (labelRef.current) {
-      setHighlightWidth(labelRef.current.getBoundingClientRect().width)
-    }
-  }, [label])
-
   return (
-    <div className="note-timeline-day-header">
-      {highlightWidth > 0 && (
-        <span
-          className="note-timeline-day-highlight"
-          style={{ width: `${highlightWidth + 10}px` }}
-          aria-hidden="true"
-        />
-      )}
-      <span className="note-timeline-day-label" ref={labelRef}>
-        {label}
-      </span>
-    </div>
+    <HighlightLabel
+      wrapClassName="note-timeline-day-header"
+      highlightClassName="note-timeline-day-highlight"
+      labelClassName="note-timeline-day-label"
+    >
+      {label}
+    </HighlightLabel>
   )
 }
 

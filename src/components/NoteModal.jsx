@@ -218,7 +218,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
             </button>
             <button
               type="submit"
-              className="add-page-btn add-page-btn-primary"
+              className="add-page-btn btn-frosted"
               disabled={submitStatus === 'submitting' || !canSave}
             >
               {submitStatus === 'submitting' ? 'Saving…' : 'Save'}

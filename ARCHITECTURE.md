@@ -55,6 +55,13 @@
 - **tokens.css**：`src/styles/tokens.css`，全站色彩／關鍵佈局值的唯一定義。
 - **imageStore.js**：`src/lib/imageStore.js`，IndexedDB 圖片存取的唯一入口。
 - **format.js**：`src/lib/format.js`，`created_at` 的日期/時間顯示格式化。
+- **返回鍵（導航鐵則，2026-07-12 定案）**：
+  1. 預設：全 app 返回一律 `‹` chevron、無外框、無底色；深色底反白 `#FDFCFA`，
+     淺色底 `#111`；熱區以透明 padding 撐到 ≥44×44。
+  2. 例外（fixed 浮動鍵）：跟著螢幕捲動、會浮在不同底色內容上的返回鍵，用
+     `.btn-frosted` 圓形變體（墨綠磨砂圓底）+ 白 `‹`——綠帶上、白底上都可見。
+     目前僅筆記頁（`/book/:id`）適用。
+  3. 標注畫面（`ImageAnnotator`）：無 `‹` 也無 X，離開一律走 Cancel／Done 膠囊。
 
 ## 新增畫面時的規則
 

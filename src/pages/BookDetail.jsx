@@ -5,6 +5,11 @@ import NoteModal from '../components/NoteModal.jsx'
 import NoteList from '../components/NoteList.jsx'
 import { fetchBookById } from '../api/books.js'
 import { getNotesByBook } from '../api/notes.js'
+import { SHELF_DEFS, resolveShelfKey } from '../lib/shelves.js'
+
+function statusLabel(book) {
+  return SHELF_DEFS.find((def) => def.key === resolveShelfKey(book))?.label ?? 'Reading'
+}
 
 // /book/:id — 點任何書封直達的筆記流頁面，沒有中間層「書籍詳情頁」。
 export default function BookDetail() {
@@ -71,7 +76,8 @@ export default function BookDetail() {
 
   return (
     <div className="book-page">
-      <Link to="/" className="book-page-back book-page-back--fixed" aria-label="回首頁">
+      <div className="book-page-band" aria-hidden="true" />
+      <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
         ‹
       </Link>
       <header className="book-page-header">
@@ -90,6 +96,9 @@ export default function BookDetail() {
               <button type="button" className="book-page-edit-btn" onClick={() => setShowEditBook(true)}>
                 Edit
               </button>
+            </p>
+            <p className="book-page-meta">
+              {statusLabel(book)} · {notes.length} notes
             </p>
           </div>
         </div>

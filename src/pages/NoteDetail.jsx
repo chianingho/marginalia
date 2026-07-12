@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getNoteById } from '../api/notes.js'
+import { fetchBookById } from '../api/books.js'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import { formatFullDate } from '../lib/format.js'
 import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
 import NoteModal from '../components/NoteModal.jsx'
+import HighlightLabel from '../components/HighlightLabel.jsx'
 
 // /note/:id — 筆記詳情頁，時間軸卡片點擊的導頁目標。
+// 總規格項目 6（批次 N）：獨立全螢幕三段式頁面（綠帶標頭／暗室照片區／紙面內文區），
+// 不透出下層——標注入口直接帶 initialAnnotate 進 NoteImageLightbox，不會經過它
+// 原本「整頁黑底 + 中央 Edit annotation 膠囊」的一般 lightbox 分支（見該元件），
+// 圖片本身不再是可點開 lightbox 的縮放入口。
 export default function NoteDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
 
   const [note, setNote] = useState(null)
+  const [book, setBook] = useState(null)
   const [status, setStatus] = useState('loading') // loading | ready | notfound
   const [imageUrl, setImageUrl] = useState(null)
-  // null | 'lightbox' | 'annotate' — 圖片本身點擊開一般 lightbox，右上標注入口直接跳標注畫面
-  const [imageOverlay, setImageOverlay] = useState(null)
+  const [showAnnotator, setShowAnnotator] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
@@ -31,6 +37,11 @@ export default function NoteDetail() {
         }
         setNote(found)
         setStatus('ready')
+        fetchBookById(found.book_id)
+          .then((b) => {
+            if (!cancelled) setBook(b)
+          })
+          .catch(() => {})
       })
       .catch(() => {
         if (!cancelled) setStatus('notfound')
@@ -70,51 +81,61 @@ export default function NoteDetail() {
   if (status === 'loading' || !note) return <p className="bookshelf-status">載入中…</p>
 
   return (
-    <div className="book-page">
-      <header className="book-page-header">
-        <button type="button" className="book-page-back" aria-label="返回" onClick={handleBack}>
+    <div className="note-detail-screen">
+      <header className="note-detail-band">
+        <button type="button" className="note-detail-back" aria-label="返回" onClick={handleBack}>
           ‹
         </button>
+        <h1 className="note-detail-title">{book?.title || 'Marginalia'}</h1>
       </header>
 
-      <div className="note-detail-body">
-        {imageUrl && (
+      {imageUrl && (
+        <div className="note-detail-darkroom">
           <div className="note-detail-image-wrap">
-            <img
-              src={imageUrl}
-              alt=""
-              className="note-detail-image"
-              onClick={() => setImageOverlay('lightbox')}
-            />
+            <img src={imageUrl} alt="" className="note-detail-image" />
             <button
               type="button"
-              className="note-detail-annotate-btn"
-              aria-label="標注"
-              onClick={() => setImageOverlay('annotate')}
+              className="note-detail-annotate-btn btn-frosted btn-frosted--sm"
+              onClick={() => setShowAnnotator(true)}
             >
-              ✎
+              ✎ Edit annotation
             </button>
+          </div>
+        </div>
+      )}
+
+      <div className="note-detail-paper">
+        {note.page != null && note.page !== '' && (
+          <div className="note-detail-meta-row">
+            <HighlightLabel
+              wrapClassName="note-detail-page-wrap"
+              highlightClassName="note-detail-page-highlight"
+              labelClassName="note-detail-page"
+            >
+              p. {note.page}
+            </HighlightLabel>
+            <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
+          </div>
+        )}
+        {(note.page == null || note.page === '') && (
+          <div className="note-detail-meta-row note-detail-meta-row--no-page">
+            <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
           </div>
         )}
 
-        <div className="note-detail-meta-row">
-          {note.page != null && note.page !== '' && <h1 className="note-detail-page">p. {note.page}</h1>}
-          <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
-        </div>
+        {note.content && <p className="note-detail-content">{note.content}</p>}
 
         <button type="button" className="note-detail-edit-btn" onClick={() => setShowEditModal(true)}>
-          Edit
+          ✎ Edit
         </button>
-
-        {note.content && <p className="note-detail-content">{note.content}</p>}
       </div>
 
-      {imageOverlay && imageUrl && (
+      {showAnnotator && imageUrl && (
         <NoteImageLightbox
           note={note}
           displayUrl={imageUrl}
-          initialAnnotate={imageOverlay === 'annotate'}
-          onClose={() => setImageOverlay(null)}
+          initialAnnotate
+          onClose={() => setShowAnnotator(false)}
           onAnnotated={(newUrl, updatedNote) => {
             setImageUrl(newUrl)
             setNote(updatedNote)
