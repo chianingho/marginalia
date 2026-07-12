@@ -1040,6 +1040,45 @@ button.add-book-btn--frosted:hover {
   z-index: 1;
 }
 
+/* v2-D：分類 chips，標題下方一列橫向滑動。純 UI 元件，禁用螢光黃
+   （黃色只留給「閱讀的痕跡」語意，見 tokens.css 的色彩語意法則）。 */
+.chip-row {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 var(--content-left) 14px;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font: 500 13px/32px var(--font-sans);
+  color: var(--color-ink);
+  background: transparent;
+  border: 1px solid var(--color-hairline-strong, rgba(0, 0, 0, 0.14));
+}
+
+button.chip:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-ink);
+  box-shadow: none;
+}
+
+.chip.selected,
+button.chip.selected:hover {
+  background: var(--color-green);
+  color: var(--color-bg);
+  border-color: var(--color-green);
+}
+
 .shelf-detail-status {
   padding: 8px var(--content-left) 0;
   font-size: 0.9rem;
