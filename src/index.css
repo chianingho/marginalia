@@ -914,29 +914,10 @@ button.bookshelf-filter-btn:hover {
   background: #efe7da;
 }
 
-/* 底部 scrim：預設隱藏，滾動時淡入、停止滾動 600ms 後淡出（見 Bookshelf.jsx 的 scroll listener）。
-   mask-image 讓 backdrop-filter 的模糊強度本身也隨高度漸弱，消除硬邊界那條線。 */
-.bottom-scrim {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120px;
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background: linear-gradient(to top, rgba(253, 252, 250, 0.9), rgba(253, 252, 250, 0));
-  mask-image: linear-gradient(to top, black 40%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 40%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  z-index: 15;
-}
-
-.bottom-scrim.is-visible {
-  opacity: 1;
-}
-
+/* .add-book-btn 是共用結構（位置/尺寸/fixed+safe-area），首頁「Add Book」跟
+   /book/:id「+ New Note」共用同一個 class。v2-C 只改首頁那顆的外觀，New Note
+   不在這批範圍內，所以外觀（背景/邊框/陰影/文字色）分離成 --frosted 修飾
+   class，只加在首頁那顆按鈕上，New Note 維持原本黑底樣式不動。 */
 .add-book-btn {
   position: fixed;
   left: 50%;
@@ -971,6 +952,32 @@ button.add-book-btn:active {
 .add-book-btn-icon {
   font-size: 1.1rem;
   line-height: 1;
+}
+
+/* v2-C：磨砂 + 立體玻璃感，要能透出書架與內容——後面不能再墊一層近乎不透明的
+   白色 scrim（舊版 .bottom-scrim 已整組移除，含 Bookshelf.jsx 的 DOM 與 scroll
+   監聽），不然磨砂看起來就是純白一片。只套用在首頁 Add Book 按鈕。 */
+.add-book-btn--frosted {
+  border: 0.5px solid rgba(253, 252, 250, 0.22);
+  background: rgba(62, 74, 61, 0.78);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    0 10px 28px rgba(62, 74, 61, 0.28),
+    inset 0 1px 0 rgba(253, 252, 250, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  color: var(--color-bg);
+}
+
+button.add-book-btn--frosted:hover {
+  background: rgba(62, 74, 61, 0.78);
+  color: var(--color-bg);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    0 10px 28px rgba(62, 74, 61, 0.28),
+    inset 0 1px 0 rgba(253, 252, 250, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
 }
 
 /* ---- Shelf detail (/shelf/:status) ---- */

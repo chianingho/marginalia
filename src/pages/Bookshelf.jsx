@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AddBookModal from '../components/AddBookModal.jsx'
 import { fetchBooks } from '../api/books.js'
@@ -83,26 +83,9 @@ export default function Bookshelf() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [scrimVisible, setScrimVisible] = useState(false)
-  const scrimTimer = useRef(null)
 
   useEffect(() => {
     load()
-  }, [])
-
-  // 滾動時淡入 scrim，停止滾動 600ms 後淡出；已到頁面最底部時保持隱藏
-  useEffect(() => {
-    function handleScroll() {
-      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 8
-      setScrimVisible(!atBottom)
-      clearTimeout(scrimTimer.current)
-      scrimTimer.current = setTimeout(() => setScrimVisible(false), 600)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      clearTimeout(scrimTimer.current)
-    }
   }, [])
 
   async function load() {
@@ -211,8 +194,7 @@ export default function Bookshelf() {
         </div>
       )}
 
-      <div className={`bottom-scrim ${scrimVisible ? 'is-visible' : ''}`} aria-hidden="true" />
-      <button type="button" className="add-book-btn" onClick={() => setShowAddModal(true)}>
+      <button type="button" className="add-book-btn add-book-btn--frosted" onClick={() => setShowAddModal(true)}>
         <span className="add-book-btn-icon">＋</span>
         Add Book
       </button>
