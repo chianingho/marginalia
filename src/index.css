@@ -678,24 +678,6 @@ button.note-timeline-card:hover {
   text-align: center;
 }
 
-.bookshelf-header-titles {
-  position: relative;
-  z-index: 0;
-}
-
-.bookshelf-eyebrow {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  color: #000;
-}
-
-.bookshelf-groupby {
-  margin-top: 4px;
-}
-
 /* 品牌橫幅：SVG 靠 viewBox + width 定高，不設固定 height，避免 layout shift。
    負 margin 抵銷 .bookshelf-header 的左右 padding，讓綠底滿版出血；
    maxWidth 390 由元件內 inline style 控制，這裡只負責破格滿版。 */
@@ -773,21 +755,21 @@ button.bookshelf-filter-btn:hover {
   align-items: baseline;
   justify-content: space-between;
   padding: 0 var(--content-left);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .shelf-row-label {
   font-family: var(--font-brand);
-  font-size: 14px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--color-text);
   letter-spacing: 0.02em;
 }
 
 .shelf-row-see-all {
-  font-family: var(--font-sans);
+  font-family: var(--font-brand);
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 600;
   color: #000;
   text-decoration: none;
   white-space: nowrap;
@@ -939,9 +921,8 @@ button.bookshelf-filter-btn:hover {
 }
 
 /* .add-book-btn 是共用結構（位置/尺寸/fixed+safe-area），首頁「Add Book」跟
-   /book/:id「+ New Note」共用同一個 class。v2-C 只改首頁那顆的外觀，New Note
-   不在這批範圍內，所以外觀（背景/邊框/陰影/文字色）分離成 --frosted 修飾
-   class，只加在首頁那顆按鈕上，New Note 維持原本黑底樣式不動。 */
+   /book/:id「+ New Note」共用同一個 class；外觀（背景/邊框/陰影/文字色）分離成
+   共用的 .btn-frosted class（F-6），兩顆按鈕都套用，磨砂玻璃material同源。 */
 .add-book-btn {
   position: fixed;
   left: 50%;
@@ -978,10 +959,10 @@ button.add-book-btn:active {
   line-height: 1;
 }
 
-/* v2-C：磨砂 + 立體玻璃感，要能透出書架與內容——後面不能再墊一層近乎不透明的
-   白色 scrim（舊版 .bottom-scrim 已整組移除，含 Bookshelf.jsx 的 DOM 與 scroll
-   監聽），不然磨砂看起來就是純白一片。只套用在首頁 Add Book 按鈕。 */
-.add-book-btn--frosted {
+/* F-6：共用磨砂玻璃 class，唯一來源。首頁 Add Book、筆記頁 New Note 共用；
+   批次 N 的標注編輯小號變體、批次 P 也引用同一份。要能透出下方內容——
+   後面不能再墊一層近乎不透明的白色 scrim（舊版 .bottom-scrim 已整組移除）。 */
+.btn-frosted {
   border: 0.5px solid rgba(253, 252, 250, 0.22);
   background: rgba(62, 74, 61, 0.78);
   backdrop-filter: blur(14px) saturate(1.15);
@@ -994,7 +975,7 @@ button.add-book-btn:active {
   color: var(--color-bg);
 }
 
-button.add-book-btn--frosted:hover {
+button.btn-frosted:hover {
   background: rgba(62, 74, 61, 0.78);
   color: var(--color-bg);
   box-shadow:
@@ -1013,55 +994,46 @@ button.add-book-btn--frosted:hover {
   flex-direction: column;
 }
 
-.shelf-detail-header {
+/* F-5：See All 頁頂部改綠底色帶（取代原本白底標題/螢光筆劃底線佈局）。
+   大標左緣對齊 var(--content-left)，與下方 .chip-row 的左 padding 同一個 token，
+   兩者天然左緣對齊，不用另外量測。 */
+.shelf-detail-banner {
   position: relative;
   flex-shrink: 0;
-  padding: 20px var(--content-left) 16px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-green);
+  padding: 8px var(--content-left) 10px;
 }
 
 .shelf-detail-back {
-  position: absolute;
-  left: 10px;
-  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  align-self: flex-start;
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
   border-radius: 50%;
-  color: #000;
-  font-size: 22px;
+  color: var(--color-bg);
+  font-size: 24px;
   line-height: 1;
   text-decoration: none;
 }
 
 .shelf-detail-back:hover {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(253, 252, 250, 0.14);
 }
 
 .shelf-detail-title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 700;
-  color: #000;
-}
-
-.shelf-detail-title-inner {
-  position: relative;
-  display: inline-block;
-}
-
-/* 一痕螢光筆：疊在標題文字之上（DOM 順序在後 = 疊在上面），multiply 讓黑字透出。
-   top:45% + translateY(-50%) = 置中略偏上；rotate(-1.5deg) = 近水平微傾斜（落在 -2°~+2° 之間）。 */
-.shelf-detail-title-brush {
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  transform: translate(-50%, -50%) rotate(-1.5deg);
-  pointer-events: none;
-  z-index: 1;
+  font-family: var(--font-brand);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-bg);
+  text-align: left;
 }
 
 /* v2-D：分類 chips，標題下方一列橫向滑動。純 UI 元件，禁用螢光黃
@@ -1403,13 +1375,14 @@ button.note-lightbox-annotate:hover {
   padding: calc(var(--safe-top) + 10px) 10px 10px;
 }
 
+/* F-7：X 圖示白 #FDFCFA + 半透明白圓底，黑底上維持清晰可見。位置尺寸不動。 */
 .annotator-exit {
   width: 44px;
   height: 44px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fdfcfa;
   border: none;
   font-size: 20px;
   line-height: 1;
@@ -1421,44 +1394,70 @@ button.note-lightbox-annotate:hover {
 
 button.annotator-exit:hover {
   background: rgba(255, 255, 255, 0.28);
-  color: #fff;
+  color: #fdfcfa;
   box-shadow: none;
-}
-
-.annotator-tool-indicator {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  padding: 9px 14px;
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .annotator-spacer {
   flex: 1;
 }
 
+/* F-8：下排工具列，置中；色票 4 顆 + 色票右側 Undo/Clear。 */
+.annotator-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 4px 10px 14px;
+}
+
+.annotator-swatches {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.annotator-swatch {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  box-shadow: none;
+  transform: scale(1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button.annotator-swatch:hover {
+  box-shadow: none;
+}
+
+.annotator-swatch.selected {
+  box-shadow: 0 0 0 2px #fff;
+  transform: scale(1.1);
+}
+
 .annotator-clear,
 .annotator-undo {
   flex-shrink: 0;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  color: #fff;
-  padding: 9px 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  border: none;
+  border-radius: 50%;
+  color: #fdfcfa;
 }
 
 button.annotator-clear:hover,
 button.annotator-undo:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.28);
+  color: #fdfcfa;
   box-shadow: none;
 }
 
@@ -1485,21 +1484,22 @@ button.annotator-undo:disabled {
   border-radius: 4px;
 }
 
+/* F-8：Done 改白底黑字（黃色讓給筆跡與選中色票，不再用來標示動作按鈕）。 */
 .annotator-done {
   flex-shrink: 0;
-  background: var(--color-highlight);
+  background: #fdfcfa;
   border: none;
   border-radius: 999px;
-  color: var(--color-ink);
+  color: #111;
   padding: 9px 18px;
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 button.annotator-done:hover {
-  background: var(--color-highlight);
-  color: var(--color-ink);
-  box-shadow: 0 0 0 2px rgba(242, 255, 0, 0.4);
+  background: #fdfcfa;
+  color: #111;
+  box-shadow: 0 0 0 2px rgba(253, 252, 250, 0.4);
 }
 
 input.add-modal-file-input {
@@ -1642,17 +1642,17 @@ button.action-sheet-option:hover {
   width: 100%;
   margin-top: 12px;
   background: #fff;
-  border: 1.5px solid #1a1a1a;
+  border: 1.5px solid var(--color-green);
   border-radius: 14px;
   padding: 14px;
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-green);
   text-align: center;
 }
 
 button.action-sheet-cancel:hover {
-  background: #1a1a1a;
+  background: var(--color-green);
   color: #fff;
   box-shadow: none;
 }

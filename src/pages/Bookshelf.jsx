@@ -5,7 +5,7 @@ import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
 
-const GROUP_BY_SUBTITLE = { year: 'year', category: 'category' }
+const GROUP_BY_SUBTITLE = { year: 'Year', category: 'Category' }
 
 function matchesQuery(book, query) {
   const q = query.trim().toLowerCase()
@@ -130,13 +130,7 @@ export default function Bookshelf() {
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
-        <BrandBanner />
-
-        <div className="bookshelf-header-titles">
-          {GROUP_BY_SUBTITLE[groupBy] && (
-            <p className="bookshelf-eyebrow bookshelf-groupby">{GROUP_BY_SUBTITLE[groupBy]}</p>
-          )}
-        </div>
+        <BrandBanner subtitle={GROUP_BY_SUBTITLE[groupBy]} />
 
         <div className="bookshelf-header-icons">
           <button
@@ -193,7 +187,7 @@ export default function Bookshelf() {
         </div>
       )}
 
-      <button type="button" className="add-book-btn add-book-btn--frosted" onClick={() => setShowAddModal(true)}>
+      <button type="button" className="add-book-btn btn-frosted" onClick={() => setShowAddModal(true)}>
         <span className="add-book-btn-icon">＋</span>
         Add Book
       </button>

@@ -97,7 +97,7 @@ export default function BookDetail() {
 
       <NoteList notes={notes} onNoteClick={openEditNote} />
 
-      <button type="button" className="add-book-btn" onClick={openNewNote}>
+      <button type="button" className="add-book-btn btn-frosted" onClick={openNewNote}>
         <span className="add-book-btn-icon">＋</span>
         New Note
       </button>

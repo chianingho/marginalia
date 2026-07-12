@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useScrollLock } from '../lib/scrollLock.js'
 
 // 截圖標注：純 canvas + pointer events，不引入任何繪圖套件。
-// 唯一工具＝螢光筆，常駐啟用，沒有其他工具可切換。
+// 唯一工具＝螢光筆，常駐啟用，沒有其他工具可切換；F-8 起筆色可從 4 顆色票切換。
 // 非破壞性：進入時吃 initialStrokes（正規化 0-1 座標）重繪成起始狀態，Undo 是
 // 逐筆退的「快照 stack」——每畫完一筆或按 Clear 都 push 一份完整 strokes 陣列快照，
 // Undo 就是 pop 掉最上面那份，回到上一份快照（Clear 也能被 Undo 還原，因為 Clear
@@ -11,23 +11,26 @@ import { useScrollLock } from '../lib/scrollLock.js'
 // 並把 strokes 寫回 note 記錄，原圖（imageUrl 對應的來源）完全不動。
 const HIGHLIGHT_WIDTH_RATIO = 0.045 // 圖寬的 4.5%
 
-// Canvas 2D 的 strokeStyle 不吃 CSS var()，只能在執行時讀出 tokens.css 定義的實際值
-// （跟首頁/書架頁書名刷色同一個 --color-highlight 常數）。第一次呼叫後快取起來，
-// 這個值本來就是靜態設計常數，不會在執行期間變動。
-let cachedHighlightColor = null
-function getHighlightColor() {
-  if (!cachedHighlightColor) {
-    cachedHighlightColor = getComputedStyle(document.documentElement).getPropertyValue('--color-highlight').trim()
-  }
-  return cachedHighlightColor
+const SWATCH_COLORS = ['#F2FF00', '#FF9EC4', '#7FD8FF', '#8CFF9E']
+const DEFAULT_COLOR = SWATCH_COLORS[0]
+
+// F-8（批次二未上）：色彩只在本次編輯 session 的記憶體中跟著每一筆走，用來讓
+// 多色繪製/合成當下正確顯示；Done 匯出的 strokes 仍是舊格式（純座標陣列，無
+// color 欄位），不擅自生出新的持久化 schema——欄位真正定案、寫回 note 記錄要
+// 等批次二。所以「重新打開標注畫面」時，之前畫的筆畫一律吃不到色票資訊，
+// 依規格 fallback 回黃色（見 normalizeInitialStrokes）。
+function normalizeInitialStrokes(initialStrokes) {
+  return initialStrokes.map((stroke) =>
+    Array.isArray(stroke) ? { color: DEFAULT_COLOR, points: stroke } : stroke,
+  )
 }
 
 // pixelPoints：畫布像素座標（不是正規化座標）
-function drawStroke(ctx, pixelPoints, canvasWidth) {
+function drawStroke(ctx, pixelPoints, canvasWidth, color) {
   if (pixelPoints.length < 2) return
   ctx.save()
   ctx.globalCompositeOperation = 'multiply'
-  ctx.strokeStyle = getHighlightColor()
+  ctx.strokeStyle = color
   ctx.lineWidth = Math.max(4, canvasWidth * HIGHLIGHT_WIDTH_RATIO)
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
@@ -48,12 +51,32 @@ function buildInitialHistory(initialStrokes) {
   return history
 }
 
+function UndoIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 7H15C18.3137 7 21 9.68629 21 13C21 16.3137 18.3137 19 15 19H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10.5 3.5L7 7L10.5 10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function ClearIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 7H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M9 7V4.5C9 4.22386 9.22386 4 9.5 4H14.5C14.7761 4 15 4.22386 15 4.5V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 7L7.8 19.2C7.83 19.66 8.21 20 8.67 20H15.33C15.79 20 16.17 19.66 16.2 19.2L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, onCancel }) {
   const canvasRef = useRef(null)
   const baseImageRef = useRef(null)
-  const historyRef = useRef(buildInitialHistory(initialStrokes)) // 快照 stack；最上面一份 = 目前狀態
+  const historyRef = useRef(buildInitialHistory(normalizeInitialStrokes(initialStrokes))) // 快照 stack；最上面一份 = 目前狀態
   const draftRef = useRef(null) // 正在畫的那一筆，像素座標
   const [strokeCount, setStrokeCount] = useState(historyRef.current[historyRef.current.length - 1].length)
+  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR)
 
   function currentStrokes() {
     return historyRef.current[historyRef.current.length - 1]
@@ -89,11 +112,11 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-    for (const normPoints of currentStrokes()) {
-      const pixelPoints = normPoints.map((p) => ({ x: p.x * canvas.width, y: p.y * canvas.height }))
-      drawStroke(ctx, pixelPoints, canvas.width)
+    for (const stroke of currentStrokes()) {
+      const pixelPoints = stroke.points.map((p) => ({ x: p.x * canvas.width, y: p.y * canvas.height }))
+      drawStroke(ctx, pixelPoints, canvas.width, stroke.color)
     }
-    if (draftRef.current) drawStroke(ctx, draftRef.current, canvas.width)
+    if (draftRef.current) drawStroke(ctx, draftRef.current.points, canvas.width, draftRef.current.color)
   }
 
   function getCanvasPoint(e) {
@@ -110,21 +133,24 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
   function handlePointerDown(e) {
     e.preventDefault()
     if (!baseImageRef.current) return
-    draftRef.current = [getCanvasPoint(e)]
+    draftRef.current = { color: selectedColor, points: [getCanvasPoint(e)] }
     canvasRef.current.setPointerCapture(e.pointerId)
   }
 
   function handlePointerMove(e) {
     if (!draftRef.current) return
     e.preventDefault()
-    draftRef.current.push(getCanvasPoint(e))
+    draftRef.current.points.push(getCanvasPoint(e))
     redraw()
   }
 
   function handlePointerUp() {
     if (!draftRef.current) return
     const canvas = canvasRef.current
-    const normalizedStroke = draftRef.current.map((p) => ({ x: p.x / canvas.width, y: p.y / canvas.height }))
+    const normalizedStroke = {
+      color: draftRef.current.color,
+      points: draftRef.current.points.map((p) => ({ x: p.x / canvas.width, y: p.y / canvas.height })),
+    }
     draftRef.current = null
     pushHistory([...currentStrokes(), normalizedStroke])
   }
@@ -137,7 +163,9 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     redraw()
   }
 
-  // Clear：一鍵清空，計入 undo stack（push 一份空陣列），按 Undo 可還原
+  // Clear：一鍵清空，計入 undo stack（push 一份空陣列），按 Undo 可還原。
+  // 已知限制（批次二完成前不處理）：Clear 清的是目前快照的「全部」筆畫，
+  // 不會特別區分哪些是這次進來才畫的、哪些是之前存檔就有的——維持既有行為不動。
   function handleClear() {
     if (currentStrokes().length === 0) return
     pushHistory([])
@@ -149,7 +177,7 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
   }
 
   function handleDone() {
-    const strokes = currentStrokes()
+    const strokes = currentStrokes().map((stroke) => stroke.points)
     canvasRef.current.toBlob((blob) => {
       if (blob) onDone(blob, strokes)
     }, 'image/png')
@@ -164,16 +192,37 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
         <button type="button" className="annotator-exit" onClick={handleExit} aria-label="Exit">
           ✕
         </button>
-        <span className="annotator-tool-indicator">✎ Highlighter</span>
         <div className="annotator-spacer" />
-        <button type="button" className="annotator-clear" onClick={handleClear} disabled={strokeCount === 0}>
-          Clear
-        </button>
-        <button type="button" className="annotator-undo" onClick={handleUndo} disabled={historyRef.current.length <= 1}>
-          Undo
-        </button>
         <button type="button" className="annotator-done" onClick={handleDone}>
           Done
+        </button>
+      </div>
+
+      <div className="annotator-toolbar">
+        <div className="annotator-swatches">
+          {SWATCH_COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              className={`annotator-swatch ${selectedColor === color ? 'selected' : ''}`}
+              style={{ background: color }}
+              onClick={() => setSelectedColor(color)}
+              aria-label={`螢光筆顏色 ${color}`}
+              aria-pressed={selectedColor === color}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          className="annotator-undo"
+          onClick={handleUndo}
+          disabled={historyRef.current.length <= 1}
+          aria-label="Undo"
+        >
+          <UndoIcon />
+        </button>
+        <button type="button" className="annotator-clear" onClick={handleClear} disabled={strokeCount === 0} aria-label="Clear">
+          <ClearIcon />
         </button>
       </div>
 

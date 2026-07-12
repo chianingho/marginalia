@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchBooks } from '../api/books.js'
 import { resolveShelfRow } from '../lib/shelves.js'
@@ -7,40 +7,6 @@ function chunk(list, size) {
   const out = []
   for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size))
   return out
-}
-
-// 一痕螢光筆劃過標題文字：寬度依實際量到的文字寬度計算（不寫死），
-// 左右各外擴 8–12px；只有一條，不做纖維束、不做乾段。
-// 顏色用全站共用的 --color-highlight（tokens.css），wobble 濾鏡參數（scale ≤3）維持既有值。
-function TitleStroke({ textWidth, titleFontSize = 22 }) {
-  if (!textWidth) return null
-  const overhang = 10
-  const w = Math.round(textWidth + overhang * 2)
-  const h = Math.round(titleFontSize * 0.7) // 標題字高的 0.6–0.8 倍
-  const points = `1,3 ${w - 1},1 ${w - 2},${h - 2} 2,${h - 1}`
-
-  return (
-    <svg
-      className="shelf-detail-title-brush"
-      viewBox={`0 0 ${w} ${h}`}
-      style={{ width: `${w}px`, height: `${h}px` }}
-      aria-hidden="true"
-    >
-      <defs>
-        <filter id="shelf-title-wobble" x="-20%" y="-40%" width="140%" height="180%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.02 0.35" numOctaves="2" seed="6" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </defs>
-      <polygon
-        points={points}
-        fill="var(--color-highlight)"
-        opacity="0.55"
-        filter="url(#shelf-title-wobble)"
-        style={{ mixBlendMode: 'multiply' }}
-      />
-    </svg>
-  )
 }
 
 const UNCATEGORIZED_LABEL = 'Uncategorized'
@@ -107,9 +73,7 @@ export default function ShelfDetail() {
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
   const [row, setRow] = useState(null)
-  const [titleWidth, setTitleWidth] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState(null)
-  const titleRef = useRef(null)
 
   useEffect(() => {
     setSelectedCategory(null) // 換排（不同 groupBy/slug）要重置篩選，不然選了的分類可能在新的一排裡完全不存在
@@ -139,24 +103,13 @@ export default function ShelfDetail() {
     : []
   const rowsOf4 = chunk(visibleBooks, 4)
 
-  useEffect(() => {
-    if (titleRef.current) {
-      setTitleWidth(titleRef.current.getBoundingClientRect().width)
-    }
-  }, [title])
-
   return (
     <div className="shelf-detail-page">
-      <header className="shelf-detail-header">
+      <header className="shelf-detail-banner">
         <Link to="/" className="shelf-detail-back" aria-label="回首頁">
           ‹
         </Link>
-        <h1 className="shelf-detail-title">
-          <span className="shelf-detail-title-inner" ref={titleRef}>
-            {title}
-            <TitleStroke textWidth={titleWidth} />
-          </span>
-        </h1>
+        <h1 className="shelf-detail-title">{title}</h1>
       </header>
 
       {status === 'ready' && row && (
