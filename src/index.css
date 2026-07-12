@@ -996,6 +996,111 @@ button.bookshelf-filter-btn:hover {
   height: 8.75px; /* 7px * 1.25 */
 }
 
+/* 增補項 8：首頁 chips（Year/Category 模式下橫幅下方一列）。樣式沿用既有
+   .chip-row/.chip 規格（v2-D 建立，原本用在 See All 頁，該處已隨項目 8-6
+   移除，這裡是唯一使用點），32px 膠囊、未選透明底+hairline邊、選中墨綠底
+   白字，禁用黃色。 */
+
+/* 增補項 8-2/8-7：換行書架，chip 選中單一組、或「所有書籍」模式共用。
+   書封每層 3 本，用跟 See All 頁一樣的 grid + 3D 層板語言，只是欄數從 4
+   改 3（書封因此更大一些，呼應「書從架上抽出」的主角化語感）。 */
+.wrap-shelf-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 var(--content-left);
+  margin-bottom: 12px;
+}
+
+.wrap-shelf-count {
+  font-family: var(--font-brand);
+  font-style: italic;
+  font-size: 13px;
+  color: #8a8a86;
+  white-space: nowrap;
+}
+
+.wrap-shelf-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 0 var(--content-left) 24px;
+}
+
+.wrap-shelf-row {
+  position: relative;
+}
+
+.wrap-shelf-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: 12px;
+  min-height: 178px;
+  padding-bottom: 14px;
+}
+
+.wrap-shelf-book {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  z-index: 1;
+}
+
+.wrap-shelf-book::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -3px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.wrap-shelf-book-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+  background: #efe7da;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+}
+
+.wrap-shelf-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wrap-shelf-book-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: #b8a78f;
+  background: #efe7da;
+}
+
+/* 跟首頁橫向排/See All 共用頂面/前緣視覺，左右貼齊內容區 */
+.wrap-shelf-plank {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 19px;
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* .add-book-btn 是共用結構（位置/尺寸/fixed+safe-area），首頁「Add Book」跟
    /book/:id「+ New Note」共用同一個 class；外觀（背景/邊框/陰影/文字色）分離成
    共用的 .btn-frosted class（F-6），兩顆按鈕都套用，磨砂玻璃material同源。 */

@@ -9,39 +9,6 @@ function chunk(list, size) {
   return out
 }
 
-const UNCATEGORIZED_LABEL = 'Uncategorized'
-
-// v2-D：分類 chips 目前只做前端篩選這一排「已經在畫面上的書」，不是查詢資料庫，
-// 所以只列出這排書裡實際出現過的類別（不是固定七大類清單）——列出一個沒有任何
-// 書對應的分類會是死路，篩了也是空的。八月要接的是「資料層真的支援類別查詢」，
-// 不是這裡的清單來源。
-function collectCategories(books) {
-  const set = new Set(books.map((book) => book.category || UNCATEGORIZED_LABEL))
-  return [...set].sort((a, b) => {
-    if (a === UNCATEGORIZED_LABEL) return 1
-    if (b === UNCATEGORIZED_LABEL) return -1
-    return a.localeCompare(b, 'zh-Hant')
-  })
-}
-
-function CategoryChips({ categories, selected, onSelect }) {
-  if (categories.length < 2) return null
-  return (
-    <div className="chip-row">
-      {categories.map((category) => (
-        <button
-          key={category}
-          type="button"
-          className={`chip ${selected === category ? 'selected' : ''}`}
-          onClick={() => onSelect(selected === category ? null : category)}
-        >
-          {category}
-        </button>
-      ))}
-    </div>
-  )
-}
-
 function ShelfGridRow({ books }) {
   return (
     <div className="shelf-grid-row">
@@ -66,20 +33,22 @@ function ShelfGridRow({ books }) {
   )
 }
 
+// 增補項 8-6：See All 頁自此只服務 Status 模式（To Read / Reading / Finished），
+// groupBy 固定 'status'，不再吃 URL 的分組類型；Year/Category 改由首頁 chips
+// 接管（見 Bookshelf.jsx），這裡不再放分類 chips（v2-D 的實作已移除）。
 export default function ShelfDetail() {
-  const { groupBy, slug } = useParams()
+  const { slug } = useParams()
+  const groupBy = 'status'
 
   const [books, setBooks] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
   const [row, setRow] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState(null)
 
   useEffect(() => {
-    setSelectedCategory(null) // 換排（不同 groupBy/slug）要重置篩選，不然選了的分類可能在新的一排裡完全不存在
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, slug])
+  }, [slug])
 
   async function load() {
     setStatus('loading')
@@ -95,12 +64,7 @@ export default function ShelfDetail() {
   }
 
   const title = row?.label ?? '找不到這一排'
-  const categories = row ? collectCategories(row.books) : []
-  const visibleBooks = row
-    ? selectedCategory
-      ? row.books.filter((book) => (book.category || UNCATEGORIZED_LABEL) === selectedCategory)
-      : row.books
-    : []
+  const visibleBooks = row?.books ?? []
   const rowsOf4 = chunk(visibleBooks, 4)
 
   return (
@@ -111,10 +75,6 @@ export default function ShelfDetail() {
         </Link>
         <h1 className="shelf-detail-title">{title}</h1>
       </header>
-
-      {status === 'ready' && row && (
-        <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
-      )}
 
       {status === 'loading' && <p className="shelf-detail-status">載入中…</p>}
       {status === 'error' && <p className="shelf-detail-status form-error">載入失敗：{error}</p>}

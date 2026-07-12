@@ -15,8 +15,11 @@ export function resolveShelfKey(book) {
   return VALID_STATUS_KEYS.has(book.status) ? book.status : 'reading'
 }
 
+// 增補項 8-7：篩選器選項改為三個（所有書籍/Year/Category），Status 不再是
+// 明列的可選項——它是沒特別選過任何東西時的預設基準視圖，不是使用者主動點的
+// 選項。groupBy 狀態本身仍然可以是 'status'（預設值），只是不出現在這份清單。
 export const GROUP_BY_OPTIONS = [
-  { value: 'status', label: 'Status' },
+  { value: 'all', label: 'All Books' },
   { value: 'year', label: 'Year' },
   { value: 'category', label: 'Category' },
 ]

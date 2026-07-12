@@ -44,7 +44,14 @@ export default function App() {
           <Route path="/book/:id" element={<BookDetail />} />
           <Route path="/note/:id" element={<NoteDetail />} />
           <Route path="/books/:bookId" element={<LegacyBookRedirect />} />
-          <Route path="/shelf/:groupBy/:slug" element={<ShelfDetail />} />
+          {/* 增補項 8：Year/Category 分組 + 「所有書籍」都是首頁 chips 接管的視圖，
+              不是獨立頁面——這幾個路由只是讓深連結/分享網址能還原對應狀態，
+              實際渲染的仍是 Bookshelf（見該檔的 useParams 初始化邏輯）。
+              See All 頁自此只服務 Status 模式。 */}
+          <Route path="/shelf/all" element={<Bookshelf />} />
+          <Route path="/shelf/year/:slug" element={<Bookshelf />} />
+          <Route path="/shelf/category/:slug" element={<Bookshelf />} />
+          <Route path="/shelf/status/:slug" element={<ShelfDetail />} />
           {/* 舊版單段狀態制路由（/shelf/:status）殘留連結一律導回首頁 */}
           <Route path="/shelf/:status" element={<Navigate to="/" replace />} />
         </Routes>
