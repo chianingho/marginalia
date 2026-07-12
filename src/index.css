@@ -1,9 +1,6 @@
 @import './styles/tokens.css';
 
 :root {
-  --font-serif: 'Noto Serif TC', 'Georgia', serif;
-  --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-
   /* R-1：改名跟 tokens.css 的 --color-bg（實際內容背景）分開——這個是舊版非
      flush 路由（.app-header/.app-main）殼層用的暖灰色，值不變，只是換名字避免
      撞名。目前 App.jsx 的路由幾乎全是 flush route，這個殼層很少真的被看到，
@@ -479,10 +476,10 @@ button.note-detail-annotate-btn:hover {
 
 .note-detail-page {
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-style: italic;
   font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-ink);
 }
 
@@ -554,8 +551,9 @@ button.note-detail-edit-btn:hover {
 .note-timeline-day-label {
   position: relative;
   z-index: 1;
-  font-size: 11px;
-  font-weight: 500;
+  font-family: var(--font-brand);
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.22em;
   color: var(--color-ink);
 }
@@ -620,8 +618,9 @@ button.note-timeline-card:hover {
 
 .note-timeline-page {
   margin: 8px 0 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-style: italic;
+  font-weight: 500;
   font-size: 13px;
   color: var(--color-ink);
 }
@@ -778,9 +777,9 @@ button.bookshelf-filter-btn:hover {
 }
 
 .shelf-row-label {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 400;
+  font-family: var(--font-brand);
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-text);
   letter-spacing: 0.02em;
 }

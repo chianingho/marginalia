@@ -1,16 +1,23 @@
 /* 全站設計常數。新增畫面一律引用這裡的變數，不要再寫死 hex 值。
    R-1（2026-07-11 重構批次）建立：把散落在各元件的寫死值集中到這裡，
-   純粹搬遷數值，沒有改任何實際顯示出來的顏色/尺寸。 */
+   純粹搬遷數值，沒有改任何實際顯示出來的顏色/尺寸。
+   v2-A（2026-07-12）擴充：Cormorant 品牌字體 + 黃痕上專用字色。 */
 :root {
   /* 色彩 */
-  --color-bg: #fdfcfa; /* 暖白舞台：書籍頁/筆記頁/時間軸等實際內容的背景 */
+  --color-bg: #fdfcfa; /* 暖白舞台：書籍頁/筆記頁/時間軸等實際內容的背景（跟橫幅線稿共用同一個值，不另外定義） */
   --color-ink: #111111; /* 內容近黑：日期標頭、頁數等強調用文字 */
   --color-text-secondary: #8a8a86; /* 次要資訊灰：時間軸時間、次要說明文字 */
   --color-note-content: #333333; /* 筆記內文 */
-  --color-green: #3e4a3d; /* 墨綠：書架層板／書的實體意象 */
+  --color-green: #3e4a3d; /* 墨綠：書的實體 + 品牌色（書架/橫幅底色/Add Book 按鈕/選中態） */
   --color-green-edge: #2a332a; /* 書架前緣、書名刷色等較深的墨綠 */
-  --color-highlight: #f2ff00; /* 螢光黃：閱讀痕跡（標注筆刷、標題刷色、日期標頭） */
+  --color-highlight: #f2ff00; /* 螢光黃：閱讀的痕跡——只能用在標注筆/日期標頭色塊/橫幅筆芯與書背，禁止用在純 UI 元件（按鈕/chips/badge/連結/focus ring） */
   --color-hairline: rgba(0, 0, 0, 0.07); /* 分隔線 */
+  --color-ink-on-yellow: #1c231b; /* 黃痕上的字色 */
+
+  /* 字體 */
+  --font-brand: 'Cormorant', 'Noto Serif TC', serif; /* 英文品牌層：日期標頭/p.{n}頁數/排標題等英數元素 */
+  --font-serif: 'Noto Serif TC', 'Georgia', serif; /* 中文標題（原有，不動） */
+  --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; /* 中文內文（原有，不動） */
 
   /* 佈局 */
   --content-left: 20px; /* 內容左邊界，書封左緣／時間軸欄共用（原 --shelf-inset） */
