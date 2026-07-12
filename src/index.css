@@ -696,13 +696,13 @@ button.note-timeline-card:hover {
   margin-top: 4px;
 }
 
-/* 首頁 lockup：單張定稿 PNG（3x 輸出），寬高寫死防 layout shift。
-   水平位置沿用 .bookshelf-header 既有的 text-align:center──img 是 inline-level
-   置換元素，同一套置中規則就會套用，不用另外寫定位邏輯。 */
-.bookshelf-lockup {
-  display: inline-block;
-  width: 150px;
-  height: 52px;
+/* 品牌橫幅：SVG 靠 viewBox + width 定高，不設固定 height，避免 layout shift。
+   負 margin 抵銷 .bookshelf-header 的左右 padding，讓綠底滿版出血；
+   maxWidth 390 由元件內 inline style 控制，這裡只負責破格滿版。 */
+.brand-banner {
+  display: block;
+  margin: -22px calc(-1 * var(--content-left)) 0;
+  background: var(--color-green);
 }
 
 /* 搜尋（放大鏡）+ 篩選 icon 並排：共用一個 wrapper 定位，z-index 3 保證
@@ -728,13 +728,13 @@ button.note-timeline-card:hover {
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: #000;
+  color: var(--color-bg);
 }
 
 button.bookshelf-search-btn:hover,
 button.bookshelf-filter-btn:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #000;
+  background: rgba(253, 252, 250, 0.14);
+  color: var(--color-bg);
   box-shadow: none;
 }
 

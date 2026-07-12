@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AddBookModal from '../components/AddBookModal.jsx'
+import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
 
@@ -129,14 +130,9 @@ export default function Bookshelf() {
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
+        <BrandBanner />
+
         <div className="bookshelf-header-titles">
-          <img
-            src="/lockup.png"
-            width="150"
-            height="52"
-            alt="Marginalia · Books"
-            className="bookshelf-lockup"
-          />
           {GROUP_BY_SUBTITLE[groupBy] && (
             <p className="bookshelf-eyebrow bookshelf-groupby">{GROUP_BY_SUBTITLE[groupBy]}</p>
           )}
