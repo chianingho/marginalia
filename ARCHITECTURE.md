@@ -55,12 +55,14 @@
 - **tokens.css**：`src/styles/tokens.css`，全站色彩／關鍵佈局值的唯一定義。
 - **imageStore.js**：`src/lib/imageStore.js`，IndexedDB 圖片存取的唯一入口。
 - **format.js**：`src/lib/format.js`，`created_at` 的日期/時間顯示格式化。
-- **meta-text（設計系統修訂，2026-07-13 定案）**：Cormorant 自「日期標頭與
-  頁碼」退場，metadata 類文字（筆記頁日期標頭、筆記頁/詳情頁 p.{n}、兩處
-  時間戳）統一改用跟時間戳同一份 font-family（`var(--font-sans)`）、無斜體，
-  共用 class `.meta-text`（`index.css`）。Cormorant（`var(--font-brand)`）
-  其餘用途（排標題、See All 大標、chips、Status 標籤、{n} books 等）不受
-  影響，繼續用 Cormorant。
+- **meta-text（設計系統修訂，2026-07-13 定案，B-5 擴大範圍）**：Cormorant
+  自「日期標頭與頁碼」退場，metadata 類文字統一改用跟時間戳同一份
+  font-family（`var(--font-sans)`）、無斜體，共用 class `.meta-text`
+  （`index.css`，只給 font-family/font-style，字級/顏色留給各自的 class）。
+  範圍：筆記頁日期標頭、筆記頁/詳情頁 p.{n}、兩處時間戳、**{n} books**
+  （`.wrap-shelf-count`）、**{Status} · {n} notes**（`.book-page-meta`）。
+  Cormorant（`var(--font-brand)`）剩下的用途：排標題、See All 大標、chips、
+  Status 標籤——這些不是「metadata 數字/時間」性質，不受影響。
 - **返回鍵（導航鐵則，2026-07-12 定案）**：
   1. 預設：全 app 返回一律 `‹` chevron、無外框、無底色；深色底反白 `#FDFCFA`，
      淺色底 `#111`；熱區以透明 padding 撐到 ≥44×44。
@@ -70,12 +72,24 @@
   3. 標注畫面（`ImageAnnotator`）：無 `‹` 也無 X，離開一律走 Cancel／Done 膠囊。
 - **首頁橫幅（2026-07-13 定案，取代 0712 總規格第 1 項「沿用頁面邊距」）**：
   `BrandBanner` 改 full-bleed 貼齊螢幕邊（不再吃 `.bookshelf-header` 左右
-  padding），純展示、無 props、無 state——原本的 Group by 疊字機制（absolute
-  疊在圖上顯示模式名/選中值）整組廢除，**chips 是分組狀態唯一的視覺指示**。
-  Year/Category 分組模式下（chips 顯示時），排標題/區塊標頭的組名文字一律
-  移除，只留右側 `{n} books`（`.wrap-shelf-count`，margin-left:auto 確保
-  沒有組名陪襯時仍貼右）；Status 預設模式完全不受影響，排標題與 See all
-  照舊。
+  padding）——原本的 Group by 疊字機制（absolute 疊在圖上顯示模式名/選中值）
+  整組廢除，**chips 是分組狀態唯一的視覺指示**。`BrandBanner` 吃一個
+  `children` prop，讓 Bookshelf 把搜尋/篩選 icons 疊在橫幅內部，因為所有
+  「相對橫幅寬高的百分比定位」（icons 對齊 Marginalia/書脊、subtitle 等）
+  都必須以 `.brand-banner` 自己的滿版寬度（390px）當基準，外面若再包一層
+  會吃 `.bookshelf-header` padding 的 wrap div，百分比會算錯（曾經踩過一次，
+  B-2 修正）。已知限制：banner.png 圖檔本身烙有**不透明**（無 alpha）
+  的白色羽化圓角，滿版後四角仍會露出白色缺口，`.brand-banner` 補的
+  `background: var(--color-green)` 只對「半透明邊緣造成的色差縫」有效，
+  對完全不透明的色塊沒有效果——要徹底解決得重出圖檔（拿掉圓角或轉真正的
+  透明背景）。
+  Year/Category 分組模式下（chips 顯示時）：All chip（或還沒選任何 chip）
+  ＝全館所有書籍的換行書架（跟「所有書籍」篩選選項重用同一個 `WrapShelf`
+  元件，不是「各組一排橫滑」了）；選中特定 chip＝該組換行書架。「各組
+  一排橫滑」的多排視圖現在**只存在於 Status 模式**（`ShelfRow`）。所有
+  書架區塊標頭一律只留右側 `{n} books`（`.wrap-shelf-count`，
+  margin-left:auto 確保沒有組名陪襯時仍貼右），組名文字不顯示；Status
+  模式排標題與 See all 完全不受影響、照舊顯示。
 - **筆記放大／標注唯一入口**：`/note/:id`（`NoteDetail.jsx`）是筆記圖片
   放大檢視與標注的唯一入口。舊的「點縮圖→整頁黑底 lightbox→中央白色
   Edit annotation 膠囊」入口（原 `NoteImageLightbox` 的一般檢視分支）已

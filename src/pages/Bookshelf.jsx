@@ -53,23 +53,18 @@ function FilterIcon() {
   )
 }
 
-// v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整；
-// 只有依 status 分組時的 Reading 排會是 true，依 year/category 分組時完全不受影響。
-// 增補項 8-2 / H-1-6：分組模式下排標題與 See all 連結一併移除，改右側顯示
-// {n} books；Status 模式兩者都不動（showLabel 同時控制這兩者，因為規格裡
-// 這兩個永遠同進退）。
-function ShelfRow({ label, href, count, books, isHero = false, showLabel = true }) {
+// v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整。
+// B-4：「各組一排橫滑」視圖已從 Year/Category 移除（改全館換行書架），
+// ShelfRow 現在只服務 Status 模式，排標題與 See all 固定顯示，不再需要
+// showLabel 開關。
+function ShelfRow({ label, href, books, isHero = false }) {
   return (
     <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
       <div className="shelf-row-header">
-        {showLabel && <span className="shelf-row-label">{label}</span>}
-        {showLabel ? (
-          <Link to={href} className="shelf-row-see-all">
-            See all ›
-          </Link>
-        ) : (
-          <span className="wrap-shelf-count">{count} books</span>
-        )}
+        <span className="shelf-row-label">{label}</span>
+        <Link to={href} className="shelf-row-see-all">
+          See all ›
+        </Link>
       </div>
       <div className="shelf-scroll">
         <div className="shelf-track">
@@ -108,7 +103,7 @@ function WrapShelf({ label, count, books }) {
   return (
     <div className="wrap-shelf" aria-label={label}>
       <div className="wrap-shelf-header">
-        <span className="wrap-shelf-count">{count} books</span>
+        <span className="wrap-shelf-count meta-text">{count} books</span>
       </div>
       <div className="wrap-shelf-rows">
         {rowsOf3.map((group, index) => (
@@ -226,9 +221,7 @@ export default function Bookshelf() {
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
-        <div className="bookshelf-banner-wrap">
-          <BrandBanner />
-
+        <BrandBanner>
           <div className="bookshelf-header-icons">
             <button
               type="button"
@@ -248,7 +241,7 @@ export default function Bookshelf() {
               <FilterIcon />
             </button>
           </div>
-        </div>
+        </BrandBanner>
 
         {searchOpen && (
           <div className="bookshelf-search-row">
@@ -295,7 +288,10 @@ export default function Bookshelf() {
         <p className="bookshelf-status empty-hint">書庫還是空的，點擊下方「Add Book」開始紀錄你的閱讀吧！</p>
       )}
 
-      {status === 'ready' && books.length > 0 && groupByState === 'all' && (
+      {/* B-4：Year/Category 模式下，All chip（或還沒選任何 chip）＝全館換行
+          書架，跟 8-7「所有書籍」重用同一個 WrapShelf，不另寫一份。
+          「各組一排橫滑」視圖從 Year/Category 移除，只剩 Status 模式保留。 */}
+      {status === 'ready' && books.length > 0 && (groupByState === 'all' || (isGrouped && !selectedRow)) && (
         <div className="shelf-rows">
           <WrapShelf label="All Books" count={filteredBooks.length} books={filteredBooks} />
         </div>
@@ -307,17 +303,15 @@ export default function Bookshelf() {
         </div>
       )}
 
-      {status === 'ready' && books.length > 0 && (groupByState === 'status' || (isGrouped && !selectedRow)) && (
+      {status === 'ready' && books.length > 0 && groupByState === 'status' && (
         <div className="shelf-rows">
           {rows.map((row) => (
             <ShelfRow
               key={row.key}
               label={row.label}
               href={`/shelf/${groupByState}/${encodeURIComponent(row.slug)}`}
-              count={row.books.length}
               books={row.books}
-              isHero={groupByState === 'status' && row.key === 'reading'}
-              showLabel={groupByState === 'status'}
+              isHero={row.key === 'reading'}
             />
           ))}
         </div>

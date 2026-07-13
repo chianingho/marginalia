@@ -97,7 +97,7 @@ export default function BookDetail() {
                 Edit
               </button>
             </p>
-            <p className="book-page-meta">
+            <p className="book-page-meta meta-text">
               {statusLabel(book)} · {notes.length} notes
             </p>
           </div>

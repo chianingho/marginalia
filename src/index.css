@@ -428,10 +428,11 @@ button.book-page-edit-btn:hover {
   box-shadow: none;
 }
 
+/* B-5：{Status} · {n} notes 同屬 metadata 層，font-family/font-style
+   交給 .meta-text，這裡只留字級/字重/顏色（沿用綠帶上的反白配色，跟
+   {n} books 的 #8A8A86 是不同底色情境，各自維持自己原本的顏色）。 */
 .book-page-meta {
   margin: 6px 0 0;
-  font-family: var(--font-brand);
-  font-style: italic;
   font-weight: 500;
   font-size: 12px;
   color: rgba(253, 252, 250, 0.72);
@@ -790,18 +791,17 @@ button.note-timeline-card:hover {
 }
 
 /* H-1-1（修訂總規格第 1 項「沿用頁面邊距」的定案）：橫幅改 full-bleed，
-   左右貼齊螢幕邊，不再吃 .bookshelf-header 的左右 padding。banner.png
-   本身的圓角是烙在圖裡的白色羽化角，跟頁面底色 var(--color-bg) 幾乎同色
-   （量測 #FCFCFB vs #FDFCFA），滿版貼齊螢幕邊後這圈白幾乎融進頁面底色，
-   肉眼看不出圓角。position:relative 讓 icons 可以用百分比定位在 wrap 上。 */
-.bookshelf-banner-wrap {
-  position: relative;
-}
-
+   左右貼齊螢幕邊，不再吃 .bookshelf-header 的左右 padding。
+   B-1：banner.png 圖檔本身烙有不透明的白色羽化圓角（無 alpha 透明通道），
+   容器補 var(--color-green) 對「圖檔邊緣半透明造成的色差縫」有效，但對
+   這種完全不透明的白色色塊沒有效果——已知限制，見批次完成報告。
+   position:relative 是 icons（B-2 起改掛在這裡當 children）的定位基準，
+   寬度是滿版真正的 390px，不能再外面多包一層會吃 padding 的 wrap div。 */
 .brand-banner {
   position: relative;
   display: block;
   overflow: hidden;
+  background: var(--color-green);
   margin: -22px calc(-1 * var(--content-left)) 0;
 }
 
@@ -817,13 +817,15 @@ button.note-timeline-card:hover {
   margin-left: -1.5%;
 }
 
-/* H-1-2：放大鏡/篩選器垂直中心對齊圖中「Marginalia」字樣（量測落在banner
-   高度 22% 處），改用相對 .bookshelf-banner-wrap 高度的百分比定位，
-   不受下方搜尋列展開/收合影響（wrap 高度只由banner圖片決定）。 */
+/* H-1-2：放大鏡/篩選器垂直中心對齊圖中「Marginalia」字樣，量測落在 banner
+   高度 22% 處。B-2：篩選器（右側那顆）右緣對齊圖中最右側書脊右緣，實測
+   落在橫幅寬度 93.2% 處（= 距右緣 6.7%）。兩者都相對 .brand-banner 自己
+   （滿版 390px），不是外面的 header（那個還留著 padding，寬度只有
+   350px，用那個當基準百分比會算錯）。 */
 .bookshelf-header-icons {
   position: absolute;
   top: 22%;
-  right: calc(var(--content-left) - 4px);
+  right: 6.7%;
   transform: translateY(-50%);
   z-index: 3;
   display: flex;
@@ -1071,10 +1073,10 @@ button.bookshelf-filter-btn:hover {
 /* H-1-6：組名移除後這常常是唯一的 header 子元素，margin-left:auto 確保
    不管有沒有 label 陪襯都固定貼右（justify-content:space-between 只在
    有兩個子元素時才有效果）。 */
+/* B-5：font-family/font-style 交給 .meta-text（跟時間戳同字體，Cormorant
+   italic 退場），這裡只留字級/顏色/排版。 */
 .wrap-shelf-count {
   margin-left: auto;
-  font-family: var(--font-brand);
-  font-style: italic;
   font-size: 13px;
   color: #8a8a86;
   white-space: nowrap;
@@ -1304,13 +1306,14 @@ button.btn-frosted:hover {
 
 /* v2-D：分類 chips，標題下方一列橫向滑動。純 UI 元件，禁用螢光黃
    （黃色只留給「閱讀的痕跡」語意，見 tokens.css 的色彩語意法則）。 */
+/* B-3：與橫幅下緣的間距加大，不壓迫、有呼吸感 */
 .chip-row {
   flex-shrink: 0;
   display: flex;
   gap: 8px;
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 0 var(--content-left) 14px;
+  padding: 22px var(--content-left) 14px;
 }
 
 .chip-row::-webkit-scrollbar {
