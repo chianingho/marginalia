@@ -84,7 +84,7 @@ export default function NoteDetail() {
     <div className="note-detail-screen">
       <header className="note-detail-band">
         <button type="button" className="note-detail-back" aria-label="返回" onClick={handleBack}>
-          ‹
+          <span>‹</span>
         </button>
         <h1 className="note-detail-title">{book?.title || 'Marginalia'}</h1>
       </header>

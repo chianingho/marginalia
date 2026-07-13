@@ -459,8 +459,13 @@ button.book-page-edit-btn:hover {
   padding: calc(var(--safe-top) + 18px) var(--content-left) 18px;
 }
 
+/* D-1-2：跟 N-1-1 同一個問題——align-items:center 置中的是行框，不是
+   「‹」這個字符本身的墨色，另外包 span 做 1.5px 光學位移往上修正，
+   跟書名的視覺中心線才會真的對齊。間距 14px、左緣 --content-left 不動。 */
 .note-detail-back {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
   background: transparent;
   border: none;
   padding: 4px;
@@ -468,6 +473,11 @@ button.book-page-edit-btn:hover {
   color: var(--color-bg);
   font-size: 22px;
   line-height: 1;
+}
+
+.note-detail-back span {
+  display: block;
+  transform: translateY(-1.5px);
 }
 
 button.note-detail-back:hover {
@@ -514,6 +524,26 @@ button.note-detail-back:hover {
   position: absolute;
   right: 12px;
   bottom: 12px;
+}
+
+/* D-1-1：改半透明白膠囊，跟標注畫面 Cancel 同語言，不再是墨綠磨砂——
+   蓋掉 .btn-frosted 的深色底/邊/陰影，只留 .btn-frosted--sm 給的形狀/
+   padding/字級。用 .note-detail-annotate-btn.btn-frosted 複合選擇器拉高
+   優先度（.btn-frosted 本體在樣式表更後面，單純同順位的話會被它蓋掉）。
+   位置、尺寸、點擊行為不動。 */
+.note-detail-annotate-btn.btn-frosted {
+  background: rgba(255, 255, 255, 0.14);
+  border: 0.5px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: none;
+  color: #fdfcfa;
+}
+
+button.note-detail-annotate-btn.btn-frosted:hover {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fdfcfa;
+  box-shadow: none;
 }
 
 /* 段三：紙面內文區 */

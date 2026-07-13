@@ -68,6 +68,21 @@
      `.btn-frosted` 圓形變體（墨綠磨砂圓底）+ 白 `‹`——綠帶上、白底上都可見。
      目前僅筆記頁（`/book/:id`）適用。
   3. 標注畫面（`ImageAnnotator`）：無 `‹` 也無 X，離開一律走 Cancel／Done 膠囊。
+- **首頁橫幅（2026-07-13 定案，取代 0712 總規格第 1 項「沿用頁面邊距」）**：
+  `BrandBanner` 改 full-bleed 貼齊螢幕邊（不再吃 `.bookshelf-header` 左右
+  padding），純展示、無 props、無 state——原本的 Group by 疊字機制（absolute
+  疊在圖上顯示模式名/選中值）整組廢除，**chips 是分組狀態唯一的視覺指示**。
+  Year/Category 分組模式下（chips 顯示時），排標題/區塊標頭的組名文字一律
+  移除，只留右側 `{n} books`（`.wrap-shelf-count`，margin-left:auto 確保
+  沒有組名陪襯時仍貼右）；Status 預設模式完全不受影響，排標題與 See all
+  照舊。
+- **筆記放大／標注唯一入口**：`/note/:id`（`NoteDetail.jsx`）是筆記圖片
+  放大檢視與標注的唯一入口。舊的「點縮圖→整頁黑底 lightbox→中央白色
+  Edit annotation 膠囊」入口（原 `NoteImageLightbox` 的一般檢視分支）已
+  整組移除；`NoteImageLightbox.jsx` 現在單純是「撈原圖→進
+  `ImageAnnotator`→存檔」的 wrapper，不再有檢視/標注兩態切換。
+  `NoteList.jsx` 的縮圖不再有獨立 `onClick`，點卡片任何位置一律導頁進
+  `/note/:id`。
 
 ## 新增畫面時的規則
 
