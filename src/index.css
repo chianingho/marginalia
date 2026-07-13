@@ -522,6 +522,17 @@ button.note-detail-back:hover {
   justify-content: flex-end;
 }
 
+/* G-1（設計系統修訂）：Cormorant 自「日期標頭與頁碼」退場，改跟時間戳同字體
+   （現行時間戳沒特別宣告 font-family，吃的是 body 的 var(--font-sans)）。
+   四個用法共用這一份：筆記頁日期標頭、筆記頁 p.{n}、詳情頁 p.{n}、兩處時間戳
+   本身。各自的字級/顏色/字距在各自的 class 上維持不動，這裡只統一
+   font-family 跟拿掉斜體。Cormorant 其餘用途（排標題/See All/chips/
+   Status/{n} books）不受影響。 */
+.meta-text {
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
 .note-detail-page-wrap {
   position: relative;
   display: inline-flex;
@@ -543,8 +554,6 @@ button.note-detail-back:hover {
   position: relative;
   z-index: 1;
   margin: 0;
-  font-family: var(--font-brand);
-  font-style: italic;
   font-weight: 500;
   font-size: 17px;
   color: #111;
@@ -617,7 +626,6 @@ button.note-detail-edit-btn:hover {
 .note-timeline-day-label {
   position: relative;
   z-index: 1;
-  font-family: var(--font-brand);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.22em;
@@ -684,8 +692,6 @@ button.note-timeline-card:hover {
 
 .note-timeline-page {
   margin: 8px 0 0;
-  font-family: var(--font-brand);
-  font-style: italic;
   font-weight: 500;
   font-size: 13px;
   color: var(--color-ink);

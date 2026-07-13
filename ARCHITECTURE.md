@@ -55,6 +55,12 @@
 - **tokens.css**：`src/styles/tokens.css`，全站色彩／關鍵佈局值的唯一定義。
 - **imageStore.js**：`src/lib/imageStore.js`，IndexedDB 圖片存取的唯一入口。
 - **format.js**：`src/lib/format.js`，`created_at` 的日期/時間顯示格式化。
+- **meta-text（設計系統修訂，2026-07-13 定案）**：Cormorant 自「日期標頭與
+  頁碼」退場，metadata 類文字（筆記頁日期標頭、筆記頁/詳情頁 p.{n}、兩處
+  時間戳）統一改用跟時間戳同一份 font-family（`var(--font-sans)`）、無斜體，
+  共用 class `.meta-text`（`index.css`）。Cormorant（`var(--font-brand)`）
+  其餘用途（排標題、See All 大標、chips、Status 標籤、{n} books 等）不受
+  影響，繼續用 Cormorant。
 - **返回鍵（導航鐵則，2026-07-12 定案）**：
   1. 預設：全 app 返回一律 `‹` chevron、無外框、無底色；深色底反白 `#FDFCFA`，
      淺色底 `#111`；熱區以透明 padding 撐到 ≥44×44。

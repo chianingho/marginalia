@@ -54,7 +54,7 @@ function DayHeader({ label }) {
     <HighlightLabel
       wrapClassName="note-timeline-day-header"
       highlightClassName="note-timeline-day-highlight"
-      labelClassName="note-timeline-day-label"
+      labelClassName="note-timeline-day-label meta-text"
     >
       {label}
     </HighlightLabel>
@@ -129,7 +129,7 @@ export default function NoteList({ notes, showBookTitle = false }) {
             {group.notes.map((note) => (
               <div className="note-timeline-row" key={note.id}>
                 <div className="note-timeline-col">
-                  <span className="note-timeline-time">{formatTimelineTime(note.created_at)}</span>
+                  <span className="note-timeline-time meta-text">{formatTimelineTime(note.created_at)}</span>
                 </div>
 
                 <div className="note-timeline-card-wrap">
@@ -143,7 +143,7 @@ export default function NoteList({ notes, showBookTitle = false }) {
                     {getOriginalImageKey(note) && (
                       <NoteThumbnail note={note} refreshToken={refreshTokens[note.id]} onOpen={(url) => openLightbox(note, url)} />
                     )}
-                    {note.page != null && note.page !== '' && <p className="note-timeline-page">p. {note.page}</p>}
+                    {note.page != null && note.page !== '' && <p className="note-timeline-page meta-text">p. {note.page}</p>}
                     {note.content && <NoteContent text={note.content} />}
                   </button>
                 </div>

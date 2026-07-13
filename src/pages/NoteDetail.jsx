@@ -110,16 +110,16 @@ export default function NoteDetail() {
             <HighlightLabel
               wrapClassName="note-detail-page-wrap"
               highlightClassName="note-detail-page-highlight"
-              labelClassName="note-detail-page"
+              labelClassName="note-detail-page meta-text"
             >
               p. {note.page}
             </HighlightLabel>
-            <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
+            <span className="note-detail-date meta-text">{formatFullDate(note.created_at)}</span>
           </div>
         )}
         {(note.page == null || note.page === '') && (
           <div className="note-detail-meta-row note-detail-meta-row--no-page">
-            <span className="note-detail-date">{formatFullDate(note.created_at)}</span>
+            <span className="note-detail-date meta-text">{formatFullDate(note.created_at)}</span>
           </div>
         )}
 
