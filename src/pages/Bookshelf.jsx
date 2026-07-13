@@ -5,8 +5,6 @@ import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
 
-const GROUP_BY_SUBTITLE = { year: 'Year', category: 'Category', all: 'All Books' }
-
 function chunk(list, size) {
   const out = []
   for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size))
@@ -57,16 +55,20 @@ function FilterIcon() {
 
 // v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整；
 // 只有依 status 分組時的 Reading 排會是 true，依 year/category 分組時完全不受影響。
-// 增補項 8-2：分組模式下 See all 連結移除，只有 Status 模式保留（showSeeAll）。
-function ShelfRow({ label, href, books, isHero = false, showSeeAll = true }) {
+// 增補項 8-2 / H-1-6：分組模式下排標題與 See all 連結一併移除，改右側顯示
+// {n} books；Status 模式兩者都不動（showLabel 同時控制這兩者，因為規格裡
+// 這兩個永遠同進退）。
+function ShelfRow({ label, href, count, books, isHero = false, showLabel = true }) {
   return (
     <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
       <div className="shelf-row-header">
-        <span className="shelf-row-label">{label}</span>
-        {showSeeAll && (
+        {showLabel && <span className="shelf-row-label">{label}</span>}
+        {showLabel ? (
           <Link to={href} className="shelf-row-see-all">
             See all ›
           </Link>
+        ) : (
+          <span className="wrap-shelf-count">{count} books</span>
         )}
       </div>
       <div className="shelf-scroll">
@@ -100,12 +102,12 @@ function ShelfRow({ label, href, books, isHero = false, showSeeAll = true }) {
 // 增補項 8-2/8-7：換行書架，chip 選中單一組、或「所有書籍」模式共用同一份
 // 實作（不另外寫一份）。每層 3 本，沿用跟首頁橫向排一樣的墨綠 3D 層板元件，
 // 不拆不簡化；最後一層不足額時 grid 自然靠左、層板照樣 left:0/right:0 滿寬。
+// H-1-6：組名文字移除（label 只留給 aria-label 用），{n} books 保留。
 function WrapShelf({ label, count, books }) {
   const rowsOf3 = chunk(books, 3)
   return (
-    <div className="wrap-shelf">
+    <div className="wrap-shelf" aria-label={label}>
       <div className="wrap-shelf-header">
-        <span className="shelf-row-label">{label}</span>
         <span className="wrap-shelf-count">{count} books</span>
       </div>
       <div className="wrap-shelf-rows">
@@ -221,38 +223,31 @@ export default function Bookshelf() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupByState, selectedChip, status])
 
-  const subtitle =
-    groupByState === 'all'
-      ? GROUP_BY_SUBTITLE.all
-      : isGrouped
-        ? selectedRow
-          ? selectedRow.label
-          : GROUP_BY_SUBTITLE[groupByState]
-        : undefined
-
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
-        <BrandBanner subtitle={subtitle} />
+        <div className="bookshelf-banner-wrap">
+          <BrandBanner />
 
-        <div className="bookshelf-header-icons">
-          <button
-            type="button"
-            className="bookshelf-search-btn"
-            onClick={toggleSearch}
-            aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
-            aria-expanded={searchOpen}
-          >
-            <SearchIcon />
-          </button>
-          <button
-            type="button"
-            className="bookshelf-filter-btn"
-            onClick={() => setFilterOpen(true)}
-            aria-label="Group by"
-          >
-            <FilterIcon />
-          </button>
+          <div className="bookshelf-header-icons">
+            <button
+              type="button"
+              className="bookshelf-search-btn"
+              onClick={toggleSearch}
+              aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
+              aria-expanded={searchOpen}
+            >
+              <SearchIcon />
+            </button>
+            <button
+              type="button"
+              className="bookshelf-filter-btn"
+              onClick={() => setFilterOpen(true)}
+              aria-label="Group by"
+            >
+              <FilterIcon />
+            </button>
+          </div>
         </div>
 
         {searchOpen && (
@@ -319,9 +314,10 @@ export default function Bookshelf() {
               key={row.key}
               label={row.label}
               href={`/shelf/${groupByState}/${encodeURIComponent(row.slug)}`}
+              count={row.books.length}
               books={row.books}
               isHero={groupByState === 'status' && row.key === 'reading'}
-              showSeeAll={groupByState === 'status'}
+              showLabel={groupByState === 'status'}
             />
           ))}
         </div>

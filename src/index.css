@@ -750,31 +750,42 @@ button.note-timeline-card:hover {
   text-align: center;
 }
 
-/* 總規格項目 1：橫幅改定稿點陣圖（/public/banner.png，圓角與構圖已烙在圖裡）。
-   容器透明底、無圓角、無邊框、無底色，左右邊距沿用 .bookshelf-header 既有 padding
-   （不再破格滿版）；img 只給 width:100%，靠圖片原生比例撐高度，不設固定 height，
-   不會有 layout shift。position:relative 給 Group by 疊字用 absolute 定位。 */
+/* H-1-1（修訂總規格第 1 項「沿用頁面邊距」的定案）：橫幅改 full-bleed，
+   左右貼齊螢幕邊，不再吃 .bookshelf-header 的左右 padding。banner.png
+   本身的圓角是烙在圖裡的白色羽化角，跟頁面底色 var(--color-bg) 幾乎同色
+   （量測 #FCFCFB vs #FDFCFA），滿版貼齊螢幕邊後這圈白幾乎融進頁面底色，
+   肉眼看不出圓角。position:relative 讓 icons 可以用百分比定位在 wrap 上。 */
+.bookshelf-banner-wrap {
+  position: relative;
+}
+
 .brand-banner {
   position: relative;
   display: block;
+  overflow: hidden;
+  margin: -22px calc(-1 * var(--content-left)) 0;
 }
 
-.brand-banner-subtitle {
-  position: absolute;
-  left: 7.5%;
-  top: 52%;
-  font-family: var(--font-brand);
-  font-weight: 500;
-  font-size: 19px;
-  color: #fdfcfa;
+/* H-1-3：圖中書堆左緣量測落在原圖寬度 6.6%，滿版後想貼齊 --content-left
+   需要整張左移約 1.5% 容器寬。純平移會在右緣露出底色縫，所以連同寬度一起
+   加大 1.5%（等比，不改變外觀比例／不裁切變形圖案本身），right 端由容器
+   overflow:hidden 吃掉多出來的量——視覺上等同「整張平移＋裁掉多的」，不是
+   把圖案拉伸變形。 */
+.brand-banner-img {
+  display: block;
+  width: 101.5%;
+  height: auto;
+  margin-left: -1.5%;
 }
 
-/* 搜尋（放大鏡）+ 篩選 icon 並排：共用一個 wrapper 定位，z-index 3 保證
-   一定蓋在標題文字／螢光筆刷束之上，熱區不會被蓋住 */
+/* H-1-2：放大鏡/篩選器垂直中心對齊圖中「Marginalia」字樣（量測落在banner
+   高度 22% 處），改用相對 .bookshelf-banner-wrap 高度的百分比定位，
+   不受下方搜尋列展開/收合影響（wrap 高度只由banner圖片決定）。 */
 .bookshelf-header-icons {
   position: absolute;
-  top: 14px;
+  top: 22%;
   right: calc(var(--content-left) - 4px);
+  transform: translateY(-50%);
   z-index: 3;
   display: flex;
   align-items: center;
@@ -1018,7 +1029,11 @@ button.bookshelf-filter-btn:hover {
   margin-bottom: 12px;
 }
 
+/* H-1-6：組名移除後這常常是唯一的 header 子元素，margin-left:auto 確保
+   不管有沒有 label 陪襯都固定貼右（justify-content:space-between 只在
+   有兩個子元素時才有效果）。 */
 .wrap-shelf-count {
+  margin-left: auto;
   font-family: var(--font-brand);
   font-style: italic;
   font-size: 13px;
@@ -1263,12 +1278,17 @@ button.btn-frosted:hover {
   display: none;
 }
 
+/* H-1-4：line-height 對齊 height 的做法在部分字型度量下文字會偏下，改用
+   flex 置中，視覺上才真的居中。 */
 .chip {
   flex-shrink: 0;
   height: 32px;
   padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
-  font: 500 13px/32px var(--font-sans);
+  font: 500 13px/1 var(--font-sans);
   color: var(--color-ink);
   background: transparent;
   border: 1px solid var(--color-hairline-strong, rgba(0, 0, 0, 0.14));
