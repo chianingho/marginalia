@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import { formatTimelineDate, formatTimelineTime } from '../lib/format.js'
-import NoteImageLightbox from './NoteImageLightbox.jsx'
 import HighlightLabel from './HighlightLabel.jsx'
 
 // 依本地日期（年/月/日）分組——notes 已經是 created_at 由舊到新排序，同一天一定
@@ -62,10 +61,11 @@ function DayHeader({ label }) {
 }
 
 // 撈顯示用截圖 blob（有標注就是合成快取，沒有就 fallback 原圖）轉成縮圖，
-// 離開時自己 revoke object URL。refreshToken 變了就強制重撈一次
-// （標注完成後用這個觸發縮圖更新，撈的時候一律走 getNoteDisplayBlob，
-// 不用擔心這裡的 note prop 是不是最新——顯示快取 key 是純 noteId 算出來的固定值）。
-function NoteThumbnail({ note, refreshToken, onOpen }) {
+// 離開時自己 revoke object URL。N-2：縮圖不再是可點開 lightbox 的獨立入口，
+// 點卡片任何位置（含縮圖）一律導頁進 /note/:id 詳情頁——不用 stopPropagation
+// 也不用 refreshToken 手動觸發更新，標注完從詳情頁返回時 /book/:id 整頁
+// 重新掛載、notes 重新撈取，縮圖自然拿到最新的顯示快取。
+function NoteThumbnail({ note }) {
   const [url, setUrl] = useState(null)
 
   useEffect(() => {
@@ -81,21 +81,11 @@ function NoteThumbnail({ note, refreshToken, onOpen }) {
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [note.id, refreshToken])
+  }, [note.id])
 
   if (!url) return null
 
-  return (
-    <img
-      src={url}
-      alt=""
-      className="note-timeline-thumb"
-      onClick={(e) => {
-        e.stopPropagation()
-        onOpen(url)
-      }}
-    />
-  )
+  return <img src={url} alt="" className="note-timeline-thumb" />
 }
 
 // 純渲染元件：吃 notes 陣列畫時間軸，依日分組（同一天共用一個日期標頭，卡片
@@ -103,11 +93,11 @@ function NoteThumbnail({ note, refreshToken, onOpen }) {
 // 時間牆會把 note.bookTitle 一起塞進 notes 陣列再傳進來）。
 // 顯示排序固定為 created_at 由舊到新（由上往下），跟資料層 getNotesByBook 回傳的
 // 新到舊順序無關——這裡只重排「顯示用」的副本，不動 notes prop、不動資料層。
-// 卡片點擊 = 導頁進 /note/:id 詳情頁（縮圖點擊另外 stopPropagation，走既有 lightbox）。
+// N-2：統一路徑，卡片內任意位置（分隔線內，含縮圖）一律導頁進 /note/:id
+// 詳情頁——舊的「點縮圖 → 整頁黑底 lightbox → Edit annotation」入口整組
+// 移除，標注一律從詳情頁的 Edit annotation 進去。
 export default function NoteList({ notes, showBookTitle = false }) {
   const navigate = useNavigate()
-  const [lightbox, setLightbox] = useState(null) // { note, url } | null
-  const [refreshTokens, setRefreshTokens] = useState({})
 
   if (notes.length === 0) {
     return <p className="note-timeline-empty">No notes yet</p>
@@ -116,54 +106,34 @@ export default function NoteList({ notes, showBookTitle = false }) {
   const sortedNotes = [...notes].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''))
   const dayGroups = groupNotesByDay(sortedNotes)
 
-  function openLightbox(note, url) {
-    setLightbox({ note, url })
-  }
-
   return (
-    <>
-      <div className="note-timeline">
-        {dayGroups.map((group) => (
-          <div className="note-timeline-day-group" key={group.key}>
-            <DayHeader label={group.label} />
-            {group.notes.map((note) => (
-              <div className="note-timeline-row" key={note.id}>
-                <div className="note-timeline-col">
-                  <span className="note-timeline-time meta-text">{formatTimelineTime(note.created_at)}</span>
-                </div>
-
-                <div className="note-timeline-card-wrap">
-                  <div className="note-timeline-divider" />
-                  <button
-                    type="button"
-                    className="note-timeline-card"
-                    onClick={() => navigate(`/note/${note.id}`)}
-                  >
-                    {showBookTitle && note.bookTitle && <p className="note-timeline-book">{note.bookTitle}</p>}
-                    {getOriginalImageKey(note) && (
-                      <NoteThumbnail note={note} refreshToken={refreshTokens[note.id]} onOpen={(url) => openLightbox(note, url)} />
-                    )}
-                    {note.page != null && note.page !== '' && <p className="note-timeline-page meta-text">p. {note.page}</p>}
-                    {note.content && <NoteContent text={note.content} />}
-                  </button>
-                </div>
+    <div className="note-timeline">
+      {dayGroups.map((group) => (
+        <div className="note-timeline-day-group" key={group.key}>
+          <DayHeader label={group.label} />
+          {group.notes.map((note) => (
+            <div className="note-timeline-row" key={note.id}>
+              <div className="note-timeline-col">
+                <span className="note-timeline-time meta-text">{formatTimelineTime(note.created_at)}</span>
               </div>
-            ))}
-          </div>
-        ))}
-      </div>
 
-      {lightbox && (
-        <NoteImageLightbox
-          note={lightbox.note}
-          displayUrl={lightbox.url}
-          onClose={() => setLightbox(null)}
-          onAnnotated={(newUrl) => {
-            setLightbox((prev) => (prev ? { ...prev, url: newUrl } : prev))
-            setRefreshTokens((prev) => ({ ...prev, [lightbox.note.id]: (prev[lightbox.note.id] || 0) + 1 }))
-          }}
-        />
-      )}
-    </>
+              <div className="note-timeline-card-wrap">
+                <div className="note-timeline-divider" />
+                <button
+                  type="button"
+                  className="note-timeline-card"
+                  onClick={() => navigate(`/note/${note.id}`)}
+                >
+                  {showBookTitle && note.bookTitle && <p className="note-timeline-book">{note.bookTitle}</p>}
+                  {getOriginalImageKey(note) && <NoteThumbnail note={note} />}
+                  {note.page != null && note.page !== '' && <p className="note-timeline-page meta-text">p. {note.page}</p>}
+                  {note.content && <NoteContent text={note.content} />}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
   )
 }

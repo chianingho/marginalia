@@ -697,7 +697,6 @@ button.note-timeline-card:hover {
   max-height: 320px;
   object-fit: cover;
   border-radius: 10px;
-  cursor: zoom-in;
 }
 
 .note-timeline-page {
@@ -1579,42 +1578,6 @@ button.note-image-remove-sm:hover {
   background: #1a1a1a;
   color: #fff;
   box-shadow: none;
-}
-
-.note-lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  background: rgba(0, 0, 0, 0.92);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 20px;
-}
-
-.note-lightbox img {
-  max-width: 100%;
-  max-height: calc(100% - 60px);
-  border-radius: 4px;
-}
-
-.note-lightbox-annotate {
-  flex-shrink: 0;
-  background: #fff;
-  color: #1a1a1a;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 22px;
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-button.note-lightbox-annotate:hover {
-  background: #fff;
-  color: #1a1a1a;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 /* ---- 截圖標注（全螢幕，MVP） ---- */

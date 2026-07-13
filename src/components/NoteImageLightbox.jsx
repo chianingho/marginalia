@@ -4,18 +4,14 @@ import { compressImage, getNoteImage, noteDisplayImageKey, saveNoteImage } from 
 import { getNoteStrokes, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
 
-// 共用截圖 lightbox：點背景關閉，可進標注模式（非破壞性——原圖 image_original 永遠
-// 不動，Done 只覆寫顯示快取 image_display 並把 strokes 寫回 note 記錄）。
-// initialAnnotate：詳情頁圖片右上的「標注」入口直接跳全螢幕標注畫面用，這種情況下不管是
-// 按 X 還是完成，都要直接關閉整個 overlay（onClose），而不是掉回使用者根本沒點開過的 lightbox。
-export default function NoteImageLightbox({ note, displayUrl, initialAnnotate = false, onClose, onAnnotated }) {
-  const [showAnnotator, setShowAnnotator] = useState(initialAnnotate)
-  const [currentDisplayUrl, setCurrentDisplayUrl] = useState(displayUrl)
+// N-2：舊的「整頁黑底 + 照片 + 中央白色 Edit annotation 膠囊」一般 lightbox
+// 分支已整組移除（含死碼）——詳情頁（NoteDetail）是筆記放大/標注的唯一入口，
+// 這個元件現在單純負責「撈原圖 → 進標注畫面 → 存檔」，不再有 initialAnnotate
+// 開關或非標注的檢視狀態。
+export default function NoteImageLightbox({ note, onClose, onAnnotated }) {
   const [originalUrl, setOriginalUrl] = useState(null)
 
-  // 只有真的要進標注畫面才去撈原圖（單純看 lightbox 不需要）
   useEffect(() => {
-    if (!showAnnotator) return
     let objectUrl
     let cancelled = false
     const originalKey = getOriginalImageKey(note)
@@ -30,7 +26,7 @@ export default function NoteImageLightbox({ note, displayUrl, initialAnnotate = 
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAnnotator])
+  }, [note.id])
 
   async function handleAnnotateDone(blob, strokes) {
     const compressed = await compressImage(blob)
@@ -44,49 +40,18 @@ export default function NoteImageLightbox({ note, displayUrl, initialAnnotate = 
       strokes,
     })
     const newUrl = URL.createObjectURL(compressed)
-    setCurrentDisplayUrl(newUrl)
     onAnnotated?.(newUrl, updatedNote)
-    if (initialAnnotate) {
-      onClose()
-    } else {
-      setShowAnnotator(false)
-    }
+    onClose()
   }
 
-  function handleAnnotatorCancel() {
-    if (initialAnnotate) {
-      onClose()
-    } else {
-      setShowAnnotator(false)
-    }
-  }
+  if (!originalUrl) return null
 
   return (
-    <>
-      {!showAnnotator && (
-        <div className="note-lightbox" onClick={onClose}>
-          <img src={currentDisplayUrl} alt="" />
-          <button
-            type="button"
-            className="note-lightbox-annotate"
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowAnnotator(true)
-            }}
-          >
-            Edit annotation
-          </button>
-        </div>
-      )}
-
-      {showAnnotator && originalUrl && (
-        <ImageAnnotator
-          imageUrl={originalUrl}
-          initialStrokes={getNoteStrokes(note)}
-          onDone={handleAnnotateDone}
-          onCancel={handleAnnotatorCancel}
-        />
-      )}
-    </>
+    <ImageAnnotator
+      imageUrl={originalUrl}
+      initialStrokes={getNoteStrokes(note)}
+      onDone={handleAnnotateDone}
+      onCancel={onClose}
+    />
   )
 }

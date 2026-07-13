@@ -9,10 +9,10 @@ import NoteModal from '../components/NoteModal.jsx'
 import HighlightLabel from '../components/HighlightLabel.jsx'
 
 // /note/:id — 筆記詳情頁，時間軸卡片點擊的導頁目標。
-// 總規格項目 6（批次 N）：獨立全螢幕三段式頁面（綠帶標頭／暗室照片區／紙面內文區），
-// 不透出下層——標注入口直接帶 initialAnnotate 進 NoteImageLightbox，不會經過它
-// 原本「整頁黑底 + 中央 Edit annotation 膠囊」的一般 lightbox 分支（見該元件），
-// 圖片本身不再是可點開 lightbox 的縮放入口。
+// 總規格項目 6（批次 N）／N-2：獨立全螢幕三段式頁面（綠帶標頭／暗室照片區／
+// 紙面內文區），不透出下層。NoteImageLightbox 這裡單純是「進標注畫面」的
+// 撈圖+存檔 wrapper（舊的整頁黑底一般 lightbox 分支已整組移除，見該元件），
+// 圖片本身不是可點開放大檢視的入口，唯一操作是 Edit annotation 按鈕。
 export default function NoteDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -133,8 +133,6 @@ export default function NoteDetail() {
       {showAnnotator && imageUrl && (
         <NoteImageLightbox
           note={note}
-          displayUrl={imageUrl}
-          initialAnnotate
           onClose={() => setShowAnnotator(false)}
           onAnnotated={(newUrl, updatedNote) => {
             setImageUrl(newUrl)
