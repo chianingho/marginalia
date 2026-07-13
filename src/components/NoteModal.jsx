@@ -213,7 +213,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
           {formError && <p className="form-error">{formError}</p>}
 
           <div className="modal-actions">
-            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={onClose}>
+            <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
               Cancel
             </button>
             <button

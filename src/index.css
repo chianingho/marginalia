@@ -1433,12 +1433,14 @@ button.chip.selected:hover {
   box-sizing: border-box;
 }
 
+/* M-2：視覺 token 化——邊框改 hairline 感的墨綠半透明、圓角統一 10px、
+   聚焦邊框改 var(--color-green)、placeholder 用次要文字色，黃色禁用。 */
 .add-modal input,
 .add-modal select,
 .add-modal textarea {
   width: 100%;
   background: #fff;
-  border: 1px solid #1a1a1a;
+  border: 1px solid rgba(62, 74, 61, 0.35);
   border-radius: 10px;
   padding: 10px 14px;
   color: #1a1a1a;
@@ -1450,12 +1452,17 @@ button.chip.selected:hover {
   min-height: 120px;
 }
 
+.add-modal input::placeholder,
+.add-modal textarea::placeholder {
+  color: #8a8a86;
+}
+
 .add-modal input:focus,
 .add-modal select:focus,
 .add-modal textarea:focus {
   outline: none;
-  border-color: #1a1a1a;
-  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.12);
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(62, 74, 61, 0.15);
 }
 
 .add-modal-search {
@@ -1481,7 +1488,7 @@ button.chip.selected:hover {
   flex-direction: column;
   gap: 4px;
   font-size: 0.88rem;
-  color: #555;
+  color: #8a8a86;
   margin-bottom: 10px;
   width: 100%;
 }
@@ -1494,7 +1501,7 @@ button.chip.selected:hover {
 .add-modal-label-text {
   display: block;
   font-size: 0.88rem;
-  color: #555;
+  color: #8a8a86;
   margin-bottom: 4px;
 }
 
@@ -1753,27 +1760,28 @@ input.add-modal-file-input {
   gap: 12px;
 }
 
+/* M-2：跟 Cancel 同語言（綠字綠框透明底） */
 .add-modal-file-btn {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--color-green);
   border-radius: 10px;
   padding: 10px 16px;
   font-size: 0.88rem;
-  color: #1a1a1a;
-  background: #fff;
+  color: var(--color-green);
+  background: transparent;
   cursor: pointer;
 }
 
 .add-modal-file-btn:hover {
-  background: #1a1a1a;
-  color: #fff;
+  background: var(--color-green);
+  color: var(--color-bg);
 }
 
 .add-modal-file-name {
   font-size: 0.85rem;
-  color: #555;
+  color: #8a8a86;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1797,6 +1805,23 @@ input.add-modal-file-input {
 button.add-page-btn-secondary:hover:not(:disabled) {
   background: #1a1a1a;
   color: #fff;
+  box-shadow: none;
+}
+
+/* M-2：New Note/Edit Note（NoteModal）與 Add Book（AddBookModal）的 Cancel
+   改綠字綠框透明底，對齊 F-3 的 Cancel 綠語言。用修飾 class 疊加而不是直接
+   改 .add-page-btn-secondary 本身——EditBookModal 的 Cancel 也共用那顆基礎
+   class，但 EditBookModal 走的是更早的 .modal 殼層、明確不在這批範圍內，
+   不能連帶被改色。 */
+.add-page-btn-secondary--green {
+  background: transparent;
+  color: var(--color-green);
+  border: 1px solid var(--color-green);
+}
+
+button.add-page-btn-secondary--green:hover:not(:disabled) {
+  background: var(--color-green);
+  color: var(--color-bg);
   box-shadow: none;
 }
 

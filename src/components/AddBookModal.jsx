@@ -232,12 +232,12 @@ export default function AddBookModal({ onClose, onCreated }) {
           {state.formError && <p className="form-error">{state.formError}</p>}
 
           <div className="modal-actions">
-            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={onClose}>
+            <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
               Cancel
             </button>
             <button
               type="submit"
-              className="add-page-btn add-page-btn-primary"
+              className="add-page-btn btn-frosted"
               disabled={state.submitStatus === 'submitting'}
             >
               {state.submitStatus === 'submitting' ? 'Adding…' : 'Add Book'}
