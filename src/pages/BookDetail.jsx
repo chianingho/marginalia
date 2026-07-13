@@ -78,7 +78,7 @@ export default function BookDetail() {
     <div className="book-page">
       <div className="book-page-band" aria-hidden="true" />
       <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
-        ‹
+        <span>‹</span>
       </Link>
       <header className="book-page-header">
         <div className="book-page-top">

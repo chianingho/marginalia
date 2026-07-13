@@ -317,12 +317,20 @@ label {
 
 /* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵，位置上移到不擋書封
    （書封頂緣 = safe-top + 58px，兩者間距 ≥ 8px）。 */
+/* N-1-1：.btn-frosted--circle 的 flex 置中對齊的是「‹」這個字元的行框中心，
+   但字型本身的字符度量會讓墨色（實際可見的筆畫）偏下，所以另外做 1-2px
+   光學位移往上修正，肉眼看起來才是真的正中央。 */
 .book-page-back {
   position: fixed;
   top: calc(var(--safe-top) + 12px);
   left: var(--content-left);
   z-index: 20;
   text-decoration: none;
+}
+
+.book-page-back span {
+  display: block;
+  transform: translateY(-1.5px);
 }
 
 .book-page-header {
@@ -338,12 +346,14 @@ label {
   align-items: flex-start;
 }
 
+/* N-1-2：圓角 2px → 8px；overflow:hidden 讓無封面 fallback 方塊自動吃到
+   同樣圓角，不用另外設定。邊線/陰影/跨界位置不動。 */
 .book-page-cover {
   display: block;
   width: 96px;
   flex-shrink: 0;
   aspect-ratio: 2 / 3;
-  border-radius: 2px;
+  border-radius: 8px;
   overflow: hidden;
   background: #efe7da;
   border: 0.5px solid rgba(0, 0, 0, 0.12);
