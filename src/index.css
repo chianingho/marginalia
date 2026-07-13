@@ -1450,6 +1450,15 @@ button.chip.selected:hover {
 .add-modal textarea {
   resize: vertical;
   min-height: 120px;
+  transition: min-height 0.18s ease;
+}
+
+/* M-3：Note 輸入框聚焦（鍵盤彈出）時放大，鍵盤收起、未聚焦時維持 120px
+   緊湊高度（跟 M-1 一屏化不衝突）；resize:vertical 讓使用者可再手動拉高，
+   原生 textarea 內容溢出時本來就會內部捲動，不用另外處理。Page 欄位與
+   其他欄位不動。 */
+.add-modal textarea:focus {
+  min-height: 220px;
 }
 
 .add-modal input::placeholder,
