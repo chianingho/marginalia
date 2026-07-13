@@ -1409,10 +1409,15 @@ button.chip.selected:hover {
   overscroll-behavior: contain;
 }
 
+/* M-1：一屏化壓縮。390×844、鍵盤收起基準下，讓 Add Book modal 全部欄位
+   （搜尋框/Details/Title/Author/Status/Category/Upload cover/按鈕列）不捲動
+   就看得到——壓的是欄位垂直間距/區塊標題間距/modal 內距，input 文字級距
+   維持 ≥16px（inline style 控制）不動，欄位一個都沒刪。max-height 87dvh
+   在 844 基準下仍留 >20px 頂底呼吸空間。 */
 .add-modal {
   width: calc(100% - 32px);
   max-width: 420px;
-  max-height: 85dvh;
+  max-height: 87dvh;
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
@@ -1420,7 +1425,7 @@ button.chip.selected:hover {
   background: var(--color-bg);
   color: #1a1a1a;
   border-radius: 18px;
-  padding: 24px;
+  padding: 22px;
   box-shadow: var(--shadow-card-hover);
 }
 
@@ -1435,7 +1440,7 @@ button.chip.selected:hover {
   background: #fff;
   border: 1px solid #1a1a1a;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   color: #1a1a1a;
   font-family: inherit;
 }
@@ -1454,7 +1459,7 @@ button.chip.selected:hover {
 }
 
 .add-modal-search {
-  margin: 20px 0 20px;
+  margin: 12px 0 14px;
 }
 
 .add-modal-section-title {
@@ -1462,7 +1467,7 @@ button.chip.selected:hover {
   font-weight: 600;
   font-size: 1.1rem;
   color: #1a1a1a;
-  margin: 4px 0 16px;
+  margin: 2px 0 10px;
 }
 
 .add-modal-form {
@@ -1474,15 +1479,15 @@ button.chip.selected:hover {
 .add-modal-label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   font-size: 0.88rem;
   color: #555;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   width: 100%;
 }
 
 .add-modal-field {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   width: 100%;
 }
 
@@ -1490,7 +1495,7 @@ button.chip.selected:hover {
   display: block;
   font-size: 0.88rem;
   color: #555;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 /* 選圖後改成壓扁的單行列（縮圖 ≤72px），不要撐開一大塊，避免選圖前後 modal 高度差太多 */
