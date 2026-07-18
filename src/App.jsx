@@ -2,7 +2,6 @@ import { Routes, Route, Link, Navigate, useLocation, useParams } from 'react-rou
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetail from './pages/BookDetail.jsx'
 import NoteDetail from './pages/NoteDetail.jsx'
-import ShelfDetail from './pages/ShelfDetail.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
@@ -51,8 +50,9 @@ export default function App() {
           <Route path="/shelf/all" element={<Bookshelf />} />
           <Route path="/shelf/year/:slug" element={<Bookshelf />} />
           <Route path="/shelf/category/:slug" element={<Bookshelf />} />
-          <Route path="/shelf/status/:slug" element={<ShelfDetail />} />
-          {/* 舊版單段狀態制路由（/shelf/:status）殘留連結一律導回首頁 */}
+          {/* Patch 02 P2-3：See all 詳細頁（ShelfDetail）移除，沒有入口了，
+              舊連結（含更早的單段 /shelf/:status）一律導回首頁。 */}
+          <Route path="/shelf/status/:slug" element={<Navigate to="/" replace />} />
           <Route path="/shelf/:status" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

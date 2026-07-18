@@ -1,5 +1,5 @@
-// 書架分組邏輯：首頁（Bookshelf）跟 See all 詳細頁（ShelfDetail）共用同一套規則，
-// 確保「首頁怎麼分排」跟「點進某一排看到什麼書」永遠一致。
+// 書架分組邏輯：首頁（Bookshelf）分組/篩選共用這一套規則。
+// Patch 02 P2-3：See all 詳細頁（ShelfDetail）已移除，不再需要跟它同步。
 
 // v2-E：Reading 排主角化，順序改成 Reading → To Read → Finished（原本 To Read 排最前）。
 export const SHELF_DEFS = [
@@ -15,13 +15,16 @@ export function resolveShelfKey(book) {
   return VALID_STATUS_KEYS.has(book.status) ? book.status : 'reading'
 }
 
-// 增補項 8-7：篩選器選項改為三個（所有書籍/Year/Category），Status 不再是
-// 明列的可選項——它是沒特別選過任何東西時的預設基準視圖，不是使用者主動點的
-// 選項。groupBy 狀態本身仍然可以是 'status'（預設值），只是不出現在這份清單。
+// Patch 02 P2-3：Status 加回明列選項（跟增補項 8-7 的決定相反）。順序把
+// Category 放在 Year 前面，讓 Year 維持是清單最後一個純按鈕項目——Category
+// 在 Bookshelf.jsx 裡改成可展開子清單的複合元件，不再是單純的
+// .action-sheet-option，混在清單最後會讓「最後一項不畫底線」的 CSS
+// （:last-of-type）誤判到別的元素上。
 export const GROUP_BY_OPTIONS = [
+  { value: 'status', label: 'Status' },
   { value: 'all', label: 'All Books' },
-  { value: 'year', label: 'Year' },
   { value: 'category', label: 'Category' },
+  { value: 'year', label: 'Year' },
 ]
 
 const GROUP_BY_STORAGE_KEY = 'reading-notes:group-by'
@@ -102,10 +105,4 @@ export function buildShelfRows(books, groupBy) {
     label: def.label,
     books: books.filter((book) => resolveShelfKey(book) === def.key),
   }))
-}
-
-// /shelf/:groupBy/:slug 詳細頁用來反查該排的書跟標題
-export function resolveShelfRow(books, groupBy, slug) {
-  const rows = buildShelfRows(books, groupBy)
-  return rows.find((row) => row.slug === slug) || null
 }

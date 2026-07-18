@@ -104,7 +104,7 @@ export default function AddBookModal({ onClose, onCreated }) {
     <div className="add-modal-backdrop" onClick={onClose}>
       <div className="add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Add Book</h2>
+          <h2 className="add-modal-title">Add Book</h2>
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
             ✕
           </button>

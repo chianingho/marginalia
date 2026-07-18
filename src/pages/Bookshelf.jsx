@@ -55,16 +55,14 @@ function FilterIcon() {
 
 // v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整。
 // B-4：「各組一排橫滑」視圖已從 Year/Category 移除（改全館換行書架），
-// ShelfRow 現在只服務 Status 模式，排標題與 See all 固定顯示，不再需要
-// showLabel 開關。
-function ShelfRow({ label, href, books, isHero = false }) {
+// ShelfRow 現在只服務 Status 模式。
+// Patch 02 P2-3：「See all ›」拿掉（不想再多一個獨立頁面），右側改純本數數字。
+function ShelfRow({ label, books, isHero = false }) {
   return (
     <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
       <div className="shelf-row-header">
         <span className="shelf-row-label">{label}</span>
-        <Link to={href} className="shelf-row-see-all">
-          See all ›
-        </Link>
+        <span className="shelf-row-count meta-text">{books.length}</span>
       </div>
       <div className="shelf-scroll">
         <div className="shelf-track">
@@ -146,6 +144,7 @@ export default function Bookshelf() {
     () => initialGroupByAndChip(location.pathname, urlSlug).chip,
   )
   const [filterOpen, setFilterOpen] = useState(false)
+  const [categoryExpanded, setCategoryExpanded] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -173,13 +172,22 @@ export default function Bookshelf() {
     setFilterOpen(false)
   }
 
-  // 增補項 8-7：Cancel 固定回 Status 預設三排（跟原本「只關掉選單」的行為不同，
-  // 因為 Status 這次拿掉了明列選項，Cancel 是唯一能回到預設三排視圖的入口）。
   function handleFilterCancel() {
     setFilterOpen(false)
+    setCategoryExpanded(false)
     setGroupByState('status')
     setSelectedChip(null)
     saveGroupBy('status')
+  }
+
+  // Patch 02 P2-1：分類篩選入口搬進面板，點分類清單裡的項目直接選定並關閉面板，
+  // 邏輯跟 handleGroupByChange 一樣（只是多帶一個 slug），資料層/儲存偏好不動。
+  function handleCategorySelect(slug) {
+    setGroupByState('category')
+    setSelectedChip(slug)
+    saveGroupBy('category')
+    setFilterOpen(false)
+    setCategoryExpanded(false)
   }
 
   function handleCreated(book) {
@@ -257,9 +265,9 @@ export default function Bookshelf() {
         )}
       </header>
 
-      {/* 增補項 8-1：chips 只在 Year/Category 顯示，位置在橫幅下方一列，
-          第一顆固定 All。組數只有 1 個也照樣顯示（All + 該組）。 */}
-      {isGrouped && rows.length > 0 && (
+      {/* 增補項 8-1：chips 列，位置在橫幅下方一列，第一顆固定 All。
+          Patch 02 P2-1：分類篩選入口搬進篩選面板，這裡只留 Year 用。 */}
+      {groupByState === 'year' && rows.length > 0 && (
         <div className="chip-row">
           <button
             type="button"
@@ -306,13 +314,7 @@ export default function Bookshelf() {
       {status === 'ready' && books.length > 0 && groupByState === 'status' && (
         <div className="shelf-rows">
           {rows.map((row) => (
-            <ShelfRow
-              key={row.key}
-              label={row.label}
-              href={`/shelf/${groupByState}/${encodeURIComponent(row.slug)}`}
-              books={row.books}
-              isHero={row.key === 'reading'}
-            />
+            <ShelfRow key={row.key} label={row.label} books={row.books} isHero={row.key === 'reading'} />
           ))}
         </div>
       )}
@@ -328,17 +330,58 @@ export default function Bookshelf() {
         <div className="action-sheet-backdrop" onClick={() => setFilterOpen(false)}>
           <div className="action-sheet" onClick={(e) => e.stopPropagation()}>
             <p className="action-sheet-title">Group by</p>
-            {GROUP_BY_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className="action-sheet-option"
-                onClick={() => handleGroupByChange(option.value)}
-              >
-                {option.label}
-                {groupByState === option.value && <span className="action-sheet-check">✓</span>}
-              </button>
-            ))}
+            {GROUP_BY_OPTIONS.map((option) => {
+              // Patch 02 P2-1：Category 選項改可展開子清單（點＋展開），不再是
+              // 首頁橫幅下方的分類膠囊列；資料層跟 handleCategorySelect 共用
+              // 原本的 buildShelfRows('category')，只是入口搬進這裡。
+              if (option.value === 'category') {
+                const categoryRows = buildShelfRows(books, 'category')
+                return (
+                  <div key={option.value} className="action-sheet-group">
+                    <button
+                      type="button"
+                      className="action-sheet-option"
+                      onClick={() => setCategoryExpanded((open) => !open)}
+                      aria-expanded={categoryExpanded}
+                    >
+                      {option.label}
+                      <span className="action-sheet-expand">
+                        {groupByState === 'category' && <span className="action-sheet-check">✓</span>}
+                        <span aria-hidden="true">{categoryExpanded ? '−' : '＋'}</span>
+                      </span>
+                    </button>
+                    {categoryExpanded && (
+                      <div className="action-sheet-sublist">
+                        {categoryRows.map((row) => (
+                          <button
+                            key={row.slug}
+                            type="button"
+                            className="action-sheet-suboption"
+                            onClick={() => handleCategorySelect(row.slug)}
+                          >
+                            {row.label}
+                            {groupByState === 'category' && selectedChip === row.slug && (
+                              <span className="action-sheet-check">✓</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  className="action-sheet-option"
+                  onClick={() => handleGroupByChange(option.value)}
+                >
+                  {option.label}
+                  {groupByState === option.value && <span className="action-sheet-check">✓</span>}
+                </button>
+              )
+            })}
             <button type="button" className="action-sheet-cancel" onClick={handleFilterCancel}>
               Cancel
             </button>
