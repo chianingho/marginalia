@@ -305,14 +305,42 @@ label {
   overflow-x: hidden;
 }
 
+/* Patch 01 P-6：底襯改紙感卡片，對應橫幅風格（原本的墨綠/teal 實色band太刺眼）。 */
 .book-page-band {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 172px;
-  background: var(--color-green);
+  background: var(--paper);
+  border-bottom: 1px solid var(--grid);
   z-index: 0;
+}
+
+/* P-6：卡片外的手繪小記號，取自橫幅 SVG 的 doodle（叉叉/圓點），純裝飾。
+   .book-page-band 自己是 position:absolute，是這兩個記號的定位基準（172px
+   卡片本身），跟頁面捲動/其餘內容高度無關。 */
+.book-page-doodle {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* 左上角避開同一角落的圓形返回鍵（left:content-left、36px 直徑），
+   往右錯開，垂直對齊返回鍵同一條基準線。 */
+.book-page-doodle--cross {
+  top: calc(var(--safe-top) + 20px);
+  left: calc(var(--content-left) + 46px);
+  width: 10px;
+  height: 10px;
+}
+
+.book-page-doodle--dot {
+  bottom: 12px;
+  right: var(--content-left);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
 }
 
 /* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵，位置上移到不擋書封
@@ -357,7 +385,7 @@ label {
   overflow: hidden;
   background: #efe7da;
   border: 0.5px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-cover); /* Patch 01 P-6 */
 }
 
 .book-page-cover img {
@@ -390,7 +418,7 @@ label {
   font-size: 19px;
   font-weight: 700;
   line-height: 1.35;
-  color: var(--color-bg);
+  color: var(--color-ink); /* Patch 01 P-6：底襯改亮色紙感卡片，文字改深色 */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -403,7 +431,7 @@ label {
 
 .book-page-author {
   font-size: 11px;
-  color: rgba(253, 252, 250, 0.62);
+  color: var(--color-text-secondary); /* Patch 01 P-6 */
 }
 
 /* Edit 位置只由作者名稱決定：跟作者文字同一個 inline flow，作者名換行時
@@ -418,24 +446,24 @@ label {
   padding: 15px 4px;
   font-size: 0.8rem;
   font-weight: 400;
-  color: rgba(253, 252, 250, 0.85);
+  color: var(--color-ink); /* Patch 01 P-6 */
   text-decoration: underline;
 }
 
 button.book-page-edit-btn:hover {
   background: transparent;
-  color: var(--color-bg);
+  color: var(--color-ink);
   box-shadow: none;
 }
 
 /* B-5：{Status} · {n} notes 同屬 metadata 層，font-family/font-style
-   交給 .meta-text，這裡只留字級/字重/顏色（沿用綠帶上的反白配色，跟
-   {n} books 的 #8A8A86 是不同底色情境，各自維持自己原本的顏色）。 */
+   交給 .meta-text，這裡只留字級/字重/顏色。
+   Patch 01 P-6：底襯改亮色紙感卡片，改用次要文字灰（跟 {n} books 同色階）。 */
 .book-page-meta {
   margin: 6px 0 0;
   font-weight: 500;
   font-size: 12px;
-  color: rgba(253, 252, 250, 0.72);
+  color: var(--color-text-secondary);
 }
 
 /* ---- Note detail (/note/:id，總規格項目 6・批次 N：獨立全螢幕三段式) ---- */
@@ -538,12 +566,12 @@ button.note-detail-back:hover {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: none;
-  color: var(--color-bg);
+  color: #fdfcfa;
 }
 
 button.note-detail-annotate-btn.btn-frosted:hover {
   background: rgba(255, 255, 255, 0.24);
-  color: var(--color-bg);
+  color: #fdfcfa;
   box-shadow: none;
 }
 
@@ -788,32 +816,35 @@ button.note-timeline-card:hover {
   padding: 28px var(--content-left) 0;
 }
 
-/* v6 改版：橫幅文字改回活文字（見 BrandBanner.jsx），不再是 banner.png
-   點陣圖，這裡不用再算 icon 疊圖的百分比定位。 */
+/* 橫幅文字是活文字（見 BrandBanner.jsx），不是點陣圖，不用算 icon 疊圖定位。
+   Patch 01 P-1：標題字體統一回 --font-serif（Fraunces），移除 Apple Garamond；
+   font-optical-sizing/font-variation-settings 修正大字級時 Fraunces 的 s 字形。 */
 .brand-hero {
   padding: 0 0 0 3px;
 }
 
 .brand-title-over {
-  font-family: var(--font-title);
+  font-family: var(--font-serif);
   font-weight: 300;
-  font-style: italic;
   font-size: clamp(30px, 9vw, 38px);
   line-height: 1.1;
   color: var(--color-green);
   letter-spacing: -0.045em;
   margin: 0 0 2px;
+  font-optical-sizing: none;
+  font-variation-settings: 'opsz' 40;
 }
 
 .brand-title {
-  font-family: var(--font-title);
+  font-family: var(--font-serif);
   font-weight: 300;
-  font-style: italic;
   font-size: clamp(50px, 15.5vw, 68px);
   line-height: 0.98;
   color: var(--color-green);
   letter-spacing: -0.045em;
   margin: 0;
+  font-optical-sizing: none;
+  font-variation-settings: 'opsz' 40;
 }
 
 .shelf-illo {
@@ -852,38 +883,43 @@ button.note-timeline-card:hover {
   }
 }
 
+/* Patch 01 P-2：篩選列補回搜尋＋篩選兩顆膠囊（原本改版時誤刪）。 */
 .bookshelf-filterrow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
   padding: 20px var(--content-left) 4px;
 }
 
-.bookshelf-count {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 16px;
-  color: var(--color-ink);
-  opacity: 0.65;
-}
-
+/* Patch 01 P-3：pillbtn 按壓狀態——去掉系統預設 tap highlight/外框，改用淡綠底 + teal focus outline。 */
 .pill-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: auto;
-  height: auto;
   padding: 7px 18px;
   border-radius: 999px;
   border: 1.2px solid var(--color-green);
   background: transparent;
   color: var(--color-green);
+  -webkit-tap-highlight-color: transparent;
 }
 
 button.pill-btn:hover {
   background: var(--color-green);
   color: var(--color-bg);
   box-shadow: none;
+}
+
+button.pill-btn:active {
+  background: rgba(30, 122, 109, 0.08);
+  color: var(--color-green);
+  box-shadow: none;
+}
+
+button.pill-btn:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
 }
 
 .bookshelf-search-row {
@@ -905,65 +941,293 @@ button.pill-btn:hover {
   font-size: 0.9rem;
 }
 
-/* v6 改版：Bookshelf 書櫃格（取代舊版分組/橫向 3D 書架，見 Bookshelf.jsx）。 */
-.bookshelf-grid-frame {
-  margin: 18px var(--content-left) 0;
-  background: var(--paper);
-  border: 1px solid var(--grid);
-}
-
-.bookshelf-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.bookshelf-cell {
-  aspect-ratio: 4 / 5;
+.shelf-rows {
+  position: relative;
+  z-index: 2;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border-right: 1px solid var(--grid);
-  border-bottom: 1px solid var(--grid);
-  padding: 22px 18px 16px;
+  gap: 22px;
+  padding: 8px 0 170px;
+}
+
+.shelf-row-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 var(--content-left);
+  margin-bottom: 12px;
+}
+
+.shelf-row-label {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+.shelf-row-see-all {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.shelf-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.shelf-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.shelf-track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  width: max-content;
+  min-width: 100%;
+  /* 92px 書封（2:3）+ 上下 padding，固定住高度，讓空排也撐出完整的排版，不會跟有書的排高度不一致 */
+  min-height: 158px;
+  padding: 6px var(--content-left) 14px var(--content-left);
+}
+
+/* 書架層板：頂面（梯形，做出景深感）+ 前緣（垂直長條）+ 投影，隨書一起橫向滑動 */
+.shelf-plank {
+  position: absolute;
+  left: var(--content-left);
+  right: 0;
+  bottom: 0;
+  height: 19px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shelf-plank-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--color-green);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+
+.shelf-plank-front {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: var(--color-green-edge);
+  border-top: 1px solid var(--shelf-edge-highlight); /* Patch 01 P-4：前緣上緣亮線 */
+  border-bottom: 1px solid #10140f;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes shelf-book-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shelf-book {
+  position: relative;
+  flex: 0 0 auto;
+  width: 92px;
+  display: block;
   text-decoration: none;
   color: inherit;
+  z-index: 1;
+  opacity: 0;
+  animation: shelf-book-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.bookshelf-cell:nth-child(2n) {
-  border-right: none;
+/* 每本書底部的小橢圓接觸陰影，落在層板頂面上 */
+.shelf-book::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -3px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  filter: blur(3px);
+  z-index: -1;
 }
 
-.bookshelf-cell:nth-last-child(-n + 2) {
-  border-bottom: none;
-}
-
-.bookshelf-cover {
-  width: 64%;
+.shelf-book-cover {
+  display: block;
+  width: 100%;
   aspect-ratio: 2 / 3;
-  box-shadow: 0 6px 16px rgba(38, 51, 46, 0.14), 0 1px 3px rgba(38, 51, 46, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+  background: #efe7da;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
 }
 
-.bookshelf-cover img {
+.shelf-book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.bookshelf-caption {
-  font-family: var(--font-sans);
+.shelf-book-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: #b8a78f;
+  background: #efe7da;
+}
+
+/* v2-E：Reading 排主角化，書封放大 1.25×（92px → 115px，2:3 比例自動跟著放大），
+   墨綠 3D 書架結構（梯形頂面/前緣厚度/投影）完全不拆不改，只有層板高度隨書封
+   等比放大，寬度本來就是撐滿整排、不用另外調。只影響依 status 分組時的
+   Reading 排，其他排（To Read/Finished）跟 year/category 分組模式完全不受影響。 */
+.shelf-row--hero .shelf-book {
+  width: 115px;
+}
+
+.shelf-row--hero .shelf-track {
+  min-height: 193px; /* 115px 書封（2:3 = 172.5px 高）+ 上下 padding 20px，等比推算 */
+}
+
+.shelf-row--hero .shelf-plank {
+  height: 23.75px; /* 19px * 1.25 */
+}
+
+.shelf-row--hero .shelf-plank-top {
+  height: 15px; /* 12px * 1.25 */
+}
+
+.shelf-row--hero .shelf-plank-front {
+  height: 8.75px; /* 7px * 1.25 */
+}
+
+/* 增補項 8：首頁 chips（Year/Category 模式下橫幅下方一列）。樣式沿用既有
+   .chip-row/.chip 規格（v2-D 建立，原本用在 See All 頁，該處已隨項目 8-6
+   移除，這裡是唯一使用點），32px 膠囊、未選透明底+hairline邊、選中墨綠底
+   白字，禁用黃色。 */
+
+/* 增補項 8-2/8-7：換行書架，chip 選中單一組、或「所有書籍」模式共用。
+   書封每層 3 本，用跟 See All 頁一樣的 grid + 3D 層板語言，只是欄數從 4
+   改 3（書封因此更大一些，呼應「書從架上抽出」的主角化語感）。 */
+.wrap-shelf-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 var(--content-left);
+  margin-bottom: 12px;
+}
+
+/* H-1-6：組名移除後這常常是唯一的 header 子元素，margin-left:auto 確保
+   不管有沒有 label 陪襯都固定貼右（justify-content:space-between 只在
+   有兩個子元素時才有效果）。 */
+/* B-5：font-family/font-style 交給 .meta-text（跟時間戳同字體，Cormorant
+   italic 退場），這裡只留字級/顏色/排版。 */
+.wrap-shelf-count {
+  margin-left: auto;
   font-size: 13px;
-  color: var(--color-ink);
-  opacity: 0.72;
-  text-align: center;
-  line-height: 1.35;
-  margin: 0;
+  color: #8a8a86;
+  white-space: nowrap;
+}
+
+.wrap-shelf-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 0 var(--content-left) 24px;
+}
+
+.wrap-shelf-row {
+  position: relative;
+}
+
+.wrap-shelf-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: 12px;
+  min-height: 178px;
+  padding-bottom: 14px;
+}
+
+.wrap-shelf-book {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  z-index: 1;
+}
+
+.wrap-shelf-book::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -3px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.wrap-shelf-book-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+  background: #efe7da;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+}
+
+.wrap-shelf-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wrap-shelf-book-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: #b8a78f;
+  background: #efe7da;
+}
+
+/* 跟首頁橫向排/See All 共用頂面/前緣視覺，左右貼齊內容區 */
+.wrap-shelf-plank {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 19px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* .add-book-btn 是共用結構（位置/尺寸/fixed+safe-area），首頁「Add Book」跟
@@ -1003,6 +1267,36 @@ button.add-book-btn:active {
 .add-book-btn-icon {
   font-size: 1.1rem;
   line-height: 1;
+}
+
+/* Patch 01 P-5/P-7：首頁 Add Book／BookDetail New Note（共用 .add-book-btn.btn-frosted）
+   改直角實色，不再是磨砂玻璃。用複合選擇器覆蓋 .btn-frosted 的背景/邊框/陰影，
+   .btn-frosted 本身（圓形返回鍵、標注小按鈕等其他變體）不受影響。 */
+.add-book-btn.btn-frosted {
+  border: none;
+  border-radius: 0;
+  padding: 15px 30px;
+  background: var(--ink);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--shadow-float);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+button.add-book-btn.btn-frosted:hover {
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: var(--shadow-float);
+}
+
+.add-book-btn.btn-frosted .add-book-btn-icon {
+  color: var(--hl);
+  font-weight: 600;
 }
 
 /* F-6：共用磨砂玻璃 class，唯一來源。首頁 Add Book、筆記頁 New Note 共用；
@@ -1054,6 +1348,191 @@ button.btn-frosted:hover {
   font-size: 11px;
   font-weight: 600;
   border-radius: 999px;
+}
+
+/* ---- Shelf detail (/shelf/:status) ---- */
+
+.shelf-detail-page {
+  min-height: 100dvh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* F-5：See All 頁頂部改綠底色帶（取代原本白底標題/螢光筆劃底線佈局）。
+   大標左緣對齊 var(--content-left)，與下方 .chip-row 的左 padding 同一個 token，
+   兩者天然左緣對齊，不用另外量測。 */
+.shelf-detail-banner {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-green);
+  padding: 8px var(--content-left) 10px;
+}
+
+.shelf-detail-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
+  border-radius: 50%;
+  color: var(--color-bg);
+  font-size: 24px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.shelf-detail-back:hover {
+  background: rgba(253, 252, 250, 0.14);
+}
+
+.shelf-detail-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-bg);
+  text-align: left;
+}
+
+/* v2-D：分類 chips，標題下方一列橫向滑動。純 UI 元件，禁用螢光黃
+   （黃色只留給「閱讀的痕跡」語意，見 tokens.css 的色彩語意法則）。 */
+/* B-3：與橫幅下緣的間距加大，不壓迫、有呼吸感 */
+.chip-row {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 22px var(--content-left) 14px;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* H-1-4：line-height 對齊 height 的做法在部分字型度量下文字會偏下，改用
+   flex 置中，視覺上才真的居中。 */
+.chip {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font: 500 13px/1 var(--font-sans);
+  color: var(--color-ink);
+  background: transparent;
+  border: 1px solid var(--color-hairline-strong, rgba(0, 0, 0, 0.14));
+}
+
+button.chip:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-ink);
+  box-shadow: none;
+}
+
+.chip.selected,
+button.chip.selected:hover {
+  background: var(--color-green);
+  color: var(--color-bg);
+  border-color: var(--color-green);
+}
+
+.shelf-detail-status {
+  padding: 8px var(--content-left) 0;
+  font-size: 0.9rem;
+}
+
+/* See all 詳細頁的書架：跟首頁同一套墨綠 3D 層板，但固定一排 4 本、不橫向捲動、
+   寬度＝內容區寬度（不做首頁的右側 full-bleed），書多於 4 本就往下加一排。 */
+.shelf-grid-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 8px var(--content-left) 48px;
+}
+
+.shelf-grid-row {
+  position: relative;
+}
+
+.shelf-grid-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+  gap: 12px;
+  min-height: 158px;
+  padding-bottom: 14px;
+}
+
+.shelf-grid-book {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  z-index: 1;
+}
+
+.shelf-grid-book::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -3px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.shelf-grid-book-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+  background: #efe7da;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+}
+
+.shelf-grid-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shelf-grid-book-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: #b8a78f;
+  background: #efe7da;
+}
+
+/* 跟首頁的 .shelf-plank 共用頂面/前緣視覺，但左右都貼齊內容區（不像首頁右側 full-bleed） */
+.shelf-grid-plank {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 19px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ---- Add Book modal ---- */
@@ -1259,7 +1738,7 @@ button.note-image-remove-sm:hover {
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
-  color: var(--color-bg);
+  color: #fdfcfa;
   padding: 9px 18px;
   font-size: 0.78rem;
   font-weight: 600;
@@ -1267,7 +1746,7 @@ button.note-image-remove-sm:hover {
 
 button.annotator-cancel:hover {
   background: rgba(255, 255, 255, 0.24);
-  color: var(--color-bg);
+  color: #fdfcfa;
   box-shadow: none;
 }
 
@@ -1324,13 +1803,13 @@ button.annotator-swatch:hover {
   background: rgba(255, 255, 255, 0.14);
   border: none;
   border-radius: 50%;
-  color: var(--color-bg);
+  color: #fdfcfa;
 }
 
 button.annotator-clear:hover,
 button.annotator-undo:hover {
   background: rgba(255, 255, 255, 0.28);
-  color: var(--color-bg);
+  color: #fdfcfa;
   box-shadow: none;
 }
 
@@ -1360,7 +1839,7 @@ button.annotator-undo:disabled {
 /* F-8：Done 改白底黑字（黃色讓給筆跡與選中色票，不再用來標示動作按鈕）。 */
 .annotator-done {
   flex-shrink: 0;
-  background: var(--color-bg);
+  background: #fdfcfa;
   border: none;
   border-radius: 999px;
   color: #111;
@@ -1370,7 +1849,7 @@ button.annotator-undo:disabled {
 }
 
 button.annotator-done:hover {
-  background: var(--color-bg);
+  background: #fdfcfa;
   color: #111;
   box-shadow: 0 0 0 2px rgba(253, 252, 250, 0.4);
 }
@@ -1467,6 +1946,110 @@ button.add-page-btn-primary:hover:not(:disabled) {
   background: #000;
   color: #fff;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Patch 01 P-5：Add Book modal「Details 頁最下方確認按鈕」（AddBookModal 送出，
+   跟 NoteModal 送出共用同一組 class）改 teal 底、直角，跟首頁 Add Book 同字體
+   規格但底色不同（teal 而非 ink），視覺上區分「送出表單」跟「開啟表單」。 */
+.add-page-btn.btn-frosted {
+  border: none;
+  border-radius: 0;
+  padding: 15px 30px;
+  background: var(--color-green);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--shadow-float);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+button.add-page-btn.btn-frosted:hover:not(:disabled) {
+  background: var(--color-green);
+  color: var(--cream);
+  box-shadow: var(--shadow-float);
+}
+
+/* ---- Group-by action sheet ---- */
+
+.action-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.action-sheet {
+  width: 100%;
+  background: var(--color-bg);
+  border-radius: 20px 20px 0 0;
+  padding: 10px 20px calc(20px + var(--safe-bottom));
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.action-sheet-title {
+  text-align: center;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  margin: 8px 0 6px;
+}
+
+.action-sheet-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 14px 4px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  text-align: left;
+}
+
+.action-sheet-option:last-of-type {
+  border-bottom: none;
+}
+
+button.action-sheet-option:hover {
+  background: transparent;
+  color: #1a1a1a;
+  box-shadow: none;
+}
+
+.action-sheet-check {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.action-sheet-cancel {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  background: #fff;
+  border: 1.5px solid var(--color-green);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-green);
+  text-align: center;
+}
+
+button.action-sheet-cancel:hover {
+  background: var(--color-green);
+  color: #fff;
+  box-shadow: none;
 }
 
 /* ---- Edit Book modal ---- */

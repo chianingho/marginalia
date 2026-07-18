@@ -2,6 +2,7 @@ import { Routes, Route, Link, Navigate, useLocation, useParams } from 'react-rou
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetail from './pages/BookDetail.jsx'
 import NoteDetail from './pages/NoteDetail.jsx'
+import ShelfDetail from './pages/ShelfDetail.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
@@ -43,11 +44,16 @@ export default function App() {
           <Route path="/book/:id" element={<BookDetail />} />
           <Route path="/note/:id" element={<NoteDetail />} />
           <Route path="/books/:bookId" element={<LegacyBookRedirect />} />
-          {/* v6 改版：首頁分組（Status/Year/Category）與 See All 頁整組移除，
-              改成單一靜態書櫃格（見 Bookshelf.jsx）。舊分組深連結
-              （/shelf/all、/shelf/year/:slug、/shelf/category/:slug、
-              /shelf/status/:slug 及更早的單段 /shelf/:status）一律導回首頁。 */}
-          <Route path="/shelf/*" element={<Navigate to="/" replace />} />
+          {/* 增補項 8：Year/Category 分組 + 「所有書籍」都是首頁 chips 接管的視圖，
+              不是獨立頁面——這幾個路由只是讓深連結/分享網址能還原對應狀態，
+              實際渲染的仍是 Bookshelf（見該檔的 useParams 初始化邏輯）。
+              See All 頁自此只服務 Status 模式。 */}
+          <Route path="/shelf/all" element={<Bookshelf />} />
+          <Route path="/shelf/year/:slug" element={<Bookshelf />} />
+          <Route path="/shelf/category/:slug" element={<Bookshelf />} />
+          <Route path="/shelf/status/:slug" element={<ShelfDetail />} />
+          {/* 舊版單段狀態制路由（/shelf/:status）殘留連結一律導回首頁 */}
+          <Route path="/shelf/:status" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>

@@ -76,7 +76,15 @@ export default function BookDetail() {
 
   return (
     <div className="book-page">
-      <div className="book-page-band" aria-hidden="true" />
+      <div className="book-page-band" aria-hidden="true">
+        {/* Patch 01 P-6：手繪小記號，取自橫幅 SVG 的 doodle，純裝飾不干擾閱讀。
+            band 自己是 position:absolute，剛好當這兩個記號的定位基準（172px 卡片本身），
+            不用另外量測跟捲動位置無關的絕對座標。 */}
+        <svg className="book-page-doodle book-page-doodle--cross" viewBox="0 0 10 10" fill="none">
+          <path d="M1 1l8 8M9 1l-8 8" stroke="var(--color-ink)" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+        <span className="book-page-doodle book-page-doodle--dot" />
+      </div>
       <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
         <span>‹</span>
       </Link>
