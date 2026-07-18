@@ -1,7 +1,9 @@
-// 書架分組邏輯：首頁（Bookshelf）跟 See all 詳細頁（ShelfDetail）共用同一套規則，
-// 確保「首頁怎麼分排」跟「點進某一排看到什麼書」永遠一致。
+// 單本書的狀態標籤邏輯。v6 改版移除了首頁的分組/書架系統
+// （原本的 buildShelfRows/resolveShelfRow/GROUP_BY_OPTIONS/loadGroupBy/
+// saveGroupBy 已刪除，無呼叫端），這裡只留 BookDetail.jsx 的 statusLabel()
+// 跟 EditBookModal.jsx 還在用的狀態正規化邏輯。
 
-// v2-E：Reading 排主角化，順序改成 Reading → To Read → Finished（原本 To Read 排最前）。
+// v2-E：Reading 排主角化留下的顯示順序，statusLabel 沿用同一份定義。
 export const SHELF_DEFS = [
   { key: 'reading', slug: 'reading', label: 'Reading' },
   { key: 'to_read', slug: 'to-read', label: 'To Read' },
@@ -13,99 +15,4 @@ const VALID_STATUS_KEYS = new Set(SHELF_DEFS.map((def) => def.key))
 // 舊資料沒有 status 欄位、或值不是三個合法選項之一時，一律當作 Reading，避免掛掉。
 export function resolveShelfKey(book) {
   return VALID_STATUS_KEYS.has(book.status) ? book.status : 'reading'
-}
-
-// 增補項 8-7：篩選器選項改為三個（所有書籍/Year/Category），Status 不再是
-// 明列的可選項——它是沒特別選過任何東西時的預設基準視圖，不是使用者主動點的
-// 選項。groupBy 狀態本身仍然可以是 'status'（預設值），只是不出現在這份清單。
-export const GROUP_BY_OPTIONS = [
-  { value: 'all', label: 'All Books' },
-  { value: 'year', label: 'Year' },
-  { value: 'category', label: 'Category' },
-]
-
-const GROUP_BY_STORAGE_KEY = 'reading-notes:group-by'
-
-export function loadGroupBy() {
-  try {
-    const value = localStorage.getItem(GROUP_BY_STORAGE_KEY)
-    return GROUP_BY_OPTIONS.some((option) => option.value === value) ? value : 'status'
-  } catch {
-    return 'status'
-  }
-}
-
-export function saveGroupBy(value) {
-  try {
-    localStorage.setItem(GROUP_BY_STORAGE_KEY, value)
-  } catch {
-    // 存不進去（例如無痕模式）不影響功能，分組偏好本來就只是體驗優化
-  }
-}
-
-const UNCATEGORIZED_SLUG = 'uncategorized'
-const UNCATEGORIZED_LABEL = 'Uncategorized'
-
-function resolveYear(book) {
-  const source = book.finished_at || book.created_at
-  const year = source ? new Date(source).getFullYear() : NaN
-  return Number.isFinite(year) ? String(year) : 'Unknown'
-}
-
-// 依目前分組模式把書分成一排一排，每排附上該排的網址 slug，供首頁跟 See all 共用。
-// 注意：slug 一律回傳「原始未編碼」的值（例如中文類別直接是「心理」，不是 encodeURIComponent 後的字串）。
-// React Router 的 useParams() 會自動把網址的百分比編碼解碼回原始字串，
-// 所以拿來跟這裡的 slug 比對時兩邊都要是「未編碼」狀態才會對上；
-// 真正組網址（<Link to=...>）時才需要另外 encodeURIComponent。
-export function buildShelfRows(books, groupBy) {
-  if (groupBy === 'year') {
-    const map = new Map()
-    for (const book of books) {
-      const year = resolveYear(book)
-      if (!map.has(year)) map.set(year, [])
-      map.get(year).push(book)
-    }
-    return [...map.entries()]
-      .sort((a, b) => {
-        if (a[0] === 'Unknown') return 1
-        if (b[0] === 'Unknown') return -1
-        return b[0].localeCompare(a[0]) // 新到舊
-      })
-      .map(([year, list]) => ({ key: year, slug: year, label: year, books: list }))
-  }
-
-  if (groupBy === 'category') {
-    const map = new Map()
-    for (const book of books) {
-      const category = book.category || UNCATEGORIZED_LABEL
-      if (!map.has(category)) map.set(category, [])
-      map.get(category).push(book)
-    }
-    return [...map.entries()]
-      .sort((a, b) => {
-        if (a[0] === UNCATEGORIZED_LABEL) return 1
-        if (b[0] === UNCATEGORIZED_LABEL) return -1
-        return a[0].localeCompare(b[0], 'zh-Hant')
-      })
-      .map(([category, list]) => ({
-        key: category,
-        slug: category === UNCATEGORIZED_LABEL ? UNCATEGORIZED_SLUG : category,
-        label: category,
-        books: list,
-      }))
-  }
-
-  // status（預設）：固定三排、固定順序
-  return SHELF_DEFS.map((def) => ({
-    key: def.key,
-    slug: def.slug,
-    label: def.label,
-    books: books.filter((book) => resolveShelfKey(book) === def.key),
-  }))
-}
-
-// /shelf/:groupBy/:slug 詳細頁用來反查該排的書跟標題
-export function resolveShelfRow(books, groupBy, slug) {
-  const rows = buildShelfRows(books, groupBy)
-  return rows.find((row) => row.slug === slug) || null
 }

@@ -1,24 +1,50 @@
 /* 全站設計常數。新增畫面一律引用這裡的變數，不要再寫死 hex 值。
-   R-1（2026-07-11 重構批次）建立：把散落在各元件的寫死值集中到這裡，
-   純粹搬遷數值，沒有改任何實際顯示出來的顏色/尺寸。
-   v2-A（2026-07-12）擴充：Cormorant 品牌字體 + 黃痕上專用字色。 */
+   R-1（2026-07-11 重構批次）建立：把散落在各元件的寫死值集中到這裡。
+   v2-A（2026-07-12）擴充：Cormorant 品牌字體 + 黃痕上專用字色（Cormorant 已於 v6 退場，見下）。
+   v6（2026-07-18）改版：套用 marginalia-redesign-spec.md 的新色票/字體。
+   語意變數名稱（--color-*／--font-serif／--font-sans）刻意保留不變，只換底層數值，
+   全站既有規則不用逐一改就自動套新色，只有這個檔案是色彩/字體的唯一來源。 */
+
+@font-face {
+  font-family: 'Apple Garamond';
+  src: url('/fonts/AppleGaramond-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  /* 色彩 */
-  --color-bg: #fdfcfa; /* 暖白舞台：書籍頁/筆記頁/時間軸等實際內容的背景（跟橫幅線稿共用同一個值，不另外定義） */
-  --color-ink: #111111; /* 內容近黑：日期標頭、頁數等強調用文字 */
-  --color-text-secondary: #8a8a86; /* 次要資訊灰：時間軸時間、次要說明文字 */
-  --color-note-content: #333333; /* 筆記內文 */
-  --color-green: #3e4a3d; /* 墨綠：書的實體 + 品牌色（書架/橫幅底色/Add Book 按鈕/選中態） */
-  --color-green-edge: #2a332a; /* 書架前緣、書名刷色等較深的墨綠 */
-  --color-highlight: #f2ff00; /* 螢光黃：閱讀的痕跡——只能用在標注筆/日期標頭色塊/橫幅筆芯與書背，禁止用在純 UI 元件（按鈕/chips/badge/連結/focus ring） */
-  --color-hairline: rgba(0, 0, 0, 0.07); /* 分隔線 */
-  --color-ink-on-yellow: #1c231b; /* 黃痕上的字色 */
-  --color-darkroom: #16171a; /* 深暖黑，非純黑：詳情頁暗室照片區底色 */
+  /* v6 原始色票 */
+  --cream: #f6f1e6;
+  --paper: #fbf8f0;
+  --teal: #1e7a6d;
+  --ink: #26332e;
+  --red: #d8502c;
+  --plum: #a84e8c;
+  --mustard: #e3a63b;
+  --cobalt: #2c4ea8;
+  --forest: #254b3a;
+  --pink: #e9a0b6;
+  --hl: #f2ff00;
+  --grid: #e6e1d2;
 
   /* 字體 */
-  --font-brand: 'Cormorant', 'Noto Serif TC', serif; /* 英文品牌層：日期標頭/p.{n}頁數/排標題等英數元素 */
-  --font-serif: 'Noto Serif TC', 'Georgia', serif; /* 中文標題（原有，不動） */
-  --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; /* 中文內文（原有，不動） */
+  --font-serif: 'Fraunces', 'Noto Serif TC', serif; /* 中文標題 fallback 不變 */
+  --font-sans: 'Archivo', -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; /* 中文內文 fallback 不變 */
+  --font-hand: 'Gloria Hallelujah', cursive; /* 只給書架插畫手寫字用 */
+  --font-title: 'Apple Garamond', serif; /* 只給 Marginalia/Books 主標題用 */
+
+  /* 色彩：語意別名指到上面的原始色票 */
+  --color-bg: var(--cream); /* 全站背景 */
+  --color-green: var(--teal); /* 品牌主色：綠帶/按鈕/選中態，原墨綠換成 teal */
+  --color-green-edge: var(--forest); /* 品牌主色的深色變體：書架前緣等 */
+  --color-ink: var(--ink); /* 內容近黑：日期標頭、頁數等強調用文字 */
+  --color-highlight: var(--hl); /* 螢光黃：閱讀的痕跡，數值不變 */
+  --color-hairline: var(--grid); /* 分隔線 */
+  --color-text-secondary: #8a8a86; /* 次要資訊灰：中性色，不屬品牌色階，維持原值 */
+  --color-note-content: var(--ink); /* 筆記內文 */
+  --color-darkroom: #16171a; /* 特例：詳情頁暗室照片區底色，刻意維持接近純黑，不套品牌色 */
+  --color-ink-on-yellow: #1c231b; /* 特例：黃痕上的字色，極少用到，維持原值 */
 
   /* 佈局 */
   --content-left: 20px; /* 內容左邊界，書封左緣／時間軸欄共用（原 --shelf-inset） */
