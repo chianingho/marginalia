@@ -1,25 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import AddBookModal from '../components/AddBookModal.jsx'
 import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
-import { GROUP_BY_OPTIONS, buildShelfRows, loadGroupBy, saveGroupBy } from '../lib/shelves.js'
+import { buildShelfRows } from '../lib/shelves.js'
 
 function chunk(list, size) {
   const out = []
   for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size))
   return out
-}
-
-// 增補項 8：這個元件掛在 4 個路由（/、/shelf/all、/shelf/year/:slug、
-// /shelf/category/:slug），只有真的用不同 URL「重新進站」（深連結、分享網址）
-// 才需要從網址還原初始狀態；同個 session 內點 chip 用 history.replaceState
-// 同步網址，不會觸發重新掛載，所以這個初始化只在 mount 當下跑一次即可。
-function initialGroupByAndChip(pathname, slug) {
-  if (pathname === '/shelf/all') return { groupBy: 'all', chip: null }
-  if (pathname.startsWith('/shelf/year/')) return { groupBy: 'year', chip: slug ?? null }
-  if (pathname.startsWith('/shelf/category/')) return { groupBy: 'category', chip: slug ?? null }
-  return { groupBy: loadGroupBy(), chip: null }
 }
 
 function matchesQuery(book, query) {
@@ -29,6 +18,19 @@ function matchesQuery(book, query) {
     book.title.toLowerCase().includes(q) ||
     (book.author || '').toLowerCase().includes(q)
   )
+}
+
+// Patch 03：facet 比對直接複用 buildShelfRows 的分組結果——某個 slug 被選中時，
+// 該 row 的 books 就是「符合這個值」的書，多個選中值取聯集（組內 OR）；
+// 不用另外寫 resolveYear/category 比對邏輯，跟首頁分組永遠是同一套規則。
+function facetAllowedIds(books, facet, selectedSlugs) {
+  if (selectedSlugs.size === 0) return null // null = 這組沒篩選，不限制
+  const rows = buildShelfRows(books, facet)
+  const ids = new Set()
+  for (const row of rows) {
+    if (selectedSlugs.has(row.slug)) row.books.forEach((b) => ids.add(b.id))
+  }
+  return ids
 }
 
 function SearchIcon() {
@@ -55,8 +57,8 @@ function FilterIcon() {
 
 // v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整。
 // B-4：「各組一排橫滑」視圖已從 Year/Category 移除（改全館換行書架），
-// ShelfRow 現在只服務 Status 模式。
-// Patch 02 P2-3：「See all ›」拿掉（不想再多一個獨立頁面），右側改純本數數字。
+// ShelfRow 現在只服務預設（無篩選）狀態。
+// Patch 02 P2-3：「See all ›」拿掉，右側改純本數數字。
 function ShelfRow({ label, books, isHero = false }) {
   return (
     <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
@@ -92,17 +94,14 @@ function ShelfRow({ label, books, isHero = false }) {
   )
 }
 
-// 增補項 8-2/8-7：換行書架，chip 選中單一組、或「所有書籍」模式共用同一份
-// 實作（不另外寫一份）。每層 3 本，沿用跟首頁橫向排一樣的墨綠 3D 層板元件，
-// 不拆不簡化；最後一層不足額時 grid 自然靠左、層板照樣 left:0/right:0 滿寬。
-// H-1-6：組名文字移除（label 只留給 aria-label 用），{n} books 保留。
-function WrapShelf({ label, count, books }) {
+// 增補項 8-2/8-7：換行書架，沿用跟首頁橫向排一樣的墨綠 3D 層板元件，不拆不簡化；
+// 最後一層不足額時 grid 自然靠左，層板照樣 left:0/right:0 滿寬。
+// Patch 03：現在只服務「有篩選條件」時的攤平結果，書量已經搬到篩選列左側
+// 顯示，這裡不再需要自己的標頭/count，簽名跟著簡化成只吃 books。
+function WrapShelf({ books }) {
   const rowsOf3 = chunk(books, 3)
   return (
-    <div className="wrap-shelf" aria-label={label}>
-      <div className="wrap-shelf-header">
-        <span className="wrap-shelf-count meta-text">{count} books</span>
-      </div>
+    <div className="wrap-shelf" aria-label="Filtered results">
       <div className="wrap-shelf-rows">
         {rowsOf3.map((group, index) => (
           <div className="wrap-shelf-row" key={index}>
@@ -130,21 +129,49 @@ function WrapShelf({ label, count, books }) {
   )
 }
 
-export default function Bookshelf() {
-  const location = useLocation()
-  const { slug: urlSlug } = useParams()
+// Patch 03 P3-2：Status/Category/Year 三組篩選外觀跟互動完全統一，都是這個元件——
+// 一顆展開/收合按鈕 + 展開後的可複選子清單，沿用 Patch 02 已經建好的
+// .action-sheet-sublist/.action-sheet-suboption，只是從「只有 Category 用」
+// 變成三組共用。
+function FilterGroup({ facet, label, rows, expanded, onToggleExpand, isActive, onToggleValue }) {
+  return (
+    <div className="action-sheet-group">
+      <button type="button" className="action-sheet-option" onClick={onToggleExpand} aria-expanded={expanded}>
+        {label}
+        <span aria-hidden="true">{expanded ? '−' : '＋'}</span>
+      </button>
+      {expanded && (
+        <div className="action-sheet-sublist">
+          {rows.map((row) => (
+            <button
+              key={row.slug}
+              type="button"
+              className="action-sheet-suboption"
+              onClick={() => onToggleValue(facet, row.slug, row.label)}
+            >
+              {row.label}
+              {isActive(facet, row.slug) && <span className="action-sheet-check">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
+const FACETS = [
+  { facet: 'status', label: 'Status' },
+  { facet: 'category', label: 'Category' },
+  { facet: 'year', label: 'Year' },
+]
+
+export default function Bookshelf() {
   const [books, setBooks] = useState([])
   const [status, setStatus] = useState('loading') // loading | ready | error
   const [error, setError] = useState('')
-  const [groupByState, setGroupByState] = useState(
-    () => initialGroupByAndChip(location.pathname, urlSlug).groupBy,
-  )
-  const [selectedChip, setSelectedChip] = useState(
-    () => initialGroupByAndChip(location.pathname, urlSlug).chip,
-  )
+  const [activeFilters, setActiveFilters] = useState([]) // [{facet, slug, label}]，依選取先後排列
+  const [expandedFacets, setExpandedFacets] = useState(() => new Set())
   const [filterOpen, setFilterOpen] = useState(false)
-  const [categoryExpanded, setCategoryExpanded] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -165,29 +192,28 @@ export default function Bookshelf() {
     }
   }
 
-  function handleGroupByChange(value) {
-    setGroupByState(value)
-    setSelectedChip(null)
-    saveGroupBy(value)
-    setFilterOpen(false)
+  function toggleFilter(facet, slug, label) {
+    setActiveFilters((prev) => {
+      const exists = prev.some((f) => f.facet === facet && f.slug === slug)
+      return exists ? prev.filter((f) => !(f.facet === facet && f.slug === slug)) : [...prev, { facet, slug, label }]
+    })
   }
 
-  function handleFilterCancel() {
-    setFilterOpen(false)
-    setCategoryExpanded(false)
-    setGroupByState('status')
-    setSelectedChip(null)
-    saveGroupBy('status')
+  function isFilterActive(facet, slug) {
+    return activeFilters.some((f) => f.facet === facet && f.slug === slug)
   }
 
-  // Patch 02 P2-1：分類篩選入口搬進面板，點分類清單裡的項目直接選定並關閉面板，
-  // 邏輯跟 handleGroupByChange 一樣（只是多帶一個 slug），資料層/儲存偏好不動。
-  function handleCategorySelect(slug) {
-    setGroupByState('category')
-    setSelectedChip(slug)
-    saveGroupBy('category')
+  function toggleFacetExpanded(facet) {
+    setExpandedFacets((prev) => {
+      const next = new Set(prev)
+      next.has(facet) ? next.delete(facet) : next.add(facet)
+      return next
+    })
+  }
+
+  function closeFilterSheet() {
     setFilterOpen(false)
-    setCategoryExpanded(false)
+    setExpandedFacets(new Set())
   }
 
   function handleCreated(book) {
@@ -202,29 +228,26 @@ export default function Bookshelf() {
     })
   }
 
-  const filteredBooks = useMemo(
+  const searchFilteredBooks = useMemo(
     () => books.filter((book) => matchesQuery(book, query)),
     [books, query],
   )
-  const isGrouped = groupByState === 'year' || groupByState === 'category'
-  const rows = isGrouped || groupByState === 'status' ? buildShelfRows(filteredBooks, groupByState) : []
-  const selectedRow = isGrouped && selectedChip ? rows.find((row) => row.slug === selectedChip) : null
 
-  // 增補項 8-4：URL 同步，不疊瀏覽歷史（history.replaceState，不是 push）。
-  // 等 rows 算出來（status === 'ready'）才同步，避免載入中那瞬間先寫一次錯的網址。
-  useEffect(() => {
-    if (status !== 'ready') return
-    let url = '/'
-    if (groupByState === 'all') {
-      url = '/shelf/all'
-    } else if (isGrouped) {
-      url = selectedChip ? `/shelf/${groupByState}/${encodeURIComponent(selectedChip)}` : '/'
-    }
-    if (window.location.pathname !== url) {
-      window.history.replaceState(null, '', url)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupByState, selectedChip, status])
+  const selectedSlugsByFacet = useMemo(() => {
+    const map = { status: new Set(), category: new Set(), year: new Set() }
+    for (const f of activeFilters) map[f.facet].add(f.slug)
+    return map
+  }, [activeFilters])
+
+  const visibleBooks = useMemo(() => {
+    if (activeFilters.length === 0) return searchFilteredBooks
+    const allowedByFacet = FACETS.map(({ facet }) =>
+      facetAllowedIds(searchFilteredBooks, facet, selectedSlugsByFacet[facet]),
+    )
+    return searchFilteredBooks.filter((book) => allowedByFacet.every((ids) => ids === null || ids.has(book.id)))
+  }, [searchFilteredBooks, activeFilters, selectedSlugsByFacet])
+
+  const statusRows = useMemo(() => buildShelfRows(searchFilteredBooks, 'status'), [searchFilteredBooks])
 
   return (
     <div className="bookshelf-page">
@@ -232,24 +255,38 @@ export default function Bookshelf() {
         <BrandBanner />
 
         <div className="bookshelf-filterrow">
-          <button
-            type="button"
-            className="pill-btn"
-            onClick={toggleSearch}
-            aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
-            aria-expanded={searchOpen}
-          >
-            <SearchIcon />
-          </button>
-          <button
-            type="button"
-            className="pill-btn"
-            onClick={() => setFilterOpen(true)}
-            aria-label="Group by"
-          >
-            <FilterIcon />
-          </button>
+          <p className="bookshelf-count">{visibleBooks.length} books</p>
+          <div className="bookshelf-filterrow-icons">
+            <button
+              type="button"
+              className="pill-btn"
+              onClick={toggleSearch}
+              aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
+              aria-expanded={searchOpen}
+            >
+              <SearchIcon />
+            </button>
+            <button type="button" className="pill-btn" onClick={() => setFilterOpen(true)} aria-label="篩選">
+              <FilterIcon />
+            </button>
+          </div>
         </div>
+
+        {activeFilters.length > 0 && (
+          <div className="filter-pills-row">
+            {activeFilters.map((f) => (
+              <button
+                key={`${f.facet}:${f.slug}`}
+                type="button"
+                className="filter-pill"
+                onClick={() => toggleFilter(f.facet, f.slug, f.label)}
+              >
+                {f.label}
+                <span aria-hidden="true">×</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {searchOpen && (
           <div className="bookshelf-search-row">
@@ -265,30 +302,6 @@ export default function Bookshelf() {
         )}
       </header>
 
-      {/* 增補項 8-1：chips 列，位置在橫幅下方一列，第一顆固定 All。
-          Patch 02 P2-1：分類篩選入口搬進篩選面板，這裡只留 Year 用。 */}
-      {groupByState === 'year' && rows.length > 0 && (
-        <div className="chip-row">
-          <button
-            type="button"
-            className={`chip ${!selectedChip ? 'selected' : ''}`}
-            onClick={() => setSelectedChip(null)}
-          >
-            All
-          </button>
-          {rows.map((row) => (
-            <button
-              key={row.slug}
-              type="button"
-              className={`chip ${selectedChip === row.slug ? 'selected' : ''}`}
-              onClick={() => setSelectedChip(selectedChip === row.slug ? null : row.slug)}
-            >
-              {row.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {status === 'loading' && <p className="bookshelf-status">載入中…</p>}
       {status === 'error' && <p className="bookshelf-status form-error">載入失敗：{error}</p>}
 
@@ -296,24 +309,19 @@ export default function Bookshelf() {
         <p className="bookshelf-status empty-hint">書庫還是空的，點擊下方「Add Book」開始紀錄你的閱讀吧！</p>
       )}
 
-      {/* B-4：Year/Category 模式下，All chip（或還沒選任何 chip）＝全館換行
-          書架，跟 8-7「所有書籍」重用同一個 WrapShelf，不另寫一份。
-          「各組一排橫滑」視圖從 Year/Category 移除，只剩 Status 模式保留。 */}
-      {status === 'ready' && books.length > 0 && (groupByState === 'all' || (isGrouped && !selectedRow)) && (
+      {status === 'ready' && books.length > 0 && activeFilters.length > 0 && visibleBooks.length === 0 && (
+        <p className="bookshelf-status empty-hint">沒有符合篩選條件的書。</p>
+      )}
+
+      {status === 'ready' && activeFilters.length > 0 && visibleBooks.length > 0 && (
         <div className="shelf-rows">
-          <WrapShelf label="All Books" count={filteredBooks.length} books={filteredBooks} />
+          <WrapShelf books={visibleBooks} />
         </div>
       )}
 
-      {status === 'ready' && books.length > 0 && isGrouped && selectedRow && (
+      {status === 'ready' && books.length > 0 && activeFilters.length === 0 && (
         <div className="shelf-rows">
-          <WrapShelf label={selectedRow.label} count={selectedRow.books.length} books={selectedRow.books} />
-        </div>
-      )}
-
-      {status === 'ready' && books.length > 0 && groupByState === 'status' && (
-        <div className="shelf-rows">
-          {rows.map((row) => (
+          {statusRows.map((row) => (
             <ShelfRow key={row.key} label={row.label} books={row.books} isHero={row.key === 'reading'} />
           ))}
         </div>
@@ -327,63 +335,23 @@ export default function Bookshelf() {
       {showAddModal && <AddBookModal onClose={() => setShowAddModal(false)} onCreated={handleCreated} />}
 
       {filterOpen && (
-        <div className="action-sheet-backdrop" onClick={() => setFilterOpen(false)}>
+        <div className="action-sheet-backdrop" onClick={closeFilterSheet}>
           <div className="action-sheet" onClick={(e) => e.stopPropagation()}>
-            <p className="action-sheet-title">Group by</p>
-            {GROUP_BY_OPTIONS.map((option) => {
-              // Patch 02 P2-1：Category 選項改可展開子清單（點＋展開），不再是
-              // 首頁橫幅下方的分類膠囊列；資料層跟 handleCategorySelect 共用
-              // 原本的 buildShelfRows('category')，只是入口搬進這裡。
-              if (option.value === 'category') {
-                const categoryRows = buildShelfRows(books, 'category')
-                return (
-                  <div key={option.value} className="action-sheet-group">
-                    <button
-                      type="button"
-                      className="action-sheet-option"
-                      onClick={() => setCategoryExpanded((open) => !open)}
-                      aria-expanded={categoryExpanded}
-                    >
-                      {option.label}
-                      <span className="action-sheet-expand">
-                        {groupByState === 'category' && <span className="action-sheet-check">✓</span>}
-                        <span aria-hidden="true">{categoryExpanded ? '−' : '＋'}</span>
-                      </span>
-                    </button>
-                    {categoryExpanded && (
-                      <div className="action-sheet-sublist">
-                        {categoryRows.map((row) => (
-                          <button
-                            key={row.slug}
-                            type="button"
-                            className="action-sheet-suboption"
-                            onClick={() => handleCategorySelect(row.slug)}
-                          >
-                            {row.label}
-                            {groupByState === 'category' && selectedChip === row.slug && (
-                              <span className="action-sheet-check">✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  className="action-sheet-option"
-                  onClick={() => handleGroupByChange(option.value)}
-                >
-                  {option.label}
-                  {groupByState === option.value && <span className="action-sheet-check">✓</span>}
-                </button>
-              )
-            })}
-            <button type="button" className="action-sheet-cancel" onClick={handleFilterCancel}>
-              Cancel
+            <p className="action-sheet-title">Filter</p>
+            {FACETS.map(({ facet, label }) => (
+              <FilterGroup
+                key={facet}
+                facet={facet}
+                label={label}
+                rows={buildShelfRows(books, facet)}
+                expanded={expandedFacets.has(facet)}
+                onToggleExpand={() => toggleFacetExpanded(facet)}
+                isActive={isFilterActive}
+                onToggleValue={toggleFilter}
+              />
+            ))}
+            <button type="button" className="action-sheet-cancel" onClick={closeFilterSheet}>
+              Done
             </button>
           </div>
         </div>

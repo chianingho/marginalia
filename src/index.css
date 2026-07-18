@@ -565,12 +565,12 @@ button.note-detail-back:hover {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: none;
-  color: #fdfcfa;
+  color: var(--color-bg);
 }
 
 button.note-detail-annotate-btn.btn-frosted:hover {
   background: rgba(255, 255, 255, 0.24);
-  color: #fdfcfa;
+  color: var(--color-bg);
   box-shadow: none;
 }
 
@@ -882,13 +882,60 @@ button.note-timeline-card:hover {
   }
 }
 
-/* Patch 01 P-2：篩選列補回搜尋＋篩選兩顆膠囊（原本改版時誤刪）。 */
+/* Patch 01 P-2：篩選列搜尋＋篩選兩顆膠囊。
+   Patch 03 P3-3：書量文字搬到左側，改 space-between；兩顆膠囊包一層
+   .bookshelf-filterrow-icons 維持原本的 gap，不受 space-between 影響。 */
 .bookshelf-filterrow {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
   padding: 20px var(--content-left) 4px;
+}
+
+/* Patch 03 P3-3：書量文字，刻意用斜體 serif——跟 .meta-text（日期標頭/頁碼等
+   metadata 統一非斜體）是不同語意層，這裡是 patch 明確指定的例外，不套
+   .meta-text。 */
+.bookshelf-count {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--color-ink);
+  opacity: 0.65;
+}
+
+.bookshelf-filterrow-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Patch 03 P3-3：已選篩選膠囊列，只在有作用中的篩選時渲染，可換行。 */
+.filter-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px var(--content-left) 0;
+}
+
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.2px solid var(--color-green);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-green);
+  background: transparent;
+}
+
+button.filter-pill:hover {
+  background: rgba(30, 122, 109, 0.08);
+  color: var(--color-green);
+  box-shadow: none;
 }
 
 /* Patch 01 P-3：pillbtn 按壓狀態——去掉系統預設 tap highlight/外框，改用淡綠底 + teal focus outline。 */
@@ -1120,34 +1167,10 @@ button.pill-btn:focus-visible {
   height: 8.75px; /* 7px * 1.25 */
 }
 
-/* 增補項 8：首頁 chips（Year/Category 模式下橫幅下方一列）。樣式沿用既有
-   .chip-row/.chip 規格（v2-D 建立，原本用在 See All 頁，該處已隨項目 8-6
-   移除，這裡是唯一使用點），32px 膠囊、未選透明底+hairline邊、選中墨綠底
-   白字，禁用黃色。 */
-
-/* 增補項 8-2/8-7：換行書架，chip 選中單一組、或「所有書籍」模式共用。
+/* 增補項 8-2/8-7：換行書架。Patch 03：現在只服務「有篩選條件」時的攤平結果，
+   書量已經搬到篩選列左側顯示（.bookshelf-count），這裡不再需要自己的標頭/count。
    書封每層 3 本，用跟 See All 頁一樣的 grid + 3D 層板語言，只是欄數從 4
    改 3（書封因此更大一些，呼應「書從架上抽出」的主角化語感）。 */
-.wrap-shelf-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0 var(--content-left);
-  margin-bottom: 12px;
-}
-
-/* H-1-6：組名移除後這常常是唯一的 header 子元素，margin-left:auto 確保
-   不管有沒有 label 陪襯都固定貼右（justify-content:space-between 只在
-   有兩個子元素時才有效果）。 */
-/* B-5：font-family/font-style 交給 .meta-text（跟時間戳同字體，Cormorant
-   italic 退場），這裡只留字級/顏色/排版。 */
-.wrap-shelf-count {
-  margin-left: auto;
-  font-size: 13px;
-  color: #8a8a86;
-  white-space: nowrap;
-}
-
 .wrap-shelf-rows {
   display: flex;
   flex-direction: column;
@@ -1347,53 +1370,10 @@ button.btn-frosted:hover {
   border-radius: 999px;
 }
 
-/* Patch 02 P2-3：See all 詳細頁（ShelfDetail）已移除，.shelf-detail-*／
-   .shelf-grid-* 相關樣式一併刪除；.chip-row/.chip 是 Year 模式共用元件（見
-   Bookshelf.jsx），繼續保留。 */
-/* v2-D：分類 chips，標題下方一列橫向滑動。純 UI 元件，禁用螢光黃
-   （黃色只留給「閱讀的痕跡」語意，見 tokens.css 的色彩語意法則）。 */
-/* B-3：與橫幅下緣的間距加大，不壓迫、有呼吸感 */
-.chip-row {
-  flex-shrink: 0;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: 22px var(--content-left) 14px;
-}
-
-.chip-row::-webkit-scrollbar {
-  display: none;
-}
-
-/* H-1-4：line-height 對齊 height 的做法在部分字型度量下文字會偏下，改用
-   flex 置中，視覺上才真的居中。 */
-.chip {
-  flex-shrink: 0;
-  height: 32px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font: 500 13px/1 var(--font-sans);
-  color: var(--color-ink);
-  background: transparent;
-  border: 1px solid var(--color-hairline-strong, rgba(0, 0, 0, 0.14));
-}
-
-button.chip:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--color-ink);
-  box-shadow: none;
-}
-
-.chip.selected,
-button.chip.selected:hover {
-  background: var(--color-green);
-  color: var(--color-bg);
-  border-color: var(--color-green);
-}
+/* Patch 03：.chip-row/.chip（Year 專用膠囊列）已移除——Status/Category/Year
+   三組篩選現在外觀/互動統一，都是 .action-sheet-group 的「+」展開子清單
+   （見下方 Group-by action sheet 區塊），選中值改用 .filter-pill 顯示在
+   篩選列下方，不再各自用不同的 UI 語言。 */
 
 /* ---- Add Book modal ---- */
 
@@ -1606,7 +1586,7 @@ button.note-image-remove-sm:hover {
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
-  color: #fdfcfa;
+  color: var(--color-bg);
   padding: 9px 18px;
   font-size: 0.78rem;
   font-weight: 600;
@@ -1614,7 +1594,7 @@ button.note-image-remove-sm:hover {
 
 button.annotator-cancel:hover {
   background: rgba(255, 255, 255, 0.24);
-  color: #fdfcfa;
+  color: var(--color-bg);
   box-shadow: none;
 }
 
@@ -1671,13 +1651,13 @@ button.annotator-swatch:hover {
   background: rgba(255, 255, 255, 0.14);
   border: none;
   border-radius: 50%;
-  color: #fdfcfa;
+  color: var(--color-bg);
 }
 
 button.annotator-clear:hover,
 button.annotator-undo:hover {
   background: rgba(255, 255, 255, 0.28);
-  color: #fdfcfa;
+  color: var(--color-bg);
   box-shadow: none;
 }
 
@@ -1707,7 +1687,7 @@ button.annotator-undo:disabled {
 /* F-8：Done 改白底黑字（黃色讓給筆跡與選中色票，不再用來標示動作按鈕）。 */
 .annotator-done {
   flex-shrink: 0;
-  background: #fdfcfa;
+  background: var(--paper);
   border: none;
   border-radius: 999px;
   color: #111;
@@ -1717,7 +1697,7 @@ button.annotator-undo:disabled {
 }
 
 button.annotator-done:hover {
-  background: #fdfcfa;
+  background: var(--paper);
   color: #111;
   box-shadow: 0 0 0 2px rgba(253, 252, 250, 0.4);
 }
@@ -1885,10 +1865,6 @@ button.add-page-btn.btn-frosted:hover:not(:disabled) {
   text-align: left;
 }
 
-.action-sheet-option:last-of-type {
-  border-bottom: none;
-}
-
 button.action-sheet-option:hover {
   background: transparent;
   color: #1a1a1a;
@@ -1900,21 +1876,18 @@ button.action-sheet-option:hover {
   font-weight: 700;
 }
 
-/* Patch 02 P2-1：Category 選項改可展開子清單（點＋展開），取代原本首頁橫幅
-   下方的分類膠囊列。.action-sheet-group 包住「Category」這顆按鈕跟展開後的
-   子清單，是 .action-sheet 的直接子層，讓 .action-sheet-option:last-of-type
-   還是準確落在 Year（清單最後一個純按鈕項目）身上。 */
-.action-sheet-expand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-}
-
+/* Patch 03 P3-2：Status/Category/Year 三組篩選外觀跟互動完全統一，都是
+   .action-sheet-group 包一顆「+」展開按鈕（沿用 .action-sheet-option）跟
+   展開後的可複選子清單（見 Bookshelf.jsx 的 FilterGroup 元件）。
+   三組都改成 .action-sheet-group 包裝後，不再靠 :last-of-type 判斷「最後
+   一項不畫底線」——每組展開狀態不同，那條規則會在各組內各自命中，反而讓
+   三組標題全部失去分隔線，所以拿掉，統一都畫底線（含 Done 前最後一項），
+   是可接受的小幅簡化。 */
 .action-sheet-sublist {
   padding-left: 16px;
 }
 
+/* P3-2：選項樣式統一 --sans 16px。 */
 .action-sheet-suboption {
   display: flex;
   align-items: center;
@@ -1924,7 +1897,8 @@ button.action-sheet-option:hover {
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   padding: 12px 4px;
-  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  font-size: 16px;
   color: #1a1a1a;
   text-align: left;
 }

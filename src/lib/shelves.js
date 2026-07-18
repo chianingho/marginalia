@@ -1,5 +1,8 @@
 // 書架分組邏輯：首頁（Bookshelf）分組/篩選共用這一套規則。
-// Patch 02 P2-3：See all 詳細頁（ShelfDetail）已移除，不再需要跟它同步。
+// Patch 03：篩選改成跨三組（Status/Category/Year）多選，不再有單一 groupBy
+// 模式，GROUP_BY_OPTIONS/loadGroupBy/saveGroupBy 已移除（沒有呼叫端了）；
+// buildShelfRows 的分組結果現在同時拿來畫「未篩選時的預設三排」跟算「篩選
+// 面板裡某個 facet 選中值涵蓋哪些書」，兩種用途共用同一份邏輯。
 
 // v2-E：Reading 排主角化，順序改成 Reading → To Read → Finished（原本 To Read 排最前）。
 export const SHELF_DEFS = [
@@ -13,37 +16,6 @@ const VALID_STATUS_KEYS = new Set(SHELF_DEFS.map((def) => def.key))
 // 舊資料沒有 status 欄位、或值不是三個合法選項之一時，一律當作 Reading，避免掛掉。
 export function resolveShelfKey(book) {
   return VALID_STATUS_KEYS.has(book.status) ? book.status : 'reading'
-}
-
-// Patch 02 P2-3：Status 加回明列選項（跟增補項 8-7 的決定相反）。順序把
-// Category 放在 Year 前面，讓 Year 維持是清單最後一個純按鈕項目——Category
-// 在 Bookshelf.jsx 裡改成可展開子清單的複合元件，不再是單純的
-// .action-sheet-option，混在清單最後會讓「最後一項不畫底線」的 CSS
-// （:last-of-type）誤判到別的元素上。
-export const GROUP_BY_OPTIONS = [
-  { value: 'status', label: 'Status' },
-  { value: 'all', label: 'All Books' },
-  { value: 'category', label: 'Category' },
-  { value: 'year', label: 'Year' },
-]
-
-const GROUP_BY_STORAGE_KEY = 'reading-notes:group-by'
-
-export function loadGroupBy() {
-  try {
-    const value = localStorage.getItem(GROUP_BY_STORAGE_KEY)
-    return GROUP_BY_OPTIONS.some((option) => option.value === value) ? value : 'status'
-  } catch {
-    return 'status'
-  }
-}
-
-export function saveGroupBy(value) {
-  try {
-    localStorage.setItem(GROUP_BY_STORAGE_KEY, value)
-  } catch {
-    // 存不進去（例如無痕模式）不影響功能，分組偏好本來就只是體驗優化
-  }
 }
 
 const UNCATEGORIZED_SLUG = 'uncategorized'
