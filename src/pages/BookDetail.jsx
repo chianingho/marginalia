@@ -76,43 +76,49 @@ export default function BookDetail() {
 
   return (
     <div className="book-page">
-      <div className="book-page-band" aria-hidden="true">
-        {/* Patch 02 P2-4：紅點/叉叉容易被誤讀成錯誤提示，改成四角星閃光記號。
-            band 自己是 position:absolute，剛好當這兩個記號的定位基準（172px 卡片本身），
-            不用另外量測跟捲動位置無關的絕對座標。 */}
-        <svg className="book-page-doodle book-page-doodle--sparkle book-page-doodle--sparkle-tl" viewBox="0 0 12 12" fill="var(--color-ink)">
-          <path d="M6 0l1.295 4.705L12 6l-4.705 1.295L6 12l-1.295-4.705L0 6l4.705-1.295z" />
-        </svg>
-        <svg className="book-page-doodle book-page-doodle--sparkle book-page-doodle--sparkle-br" viewBox="0 0 12 12" fill="var(--color-ink)">
-          <path d="M6 0l1.295 4.705L12 6l-4.705 1.295L6 12l-1.295-4.705L0 6l4.705-1.295z" />
-        </svg>
-      </div>
       <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
         <span>‹</span>
       </Link>
-      <header className="book-page-header">
-        <div className="book-page-top">
-          <div className="book-page-cover">
-            {book.cover_url ? (
-              <img src={book.cover_url} alt={book.title} />
-            ) : (
-              <span className="book-page-cover-placeholder">{book.title.slice(0, 1)}</span>
-            )}
-          </div>
-          <div className="book-page-info">
-            <h1 className="book-page-title">{book.title}</h1>
-            <p className="book-page-author-row">
-              {book.author && <span className="book-page-author">{book.author}</span>}
-              <button type="button" className="book-page-edit-btn" onClick={() => setShowEditBook(true)}>
-                Edit
-              </button>
-            </p>
-            <p className="book-page-meta meta-text">
-              {statusLabel(book)} · {notes.length} notes
-            </p>
-          </div>
+
+      {/* book-detail-redesign-0719 項目 1：海報式書封區——底色 var(--poster-backdrop)、
+          書封置中，取代原本綠帶/紙感卡片跨界浮出的版面。星芒是「閱讀痕跡層」手繪詞彙，
+          跟返回鍵/New Note 等功能性 UI 分開，只出現在這種展示性色塊上。 */}
+      <div className="book-page-poster">
+        <svg className="book-page-poster-star" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <path
+            d="M15 1l3.7 10.3L29 15l-10.3 3.7L15 29l-3.7-10.3L1 15l10.3-3.7z"
+            stroke="var(--hand-drawn-stroke)"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="book-page-cover">
+          {book.cover_url ? (
+            <img src={book.cover_url} alt={book.title} />
+          ) : (
+            <span className="book-page-cover-placeholder">{book.title.slice(0, 1)}</span>
+          )}
         </div>
-      </header>
+      </div>
+
+      {/* 項目 2：書名 + meta 單行小字網格（作者｜狀態｜N notes｜Edit）。 */}
+      <div className="book-page-titleblock">
+        <h1 className="book-page-title">{book.title}</h1>
+        <div className="book-page-title-hairline" aria-hidden="true" />
+        <div className="book-page-meta-grid">
+          {book.author && <span className="book-page-meta-item book-page-author meta-text">{book.author}</span>}
+          <span className="book-page-meta-item meta-text">{statusLabel(book)}</span>
+          <span className="book-page-meta-item meta-text">{notes.length} notes</span>
+          <button
+            type="button"
+            className="book-page-meta-item book-page-edit-btn meta-text"
+            onClick={() => setShowEditBook(true)}
+          >
+            Edit
+          </button>
+        </div>
+      </div>
 
       <NoteList notes={notes} onNoteClick={openEditNote} />
 

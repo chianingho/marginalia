@@ -48,15 +48,29 @@ function NoteContent({ text }) {
 // 左右各溢出約 5px。視覺語言呼應首頁 lockup 的 Marginalia 小字刷色，但這裡是
 // 純色小色塊（無 wobble 濾鏡），跟著文字內容變動即時重量。量測邏輯抽到共用的
 // HighlightLabel（總規格項目 6：詳情頁 p.{n} 重用同一份，不另寫）。
+// book-detail-redesign-0719 項目 3：黃色畫線樣式/邏輯完全不動，右側加一顆手繪
+// 星芒（閱讀痕跡層，跟項目 1 海報星芒同造型、等比縮小）。星芒是新的 sibling，
+// 不放進 HighlightLabel 的 children——放進去會污染它量測高亮寬度用的文字節點。
 function DayHeader({ label }) {
   return (
-    <HighlightLabel
-      wrapClassName="note-timeline-day-header"
-      highlightClassName="note-timeline-day-highlight"
-      labelClassName="note-timeline-day-label meta-text"
-    >
-      {label}
-    </HighlightLabel>
+    <div className="note-timeline-day-header-row">
+      <HighlightLabel
+        wrapClassName="note-timeline-day-header"
+        highlightClassName="note-timeline-day-highlight"
+        labelClassName="note-timeline-day-label meta-text"
+      >
+        {label}
+      </HighlightLabel>
+      <svg className="note-timeline-day-star" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <path
+          d="M15 1l3.7 10.3L29 15l-10.3 3.7L15 29l-3.7-10.3L1 15l10.3-3.7z"
+          stroke="var(--hand-drawn-stroke)"
+          strokeWidth="1.3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
   )
 }
 
@@ -88,15 +102,34 @@ function NoteThumbnail({ note }) {
   return <img src={url} alt="" className="note-timeline-thumb" />
 }
 
-// 純渲染元件：吃 notes 陣列畫時間軸，依日分組（同一天共用一個日期標頭，卡片
-// 左欄只留時間）。showBookTitle 給未來「全部筆記時間牆」用（單書頁不需要，
-// 時間牆會把 note.bookTitle 一起塞進 notes 陣列再傳進來）。
+// book-detail-redesign-0719 項目 4：頁碼手繪圈——SVG 用 position:absolute +
+// preserveAspectRatio="none" 貼滿一個 position:relative、寬度依文字內容撐開的
+// wrapper，橢圓線稿跟著文字寬度等比拉伸，不管 p.5 還是 p.555 都不會錯位變形。
+function PageBadge({ page }) {
+  return (
+    <span className="note-timeline-page-wrap">
+      <svg className="note-timeline-page-oval" viewBox="0 0 100 44" preserveAspectRatio="none" fill="none" aria-hidden="true">
+        <ellipse cx="50" cy="22" rx="47" ry="19" stroke="var(--hand-drawn-stroke)" strokeWidth="1.3" strokeLinecap="round" />
+      </svg>
+      <span className="note-timeline-page meta-text">p. {page}</span>
+    </span>
+  )
+}
+
+// 純渲染元件：吃 notes 陣列畫時間軸，依日分組（同一天共用一個日期標頭）。
+// book-detail-redesign-0719：原本的 showBookTitle/note.bookTitle（保留給未來
+// 「全部筆記時間牆」用）沒有任何呼叫端傳 true，這次整頁卡片重寫順手拿掉，
+// 之後真的要做時間牆再加回來，不影響現在的行為。
 // 顯示排序固定為 created_at 由舊到新（由上往下），跟資料層 getNotesByBook 回傳的
 // 新到舊順序無關——這裡只重排「顯示用」的副本，不動 notes prop、不動資料層。
-// N-2：統一路徑，卡片內任意位置（分隔線內，含縮圖）一律導頁進 /note/:id
-// 詳情頁——舊的「點縮圖 → 整頁黑底 lightbox → Edit annotation」入口整組
-// 移除，標注一律從詳情頁的 Edit annotation 進去。
-export default function NoteList({ notes, showBookTitle = false }) {
+// N-2：統一路徑，卡片內任意位置一律導頁進 /note/:id 詳情頁。
+// book-detail-redesign-0719 項目 4：卡片改「海報感」白底方卡（原本的左側時間欄
+// +卡片上緣髮絲線分隔的版面整組退場）——時間欄拿掉，時間併入卡片底部 meta
+// 一行（時間｜類型），時間流分組仍然只靠日期標頭。這批筆記資料沒有獨立的
+// 「標題」欄位（NoteModal 只有 content/page），spec 項目 4 提到的「筆記標題」
+// 對不上現有資料模型，這裡先略過標題列、只保留 content 當內文，此落差另外
+// 回報，不在這裡自行加欄位。
+export default function NoteList({ notes }) {
   const navigate = useNavigate()
 
   if (notes.length === 0) {
@@ -112,25 +145,22 @@ export default function NoteList({ notes, showBookTitle = false }) {
         <div className="note-timeline-day-group" key={group.key}>
           <DayHeader label={group.label} />
           {group.notes.map((note) => (
-            <div className="note-timeline-row" key={note.id}>
-              <div className="note-timeline-col">
-                <span className="note-timeline-time meta-text">{formatTimelineTime(note.created_at)}</span>
+            <button
+              type="button"
+              className="note-timeline-card"
+              key={note.id}
+              onClick={() => navigate(`/note/${note.id}`)}
+            >
+              {getOriginalImageKey(note) && <NoteThumbnail note={note} />}
+              <div className="note-timeline-card-body">
+                {note.page != null && note.page !== '' && <PageBadge page={note.page} />}
+                {note.content && <NoteContent text={note.content} />}
+                <div className="note-timeline-card-hairline" aria-hidden="true" />
+                <p className="note-timeline-card-meta meta-text">
+                  {formatTimelineTime(note.created_at)} · {getOriginalImageKey(note) ? 'Photo' : 'Text'}
+                </p>
               </div>
-
-              <div className="note-timeline-card-wrap">
-                <div className="note-timeline-divider" />
-                <button
-                  type="button"
-                  className="note-timeline-card"
-                  onClick={() => navigate(`/note/${note.id}`)}
-                >
-                  {showBookTitle && note.bookTitle && <p className="note-timeline-book">{note.bookTitle}</p>}
-                  {getOriginalImageKey(note) && <NoteThumbnail note={note} />}
-                  {note.page != null && note.page !== '' && <p className="note-timeline-page meta-text">p. {note.page}</p>}
-                  {note.content && <NoteContent text={note.content} />}
-                </button>
-              </div>
-            </div>
+            </button>
           ))}
         </div>
       ))}

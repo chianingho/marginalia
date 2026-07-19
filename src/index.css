@@ -288,62 +288,19 @@ label {
 
 /* ---- Book detail (/book/:id，單書筆記流) ---- */
 
-/* 總規格項目 3（批次 P 修訂版）：綠帶當檯面、書封跨界浮出（上半在綠帶、下半
-   浮在白底），呼應首頁 3D 書架「書從架上抽出」語意。書封跨界靠自然版面差
-   達成，不用另外量測絕對座標：.book-page-top 用 flex 對齊頂端，書封（144px）
-   比右側資訊欄（~86px）高，資訊欄留在綠帶內、書封自然探出綠帶下緣。 */
+/* book-detail-redesign-0719：整頁改「編輯海報式」——海報色塊書封 header →
+   書名/meta 網格 → 日期分組筆記時間流。舊版「綠帶/紙感卡片當檯面、書封
+   跨界浮出」的版面（Patch 01 P-6）整組退場。 */
 .book-page {
-  /* 時間軸時間欄寬度（.note-timeline-col 用），跟書封新寬度（96px）無關，
-   * 時間軸這批「零變更」，維持原值。
-   */
-  --cover-width: 84px;
   min-height: 100dvh;
   background: var(--color-bg);
-  position: relative;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
 }
 
-/* Patch 01 P-6：底襯改紙感卡片，對應橫幅風格（原本的墨綠/teal 實色band太刺眼）。 */
-.book-page-band {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 172px;
-  background: var(--paper);
-  border-bottom: 1px solid var(--grid);
-  z-index: 0;
-}
-
-/* Patch 02 P2-4：卡片外的手繪小記號，四角星閃光（取代 Patch 01 的叉叉/圓點——
-   那組配色太像錯誤提示）。.book-page-band 自己是 position:absolute，是這兩個
-   記號的定位基準（172px 卡片本身），跟頁面捲動/其餘內容高度無關。 */
-.book-page-doodle {
-  position: absolute;
-  pointer-events: none;
-}
-
-.book-page-doodle--sparkle {
-  width: 12px;
-  height: 12px;
-}
-
-/* 左上角避開同一角落的圓形返回鍵（left:content-left、36px 直徑），
-   往右錯開，垂直對齊返回鍵同一條基準線。 */
-.book-page-doodle--sparkle-tl {
-  top: calc(var(--safe-top) + 18px);
-  left: calc(var(--content-left) + 46px);
-}
-
-.book-page-doodle--sparkle-br {
-  bottom: 10px;
-  right: var(--content-left);
-}
-
-/* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵，位置上移到不擋書封
-   （書封頂緣 = safe-top + 58px，兩者間距 ≥ 8px）。 */
+/* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵。樣式/位置不動——
+   book-detail-redesign-0719 明訂返回鍵維持現狀。 */
 /* N-1-1：.btn-frosted--circle 的 flex 置中對齊的是「‹」這個字元的行框中心，
    但字型本身的字符度量會讓墨色（實際可見的筆畫）偏下，所以另外做 1-2px
    光學位移往上修正，肉眼看起來才是真的正中央。 */
@@ -360,31 +317,36 @@ label {
   transform: translateY(-1.5px);
 }
 
-.book-page-header {
+/* 項目 1：海報式書封色塊，全寬、書封置中。不再用 position:absolute 疊版面
+   （舊版「跨界浮出」效果退場），純 normal flow。 */
+.book-page-poster {
   position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  padding: calc(var(--safe-top) + 58px) var(--content-left) 16px;
-}
-
-.book-page-top {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  justify-content: center;
+  padding: calc(var(--safe-top) + 58px) var(--content-left) 32px;
+  background: var(--poster-backdrop);
 }
 
-/* N-1-2：圓角 2px → 8px；overflow:hidden 讓無封面 fallback 方塊自動吃到
-   同樣圓角，不用另外設定。邊線/陰影/跨界位置不動。 */
+/* 手繪星芒（閱讀痕跡層，見 tokens.css 的 --hand-drawn-stroke）：只出現在
+   海報色塊這種展示性區域，不放在返回鍵/New Note 等功能性 UI 上。 */
+.book-page-poster-star {
+  position: absolute;
+  top: calc(var(--safe-top) + 16px);
+  right: var(--content-left);
+  width: 30px;
+  height: 30px;
+}
+
+/* N-1-2：圓角維持 8px。柔投影是新指定值（跟 --shadow-cover 不同，海報感更重）。 */
 .book-page-cover {
   display: block;
-  width: 96px;
-  flex-shrink: 0;
+  width: 118px;
   aspect-ratio: 2 / 3;
   border-radius: 8px;
   overflow: hidden;
   background: #efe7da;
   border: 0.5px solid rgba(0, 0, 0, 0.12);
-  box-shadow: var(--shadow-cover); /* Patch 01 P-6 */
+  box-shadow: 8px 14px 24px rgba(60, 60, 50, 0.2);
 }
 
 .book-page-cover img {
@@ -405,47 +367,59 @@ label {
   color: #b8a78f;
 }
 
-.book-page-info {
-  flex: 1;
-  min-width: 0;
-  padding-top: 2px;
+/* 項目 2：書名區。字體改指定 Noto Serif TC（不是 --font-serif 的 Fraunces-first
+   堆疊——這裡刻意跳過 Fraunces，確保中英文書名字重視覺一致），字級加大、
+   拿掉 line-clamp 改自然換行。 */
+.book-page-titleblock {
+  padding: 20px var(--content-left) 0;
 }
 
 .book-page-title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: 19px;
+  font-family: 'Noto Serif TC', serif;
+  font-size: 24px;
   font-weight: 700;
-  line-height: 1.35;
-  color: var(--color-ink); /* Patch 01 P-6：底襯改亮色紙感卡片，文字改深色 */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.3;
+  color: var(--color-ink);
 }
 
-.book-page-author-row {
-  margin: 6px 0 0;
+.book-page-title-hairline {
+  height: 1px;
+  background: var(--color-hairline);
+  margin: 14px 0;
+}
+
+/* meta 四欄：作者｜狀態｜N notes｜Edit，統一小字網格，space-between 一行排開。
+   author 可能較長，允許它單獨截斷，其餘三欄不換行/不收縮，避免 Edit 被擠掉。 */
+.book-page-meta-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.book-page-meta-item {
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 .book-page-author {
-  font-size: 11px;
-  color: var(--color-text-secondary); /* Patch 01 P-6 */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Edit 位置只由作者名稱決定：跟作者文字同一個 inline flow，作者名換行時
-   自然跟著流到最後一個字後面（不是獨立一行、不是靠封面對位）。視覺維持小字，
-   點擊熱區用 padding 撐到 44px。 */
+.book-page-meta-grid > :not(.book-page-author) {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Edit 仍是功能連結，觸擊熱區用 padding 撐到 ≥44px，視覺維持小字。 */
 .book-page-edit-btn {
-  display: inline-block;
-  vertical-align: baseline;
-  margin-left: 8px;
   background: transparent;
   border: none;
   padding: 15px 4px;
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--color-ink); /* Patch 01 P-6 */
   text-decoration: underline;
 }
 
@@ -453,16 +427,6 @@ button.book-page-edit-btn:hover {
   background: transparent;
   color: var(--color-ink);
   box-shadow: none;
-}
-
-/* B-5：{Status} · {n} notes 同屬 metadata 層，font-family/font-style
-   交給 .meta-text，這裡只留字級/字重/顏色。
-   Patch 01 P-6：底襯改亮色紙感卡片，改用次要文字灰（跟 {n} books 同色階）。 */
-.book-page-meta {
-  margin: 6px 0 0;
-  font-weight: 500;
-  font-size: 12px;
-  color: var(--color-text-secondary);
 }
 
 /* ---- Note detail (/note/:id，總規格項目 6・批次 N：獨立全螢幕三段式) ---- */
@@ -673,11 +637,20 @@ button.note-detail-edit-btn:hover {
   margin-top: 8px;
 }
 
+/* book-detail-redesign-0719 項目 3：日期列改一行 flex（黃畫線標籤 + 星芒），
+   margin 從 .note-timeline-day-header 搬到這個外層 row，星芒才能跟畫線標籤
+   垂直置中對齊。 */
+.note-timeline-day-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 14px;
+}
+
 .note-timeline-day-header {
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin: 20px 0 14px;
 }
 
 .note-timeline-day-highlight {
@@ -700,53 +673,33 @@ button.note-detail-edit-btn:hover {
   color: var(--color-ink);
 }
 
-.note-timeline-row {
-  display: flex;
-  gap: 10px;
-}
-
-.note-timeline-col {
-  width: var(--cover-width);
+.note-timeline-day-star {
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 33px;
 }
 
-.note-timeline-time {
-  text-align: center;
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--color-text-secondary);
-}
-
-.note-timeline-card-wrap {
-  flex: 1;
-  min-width: 0;
-}
-
+/* book-detail-redesign-0719 項目 4：筆記卡改「海報感」白底方卡——原本的
+   左側時間欄 + 卡片上緣髮絲線分隔（.note-timeline-divider）整組退場，
+   改成每張卡自帶邊框，卡與卡之間用 margin 隔開。時間併入卡片底部 meta。 */
 .note-timeline-card {
   display: block;
   width: 100%;
   text-align: left;
-  background: transparent;
-  border: none;
+  background: #fff;
+  border: 0.5px solid #e8e5de;
+  border-radius: 4px;
+  overflow: hidden;
   padding: 0;
 }
 
-button.note-timeline-card:hover {
-  background: transparent;
-  box-shadow: none;
+.note-timeline-card + .note-timeline-card {
+  margin-top: 16px;
 }
 
-.note-timeline-book {
-  margin: 0 0 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-green-edge);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+button.note-timeline-card:hover {
+  background: #fff;
+  box-shadow: none;
 }
 
 .note-timeline-thumb {
@@ -754,18 +707,40 @@ button.note-timeline-card:hover {
   width: 100%;
   max-height: 320px;
   object-fit: cover;
-  border-radius: 10px;
+}
+
+.note-timeline-card-body {
+  padding: 14px 16px 12px;
+}
+
+/* 項目 4：頁碼手繪圈——position:relative 的 wrapper 依文字內容撐開寬度，
+   SVG 用 preserveAspectRatio="none" 貼滿整個 wrapper，橢圓跟著文字寬度
+   等比拉伸，p.5／p.555 都不會錯位變形。 */
+.note-timeline-page-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 14px;
+}
+
+.note-timeline-page-oval {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .note-timeline-page {
-  margin: 8px 0 0;
+  position: relative;
+  z-index: 1;
   font-weight: 500;
   font-size: 13px;
   color: var(--color-ink);
 }
 
 .note-timeline-content {
-  margin: 6px 0 0;
+  margin: 10px 0 0;
   font-size: 14px;
   line-height: 1.75;
   color: var(--color-note-content);
@@ -784,12 +759,15 @@ button.note-timeline-card:hover {
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
 }
 
-/* 每張卡片上緣都有一條（含每組第一張），只切卡片欄，不橫穿時間欄
-   ——結構上本來就是 .note-timeline-card-wrap 的子元素，天生不會蓋到時間欄。 */
-.note-timeline-divider {
+.note-timeline-card-hairline {
   height: 1px;
   background: var(--color-hairline);
-  margin: 16px 16px;
+  margin: 12px 0 8px;
+}
+
+.note-timeline-card-meta {
+  font-size: 11px;
+  color: var(--color-text-secondary);
 }
 
 .note-timeline-empty {
