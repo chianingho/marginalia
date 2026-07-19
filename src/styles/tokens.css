@@ -28,10 +28,6 @@
 
   /* book-detail-redesign-0719：海報式書封區底色，跟 --paper/--cream 都不同，各自獨立 token。 */
   --poster-backdrop: #efebe2;
-  /* book-detail-redesign-0719：手繪元素（星芒/頁碼圈）統一線色，屬「閱讀痕跡層」，
-     跟 --forest/--ink 都不同，各自獨立 token；深色塊上另有 rgba(253,252,250,.7) 版本，
-     本批次用不到，先不建 token。 */
-  --hand-drawn-stroke: #3e4a3d;
 
   /* 字體 */
   --font-serif: 'Fraunces', 'Noto Serif TC', serif; /* 中文標題 fallback 不變，P-1：全站標題統一用這個，不再有 Apple Garamond */

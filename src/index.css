@@ -327,16 +327,6 @@ label {
   background: var(--poster-backdrop);
 }
 
-/* 手繪星芒（閱讀痕跡層，見 tokens.css 的 --hand-drawn-stroke）：只出現在
-   海報色塊這種展示性區域，不放在返回鍵/New Note 等功能性 UI 上。 */
-.book-page-poster-star {
-  position: absolute;
-  top: calc(var(--safe-top) + 16px);
-  right: var(--content-left);
-  width: 30px;
-  height: 30px;
-}
-
 /* N-1-2：圓角維持 8px。柔投影是新指定值（跟 --shadow-cover 不同，海報感更重）。 */
 .book-page-cover {
   display: block;
@@ -637,20 +627,11 @@ button.note-detail-edit-btn:hover {
   margin-top: 8px;
 }
 
-/* book-detail-redesign-0719 項目 3：日期列改一行 flex（黃畫線標籤 + 星芒），
-   margin 從 .note-timeline-day-header 搬到這個外層 row，星芒才能跟畫線標籤
-   垂直置中對齊。 */
-.note-timeline-day-header-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 20px 0 14px;
-}
-
 .note-timeline-day-header {
   position: relative;
   display: inline-flex;
   align-items: center;
+  margin: 20px 0 14px;
 }
 
 .note-timeline-day-highlight {
@@ -673,13 +654,7 @@ button.note-detail-edit-btn:hover {
   color: var(--color-ink);
 }
 
-.note-timeline-day-star {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-/* book-detail-redesign-0719 項目 4：筆記卡改「海報感」白底方卡——原本的
+/* book-detail-redesign-0719 項目 3：筆記卡改「海報感」白底方卡——原本的
    左側時間欄 + 卡片上緣髮絲線分隔（.note-timeline-divider）整組退場，
    改成每張卡自帶邊框，卡與卡之間用 margin 隔開。時間併入卡片底部 meta。 */
 .note-timeline-card {
@@ -713,27 +688,11 @@ button.note-timeline-card:hover {
   padding: 14px 16px 12px;
 }
 
-/* 項目 4：頁碼手繪圈——position:relative 的 wrapper 依文字內容撐開寬度，
-   SVG 用 preserveAspectRatio="none" 貼滿整個 wrapper，橢圓跟著文字寬度
-   等比拉伸，p.5／p.555 都不會錯位變形。 */
-.note-timeline-page-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 14px;
-}
-
-.note-timeline-page-oval {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
+/* 項目 3：頁碼純文字小字，無裝飾。原規格指定 Cormorant，這個字體已被多輪
+   決議退場（v6 改版／Patch 01 P-1），改用 --font-serif（Fraunces/Noto Serif TC）。 */
 .note-timeline-page {
-  position: relative;
-  z-index: 1;
+  margin: 0;
+  font-family: var(--font-serif);
   font-weight: 500;
   font-size: 13px;
   color: var(--color-ink);

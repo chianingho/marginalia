@@ -81,18 +81,9 @@ export default function BookDetail() {
       </Link>
 
       {/* book-detail-redesign-0719 項目 1：海報式書封區——底色 var(--poster-backdrop)、
-          書封置中，取代原本綠帶/紙感卡片跨界浮出的版面。星芒是「閱讀痕跡層」手繪詞彙，
-          跟返回鍵/New Note 等功能性 UI 分開，只出現在這種展示性色塊上。 */}
+          書封置中，取代原本綠帶/紙感卡片跨界浮出的版面。修訂版 spec 明訂「本批次不含
+          任何手繪/插畫元素」，先前草稿的星芒 SVG 已拿掉。 */}
       <div className="book-page-poster">
-        <svg className="book-page-poster-star" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-          <path
-            d="M15 1l3.7 10.3L29 15l-10.3 3.7L15 29l-3.7-10.3L1 15l10.3-3.7z"
-            stroke="var(--hand-drawn-stroke)"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
         <div className="book-page-cover">
           {book.cover_url ? (
             <img src={book.cover_url} alt={book.title} />

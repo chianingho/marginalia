@@ -102,26 +102,17 @@
   （`.book-page-poster`）。跟 `--paper`/`--cream` 是各自獨立的值，不要互相
   取代——三者視覺相近但語意不同（`--cream` 全站背景、`--paper` 卡片底、
   `--poster-backdrop` 只給海報式展示色塊）。
-- **手繪元素＝「閱讀痕跡層」（book-detail-redesign-0719 定案）**：跟螢光黃
-  同一套邏輯——只能出現在**內容區**（日期、頁碼等），不得用在返回鍵／
-  New Note／Edit 等**功能性 UI**上。統一規格：`stroke: var(--hand-drawn-stroke)`
-  （`#3E4A3D`；深色塊上改用 `rgba(253,252,250,.7)`，目前還沒有實際用例）、
-  `stroke-width: 1–1.3px`、`stroke-linecap: round`、inline SVG、`fill: none`。
-  目前兩種詞彙：**星芒**（四向細長尖芒，`.book-page-poster-star` 30px／
-  `.note-timeline-day-star` 16px，同一個 path 等比縮放）、**頁碼圈**
-  （`.note-timeline-page-oval`，`preserveAspectRatio="none"` 貼滿依文字寬度
-  撐開的 wrapper，橢圓跟著文字內容拉伸，不寫死尺寸）。新增手繪詞彙比照
-  這份規格，不要另開一套 stroke 數值。
 - **書籍詳細頁結構（book-detail-redesign-0719 改版，取代舊版綠帶/紙感卡片
   header）**：`BookDetail.jsx` 由上而下＝固定返回鍵（`.btn-frosted--circle`，
   樣式/邏輯沒變）→ 海報式書封色塊（`.book-page-poster`，`--poster-backdrop`
-  底、書封置中、右上角星芒）→ 書名/meta 區（`.book-page-titleblock`，
-  書名 Noto Serif TC 700、髮絲線、四欄 meta 網格：作者｜狀態｜N notes｜Edit，
-  皆套 `.meta-text`）→ `NoteList` 日期分組時間流（每則筆記是白底海報感方卡
-  `.note-timeline-card`：縮圖滿寬貼頂→內文→髮絲線→時間｜類型 meta 一行；
-  頁碼用手繪圈）。已知落差：筆記資料目前沒有獨立的「標題」欄位
-  （`NoteModal` 只有 `content`/`page`），時間流卡片因此沒有標題列，只顯示
-  `content` 當內文——之後真的要加標題需要先擴充資料模型。
+  底、書封置中）→ 書名/meta 區（`.book-page-titleblock`，書名 Noto Serif TC
+  700、髮絲線、四欄 meta 網格：作者｜狀態｜N notes｜Edit，皆套 `.meta-text`）
+  → `NoteList` 日期分組時間流（每則筆記是白底海報感方卡 `.note-timeline-card`：
+  縮圖滿寬貼頂→頁碼（純文字小字，`--font-serif`）→內文→髮絲線→時間｜類型
+  meta 一行）。本批次明訂不含手繪/插畫元素。已知落差：筆記資料目前沒有
+  獨立的「標題」欄位（`NoteModal` 只有 `content`/`page`），時間流卡片因此
+  沒有標題列，頁碼也沒有標題可對齊，只顯示 `content` 當內文——之後真的要加
+  標題需要先擴充資料模型。
 
 ## 新增畫面時的規則
 
