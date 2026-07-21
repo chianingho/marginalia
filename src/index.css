@@ -412,23 +412,24 @@ button.book-page-edit-btn:hover {
   overflow-x: hidden;
 }
 
-/* 段一：綠帶標頭，只放書名（找不到書 fallback 顯示 "Marginalia"），不放作者。
-   返回鍵走導航鐵則「預設」（無框無底色，深色底反白），不是 fixed 例外——
-   這顆跟著內容走，不需要跟捲動脫鉤。 */
-/* UI 修正批次（總規格項目 8）：橫幅底色由 teal 改標準色米色（--color-bg）。 */
+/* 段一：置頂書名列。
+   UI 修正批次（筆記詳情頁 2026-07-21）：header 改真正 sticky，捲動時固定在
+   viewport 頂端；原本貼在截圖右下角的「Edit annotation」膠囊搬進這一列
+   最右側（見 NoteDetail.jsx），底部加一條極淡髮絲線，跟捲到底下的截圖/
+   內文之間有個視覺分界，不會整個黏在一起分不清層次。 */
 .note-detail-band {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 14px;
   background: var(--color-bg);
   padding: calc(var(--safe-top) + 18px) var(--content-left) 18px;
+  border-bottom: 1px solid var(--color-hairline);
 }
 
-/* UI 修正批次（總規格項目 6/7）：返回鍵改套 .btn-frosted/.btn-frosted--circle，
-   跟 BookDetail 的浮動返回鍵共用同一份配色/材質（深色玻璃圓鈕），不再自己
-   另外定義一套透明底樣式；圖示也換成 SVG 箭頭，靠 flex 置中即可跟書名
-   同一水平線對齊，不需要文字字元的光學位移修正。 */
 .note-detail-back {
   flex-shrink: 0;
 }
@@ -446,51 +447,44 @@ button.book-page-edit-btn:hover {
   text-overflow: ellipsis;
 }
 
-/* 段二：暗室照片區，#16171A（非純黑）。Edit annotation 用 .btn-frosted 小號
-   變體，貼照片右下角；照片本身不再是可點開全螢幕 lightbox 的縮放入口
-   （原本「整頁黑底 + 中央白膠囊」的一般 lightbox 分支，這個入口不會經過）。
-   純文字筆記（無圖）這整段不渲染，綠帶直接接紙面內文區。 */
+/* 返回鍵／Edit annotation 膠囊現在都在同一顆米色 header 上，材質/圓角/
+   尺寸要一致（總規格：動作膠囊移位 2）——共用這顆「透明液態玻璃」變體：
+   淺色半透明底＋模糊＋細邊框，不是 .btn-frosted 那份給深色背景用的
+   不透明深玻璃，米色底上才看得出「玻璃」的通透感，不會變成一顆實心深色圓。 */
+.btn-frosted--glass {
+  border: 1px solid rgba(var(--ink-rgb), 0.14);
+  background: rgba(var(--paper-rgb), 0.55);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  box-shadow: 0 2px 8px rgba(var(--ink-rgb), 0.08);
+  color: var(--color-ink);
+}
+
+button.btn-frosted--glass:hover {
+  background: rgba(var(--paper-rgb), 0.8);
+  color: var(--color-ink);
+  box-shadow: 0 2px 8px rgba(var(--ink-rgb), 0.08);
+}
+
+.note-detail-annotate-btn {
+  flex-shrink: 0;
+}
+
+/* 段二：暗室照片區，#16171A（非純黑）。
+   UI 修正批次：截圖改滿版顯示（總規格：儲存截圖滿版顯示 3）——移除左右
+   （連帶上下一起）的 letterbox padding，圖片直接貼齊螢幕左右邊緣；圓角
+   也拿掉，滿版圖片貼齊邊緣時還留圓角會很奇怪。寬度維持 100%、height:auto，
+   比例不變、不變形。純文字筆記（無圖）這整段不渲染，header 直接接紙面
+   內文區。 */
 .note-detail-darkroom {
   flex-shrink: 0;
   background: var(--color-darkroom);
-  padding: 20px 26px;
-}
-
-.note-detail-image-wrap {
-  position: relative;
 }
 
 .note-detail-image {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 3px;
-}
-
-.note-detail-annotate-btn {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-}
-
-/* D-1-1：改半透明白膠囊，跟標注畫面 Cancel 同語言，不再是墨綠磨砂——
-   蓋掉 .btn-frosted 的深色底/邊/陰影，只留 .btn-frosted--sm 給的形狀/
-   padding/字級。用 .note-detail-annotate-btn.btn-frosted 複合選擇器拉高
-   優先度（.btn-frosted 本體在樣式表更後面，單純同順位的話會被它蓋掉）。
-   位置、尺寸、點擊行為不動。 */
-.note-detail-annotate-btn.btn-frosted {
-  background: rgba(var(--paper-rgb), 0.14);
-  border: 0.5px solid rgba(var(--paper-rgb), 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: none;
-  color: var(--color-bg);
-}
-
-button.note-detail-annotate-btn.btn-frosted:hover {
-  background: rgba(var(--paper-rgb), 0.24);
-  color: var(--color-bg);
-  box-shadow: none;
 }
 
 /* 段三：紙面內文區 */

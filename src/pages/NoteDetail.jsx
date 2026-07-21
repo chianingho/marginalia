@@ -95,27 +95,27 @@ export default function NoteDetail() {
       <header className="note-detail-band">
         <button
           type="button"
-          className="note-detail-back btn-frosted btn-frosted--circle"
+          className="note-detail-back btn-frosted--circle btn-frosted--glass"
           aria-label="返回"
           onClick={handleBack}
         >
           <ChevronLeftIcon />
         </button>
         <h1 className="note-detail-title">{book?.title || 'Marginalia'}</h1>
+        {imageUrl && (
+          <button
+            type="button"
+            className="note-detail-annotate-btn btn-frosted--sm btn-frosted--glass"
+            onClick={() => setShowAnnotator(true)}
+          >
+            ✎ Edit annotation
+          </button>
+        )}
       </header>
 
       {imageUrl && (
         <div className="note-detail-darkroom">
-          <div className="note-detail-image-wrap">
-            <img src={imageUrl} alt="" className="note-detail-image" />
-            <button
-              type="button"
-              className="note-detail-annotate-btn btn-frosted btn-frosted--sm"
-              onClick={() => setShowAnnotator(true)}
-            >
-              ✎ Edit annotation
-            </button>
-          </div>
+          <img src={imageUrl} alt="" className="note-detail-image" />
         </div>
       )}
 
