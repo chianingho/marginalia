@@ -204,7 +204,10 @@ export default function Splash({ children }) {
             </div>
 
             <div className={`splash-bird ${birdIn ? 'splash-bird--in' : ''}`}>
-              <svg viewBox="0 0 100 110" filter="url(#splash-rough)">
+              {/* BirdDoodle 的座標是原本 BrandBanner 440×218 viewBox 底下量出來的
+                  本地座標（原生落在 x:371–410 / y:122–188 一帶），這裡直接裁一個
+                  貼合鳥的 viewBox 視窗，不改路徑數字，維持跟首頁同一份資產。 */}
+              <svg viewBox="368 118 46 74" filter="url(#splash-rough)">
                 <BirdDoodle eyeClassName={`splash-eye ${eyeWink ? 'splash-eye--wink' : ''}`} />
               </svg>
             </div>
