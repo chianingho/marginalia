@@ -108,7 +108,12 @@ export default function NoteList({ notes }) {
   const navigate = useNavigate()
 
   if (notes.length === 0) {
-    return <p className="note-timeline-empty">No notes yet</p>
+    return (
+      <div className="note-timeline-empty">
+        <p>No notes yet</p>
+        <p className="meta-text">點下方 + NEW NOTE 記下第一個想法</p>
+      </div>
+    )
   }
 
   const sortedNotes = [...notes].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''))

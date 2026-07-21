@@ -4,6 +4,7 @@ import AddBookModal from '../components/AddBookModal.jsx'
 import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { buildShelfRows } from '../lib/shelves.js'
+import { ONBOARDING_STORAGE_KEY, buildOnboardingTour, useOnboarding } from '../onboarding/useOnboarding.js'
 
 function chunk(list, size) {
   const out = []
@@ -210,12 +211,16 @@ export default function Bookshelf() {
     return searchFilteredBooks.filter((book) => allowedByFacet.every((ids) => ids === null || ids.has(book.id)))
   }, [searchFilteredBooks, activeFilters, selectedSlugsByFacet])
 
+  // 書架資料載入完成（status 變 'ready'）後才可能觸發導覽，避免在空畫面/
+  // loading 狀態就搶跑；DOM 目標是否真的存在由 useOnboarding 內部輪詢確認。
+  useOnboarding(status === 'ready')
+
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
         <BrandBanner
           actions={
-            <div className="bookshelf-filterrow-icons">
+            <div className="bookshelf-filterrow-icons" data-tour="search-tools">
               <button
                 type="button"
                 className="pill-btn"
@@ -231,6 +236,19 @@ export default function Bookshelf() {
             </div>
           }
         />
+
+        {/* DEV ONLY: remove after onboarding QA */}
+        <button
+          type="button"
+          className="tour-replay-btn"
+          onClick={() => {
+            localStorage.removeItem(ONBOARDING_STORAGE_KEY)
+            buildOnboardingTour().drive()
+          }}
+        >
+          重看導覽
+        </button>
+        {/* END DEV ONLY */}
 
         <div className="bookshelf-filterrow">
           <p className="bookshelf-count">{visibleBooks.length} books</p>
@@ -269,7 +287,7 @@ export default function Bookshelf() {
       {status === 'error' && <p className="bookshelf-status form-error">載入失敗：{error}</p>}
 
       {status === 'ready' && books.length === 0 && (
-        <p className="bookshelf-status empty-hint">書庫還是空的，點擊下方「Add Book」開始紀錄你的閱讀吧！</p>
+        <p className="bookshelf-status empty-hint meta-text">書櫃還是空的 — 點下方 ADD BOOK 加入第一本書</p>
       )}
 
       {status === 'ready' && books.length > 0 && activeFilters.length > 0 && visibleBooks.length === 0 && (
@@ -282,7 +300,12 @@ export default function Bookshelf() {
         </div>
       )}
 
-      <button type="button" className="add-book-btn btn-frosted" onClick={() => setShowAddModal(true)}>
+      <button
+        type="button"
+        className="add-book-btn btn-frosted"
+        data-tour="add-book"
+        onClick={() => setShowAddModal(true)}
+      >
         <span className="add-book-btn-icon">＋</span>
         Add Book
       </button>
