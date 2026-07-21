@@ -1,3 +1,5 @@
+import BirdDoodle from './BirdDoodle.jsx'
+
 // v6 改版：橫幅文字改回活文字（Marginalia/Books，Apple Garamond Light Italic），
 // 不再是 banner.png 點陣圖，換字不用重出圖檔。插畫是複製自
 // marginalia-redesign-preview.html 的 .shelf-illo 手繪 SVG，路徑不變，
@@ -5,6 +7,8 @@
 // prefers-reduced-motion media query 內。
 // UI 修正批次（總規格項目 2）：actions 讓呼叫端把搜尋/篩選膠囊塞進跟
 // 「Marginalia」同一水平列、靠右對齊，不用另外複製一份 brand-hero 排版。
+// 開場動畫改版：粉紅小鳥抽成 <BirdDoodle />（見該檔），跟 Splash.jsx 共用
+// 同一份資產，這裡不再自己內嵌一份鳥的路徑。
 export default function BrandBanner({ actions }) {
   return (
     <div className="brand-hero">
@@ -111,18 +115,7 @@ export default function BrandBanner({ actions }) {
         </g>
 
         {/* pink bird + caption */}
-        <g>
-          <path
-            d="M394 132c8 1 14 6 15.5 14 1.6 8.5-2.5 16-9.5 19.5 1.5 2.5 4 4 7 4.5-3.5 2.5-8 3-12 1.5-2 .6-4 .9-6.5.7-9.5-.8-16.5-7.5-17-16.5-.5-9 4.5-16.5 12.5-19.5-2-2.5-2.5-5.5-1.5-8.5 3.5.5 6 2 7.5 4.3z"
-            fill="#E9A0B6"
-          />
-          <path d="M383 124l-7-1.5 6 5" fill="#D8502C" />
-          <circle className="blink" cx="386.5" cy="130.5" r="1.7" fill="#26332E" />
-          <g stroke="#26332E" strokeWidth="1.8" strokeLinecap="round">
-            <path d="M390 171v14M390 185l-4 3M390 185l4 3" />
-            <path d="M400 170v15M400 185l-4 3M400 185l4 3" />
-          </g>
-        </g>
+        <BirdDoodle />
         <text x="318" y="112" fontFamily="Gloria Hallelujah" fontSize="11" fill="#26332E" transform="rotate(-3 318 112)">i must</text>
         <text x="322" y="128" fontFamily="Gloria Hallelujah" fontSize="11" fill="#26332E" transform="rotate(2 322 128)">read</text>
 

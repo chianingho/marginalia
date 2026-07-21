@@ -37,6 +37,7 @@
   --font-serif: 'Fraunces', 'Noto Serif TC', serif; /* 中文標題 fallback 不變，P-1：全站標題統一用這個，不再有 Apple Garamond */
   --font-sans: 'Archivo', -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; /* 中文內文 fallback 不變 */
   --font-hand: 'Gloria Hallelujah', cursive; /* 只給書架插畫手寫字用 */
+  --font-splash: 'Cormorant', serif; /* 只給開場動畫（Splash.jsx）的打字字標用，不是全站標題字體 */
 
   /* 色彩：語意別名指到上面的原始色票 */
   --color-bg: var(--cream); /* 全站背景 */
@@ -56,11 +57,14 @@
   /* 錯誤/刪除等危險狀態文字色，語意別名指到品牌紅，不再各自寫 #b3432f 之類的值。 */
   --color-danger: var(--red);
 
-  /* 首次導覽（driver.js coach mark）spec 指定的兩個精確色值，跟現有
-     --paper/--ink 都不同（不是同一顆數值換名字，是刻意給的獨立色），
+  /* 首次導覽（driver.js coach mark）spec 指定的精確色值，跟現有
+     --paper 不同（不是同一顆數值換名字，是刻意給的獨立色），
      所以在這裡建成正式 token，不是散落在導覽元件裡的寫死值。 */
   --color-tour-bg: #fdfcfa;
-  --color-tour-ink: #3e4a3d;
+  /* 品牌綠的柔和版，比 --ink 淺一階——導覽 popover 文字跟開場動畫
+     （Splash.jsx）手繪書線都指定同一顆 #3E4A3D，所以用通用名稱，
+     不是 tour 專屬。 */
+  --color-ink-soft: #3e4a3d;
 
   /* RGB 分量版本，給需要透明度的 rgba() 用——來源都是上面同一顆 hex token，
      不是另外調色，全站陰影/毛玻璃/遮罩統一從這三組出，不再用 rgba(0,0,0,x) 或

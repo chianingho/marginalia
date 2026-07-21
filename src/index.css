@@ -1702,7 +1702,7 @@ button.action-sheet-cancel:hover {
 
 /* ---- 首次進站導覽（driver.js coach mark）----
    driver.js 自己有一份 driver.css（在 useOnboarding.js import），這裡只覆寫
-   它暴露出來的 class，套全域標準色 token（--color-tour-bg/--color-tour-ink，
+   它暴露出來的 class，套全域標準色 token（--color-tour-bg/--color-ink-soft，
    見 tokens.css）跟共用按鈕材質，不引入 token 以外的顏色、也不自訂新的
    按鈕視覺語言——「下一步/完成」直接借 .btn-frosted 那份深色玻璃的視覺
    （border/background/blur/文字色都是同一組 token），「略過」借
@@ -1710,7 +1710,7 @@ button.action-sheet-cancel:hover {
 .driver-popover.marginalia-tour {
   font-family: var(--font-sans);
   background: var(--color-tour-bg);
-  color: var(--color-tour-ink);
+  color: var(--color-ink-soft);
   border-radius: 18px;
   padding: 18px 20px;
   box-shadow: var(--shadow-float);
@@ -1721,13 +1721,13 @@ button.action-sheet-cancel:hover {
   font-family: var(--font-serif);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-tour-ink);
+  color: var(--color-ink-soft);
 }
 
 .marginalia-tour .driver-popover-description {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--color-tour-ink);
+  color: var(--color-ink-soft);
 }
 
 /* 箭頭底色跟 popover 本體同色，四個方向各自只蓋掉「有顏色那一邊」的
@@ -1794,10 +1794,14 @@ button.action-sheet-cancel:hover {
   color: var(--color-bg);
 }
 
-/* ---- 開場動畫（app 內首次入場動畫，四拍版總長 1.2s）----
+/* ---- 開場動畫（app 內首次入場動畫，改版：打字→畫書→小鳥→眨眼→轉場，
+   總長約 2.7s）----
+   取代舊的四拍版（淡入字標→螢光筆掃過→縮小淡出），整組 class 換新。
    跟 public/ 的 PWA manifest 靜態 splash 是兩回事，這裡不動 manifest。
-   reduced-motion 分支完全在 Splash.jsx 用不同 class／不渲染 .splash-sweep
-   處理，這裡的 @keyframes 只會套到「沒有偏好減少動態」的使用者身上。 */
+   reduced-motion：Splash.jsx 在 JS 層直接讓字標/書一開始就是完成態、
+   從不進入 blink 階段，這裡的 CSS 只需要額外擋掉小鳥的「pop」進場動畫
+   （小鳥本身的顯示/隱藏是 opacity，不受影響，只有動態的那段 keyframe
+   包進 @media (prefers-reduced-motion: no-preference)）。 */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -1807,90 +1811,112 @@ button.action-sheet-cancel:hover {
   justify-content: center;
   background: var(--color-bg);
   cursor: pointer;
-  animation: splash-overlay-out 1.2s linear forwards;
+  opacity: 1;
 }
 
-@keyframes splash-overlay-out {
+.splash-overlay--exiting {
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.splash-lockup {
+  width: min(86vw, 420px);
+  height: auto;
+  overflow: visible;
+  transform: scale(1);
+}
+
+.splash-lockup--exiting {
+  transform: scale(0.92);
+  transition-property: transform;
+  transition-timing-function: ease;
+}
+
+.splash-wordmark-text {
+  font-family: var(--font-splash);
+  font-weight: 500;
+  font-size: 46px;
+  fill: var(--color-green);
+  letter-spacing: 0.01em;
+}
+
+.splash-cursor {
+  fill: var(--color-green);
+  animation: splash-cursor-blink 0.5s step-end infinite;
+}
+
+@keyframes splash-cursor-blink {
   0%,
-  75% {
+  100% {
     opacity: 1;
   }
-  100% {
+  50% {
     opacity: 0;
   }
 }
 
-.splash-overlay--reduced {
-  animation: none;
+/* 手繪線：spec 指定 #3E4A3D，跟導覽 popover 文字同一顆 --color-ink-soft
+   token（不是 --color-ink／#26332e，數值不同，各自獨立）。
+   stroke-dashoffset 的實際數值/transition 由 Splash.jsx 的 BookLine 用
+   getTotalLength() 量出來後 inline 設定，這裡只管線條本身的視覺規格。 */
+.splash-book-line {
+  fill: none;
+  stroke: var(--color-ink-soft);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition-property: stroke-dashoffset, opacity;
+  transition-timing-function: ease;
 }
 
-/* 0–0.4s 字標淡入；0.9–1.2s 微縮＋（透過 .splash-overlay 本身淡出）首頁疊上。 */
-.splash-wordmark {
-  position: relative;
-  display: inline-block;
-  font-family: var(--font-serif);
-  font-weight: 300;
-  font-size: clamp(40px, 13vw, 64px);
-  color: var(--color-green);
-  letter-spacing: -0.045em;
+.splash-bird {
   opacity: 0;
-  transform: scale(1);
-  animation: splash-wordmark-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
 }
 
-@keyframes splash-wordmark-in {
+.splash-bird--in {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .splash-bird--in {
+    animation: splash-bird-pop 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+}
+
+@keyframes splash-bird-pop {
   0% {
     opacity: 0;
-    transform: scale(1);
+    transform: scale(0.6);
   }
-  33.34% {
+  70% {
     opacity: 1;
-    transform: scale(1);
-  }
-  75% {
-    opacity: 1;
-    transform: scale(1);
+    transform: scale(1.08);
   }
   100% {
     opacity: 1;
-    transform: scale(0.88);
+    transform: scale(1);
   }
 }
 
-.splash-wordmark--static {
-  opacity: 1;
-  animation: none;
+.splash-eye {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-/* 0.4–0.9s：螢光筆黃掃過字標——招牌閱讀痕跡，這裡是唯一允許在功能性 UI
-   之外使用高亮黃的地方（總規格限制）。scaleX 從左往右長出，不用 clip-path。 */
-.splash-sweep {
-  position: absolute;
-  left: -4%;
-  right: -4%;
-  top: 18%;
-  height: 62%;
-  background: var(--color-highlight);
-  opacity: 0;
-  transform: scaleX(0) skewX(-8deg);
-  transform-origin: left center;
-  z-index: -1;
-  animation: splash-sweep-in 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+.splash-eye--blink {
+  animation: splash-blink 250ms ease-in-out 1;
 }
 
-@keyframes splash-sweep-in {
+@keyframes splash-blink {
   0%,
-  33.34% {
-    opacity: 0;
-    transform: scaleX(0) skewX(-8deg);
-  }
-  34% {
-    opacity: 0.55;
-  }
-  75%,
   100% {
-    opacity: 0.55;
-    transform: scaleX(1) skewX(-8deg);
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.1);
   }
 }
 
