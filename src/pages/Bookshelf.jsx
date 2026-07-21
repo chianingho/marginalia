@@ -64,7 +64,6 @@ function ShelfRow({ label, books, isHero = false }) {
     <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
       <div className="shelf-row-header">
         <span className="shelf-row-label">{label}</span>
-        <span className="shelf-row-count meta-text">{books.length}</span>
       </div>
       <div className="shelf-scroll">
         <div className="shelf-track">
@@ -252,41 +251,43 @@ export default function Bookshelf() {
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
-        <BrandBanner />
+        <BrandBanner
+          actions={
+            <div className="bookshelf-filterrow-icons">
+              <button
+                type="button"
+                className="pill-btn"
+                onClick={toggleSearch}
+                aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
+                aria-expanded={searchOpen}
+              >
+                <SearchIcon />
+              </button>
+              <button type="button" className="pill-btn" onClick={() => setFilterOpen(true)} aria-label="篩選">
+                <FilterIcon />
+              </button>
+            </div>
+          }
+        />
 
         <div className="bookshelf-filterrow">
           <p className="bookshelf-count">{visibleBooks.length} books</p>
-          <div className="bookshelf-filterrow-icons">
-            <button
-              type="button"
-              className="pill-btn"
-              onClick={toggleSearch}
-              aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
-              aria-expanded={searchOpen}
-            >
-              <SearchIcon />
-            </button>
-            <button type="button" className="pill-btn" onClick={() => setFilterOpen(true)} aria-label="篩選">
-              <FilterIcon />
-            </button>
-          </div>
+          {activeFilters.length > 0 && (
+            <div className="filter-pills-row">
+              {activeFilters.map((f) => (
+                <button
+                  key={`${f.facet}:${f.slug}`}
+                  type="button"
+                  className="filter-pill"
+                  onClick={() => toggleFilter(f.facet, f.slug, f.label)}
+                >
+                  {f.label}
+                  <span aria-hidden="true">×</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-
-        {activeFilters.length > 0 && (
-          <div className="filter-pills-row">
-            {activeFilters.map((f) => (
-              <button
-                key={`${f.facet}:${f.slug}`}
-                type="button"
-                className="filter-pill"
-                onClick={() => toggleFilter(f.facet, f.slug, f.label)}
-              >
-                {f.label}
-                <span aria-hidden="true">×</span>
-              </button>
-            ))}
-          </div>
-        )}
 
         {searchOpen && (
           <div className="bookshelf-search-row">

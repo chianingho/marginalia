@@ -3,10 +3,15 @@
 // marginalia-redesign-preview.html 的 .shelf-illo 手繪 SVG，路徑不變，
 // 只把屬性名稱轉成 JSX camelCase。動畫（sway/blink）包在 index.css 的
 // prefers-reduced-motion media query 內。
-export default function BrandBanner() {
+// UI 修正批次（總規格項目 2）：actions 讓呼叫端把搜尋/篩選膠囊塞進跟
+// 「Marginalia」同一水平列、靠右對齊，不用另外複製一份 brand-hero 排版。
+export default function BrandBanner({ actions }) {
   return (
     <div className="brand-hero">
-      <p className="brand-title-over">Marginalia</p>
+      <div className="brand-hero-row">
+        <p className="brand-title-over">Marginalia</p>
+        {actions}
+      </div>
       <h1 className="brand-title">Books</h1>
 
       <svg className="shelf-illo" viewBox="0 0 440 218" fill="none" aria-hidden="true">

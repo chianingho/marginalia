@@ -76,8 +76,8 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal edit-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="add-modal-backdrop" onClick={onClose}>
+      <div className="add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit Book</h2>
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
@@ -85,8 +85,8 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="edit-modal-form">
-          <label className="edit-modal-label">
+        <form onSubmit={handleSubmit} className="add-modal-form">
+          <label className="add-modal-label">
             Title
             <input
               type="text"
@@ -97,7 +97,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
             />
           </label>
 
-          <label className="edit-modal-label">
+          <label className="add-modal-label">
             Author (optional)
             <input
               type="text"
@@ -107,7 +107,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
             />
           </label>
 
-          <label className="edit-modal-label">
+          <label className="add-modal-label">
             Status
             <select
               value={state.status}
@@ -121,7 +121,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
             </select>
           </label>
 
-          <label className="edit-modal-label">
+          <label className="add-modal-label">
             Category (optional)
             <select value={state.category} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
               <option value="">None</option>
@@ -143,15 +143,15 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
             )}
           </label>
 
-          <div className="edit-modal-field">
-            <label htmlFor="edit-modal-file-input" className="edit-modal-label-text">
+          <div className="add-modal-field">
+            <label htmlFor="edit-modal-file-input" className="add-modal-label-text">
               Upload cover (optional, replaces current cover)
             </label>
-            <div className="edit-modal-file-row">
-              <label htmlFor="edit-modal-file-input" className="edit-modal-file-btn">
+            <div className="add-modal-file-row">
+              <label htmlFor="edit-modal-file-input" className="add-modal-file-btn">
                 Choose file
               </label>
-              <span className="edit-modal-file-name">
+              <span className="add-modal-file-name">
                 {state.coverFile ? state.coverFile.name : 'No file chosen'}
               </span>
             </div>
@@ -160,19 +160,19 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="edit-modal-file-input"
+              className="add-modal-file-input"
             />
           </div>
 
           {state.formError && <p className="form-error">{state.formError}</p>}
 
           <div className="modal-actions">
-            <button type="button" className="add-page-btn add-page-btn-secondary" onClick={onClose}>
+            <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
               Cancel
             </button>
             <button
               type="submit"
-              className="add-page-btn add-page-btn-primary"
+              className="add-page-btn btn-frosted"
               disabled={state.submitStatus === 'submitting'}
             >
               {state.submitStatus === 'submitting' ? 'Saving…' : 'Save'}

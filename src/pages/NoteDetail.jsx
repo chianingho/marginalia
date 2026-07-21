@@ -8,6 +8,16 @@ import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
 import NoteModal from '../components/NoteModal.jsx'
 import HighlightLabel from '../components/HighlightLabel.jsx'
 
+// UI 修正批次（總規格項目 7）：跟 BookDetail 的返回鍵共用同一顆 SVG 箭頭，
+// 不用文字字元「‹」，避免字型墨色不置中的問題。
+function ChevronLeftIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 // /note/:id — 筆記詳情頁，時間軸卡片點擊的導頁目標。
 // 總規格項目 6（批次 N）／N-2：獨立全螢幕三段式頁面（綠帶標頭／暗室照片區／
 // 紙面內文區），不透出下層。NoteImageLightbox 這裡單純是「進標注畫面」的
@@ -83,8 +93,13 @@ export default function NoteDetail() {
   return (
     <div className="note-detail-screen">
       <header className="note-detail-band">
-        <button type="button" className="note-detail-back" aria-label="返回" onClick={handleBack}>
-          <span>‹</span>
+        <button
+          type="button"
+          className="note-detail-back btn-frosted btn-frosted--circle"
+          aria-label="返回"
+          onClick={handleBack}
+        >
+          <ChevronLeftIcon />
         </button>
         <h1 className="note-detail-title">{book?.title || 'Marginalia'}</h1>
       </header>

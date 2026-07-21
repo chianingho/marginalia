@@ -1,18 +1,13 @@
 @import './styles/tokens.css';
 
 :root {
-  /* R-1：改名跟 tokens.css 的 --color-bg（實際內容背景）分開——這個是舊版非
-     flush 路由（.app-header/.app-main）殼層用的暖灰色，值不變，只是換名字避免
-     撞名。目前 App.jsx 的路由幾乎全是 flush route，這個殼層很少真的被看到，
-     但顏色本身沒有動過。 */
-  --color-shell-bg: #e6e2dc;
-  --color-surface: #fffdfa;
-  --color-text: #3a332c;
-  --color-text-muted: #9c8f80;
-  --color-accent: #8a6d4b;
-  --color-border: #e9e1d4;
-
-  --shadow-card-hover: 0 16px 36px rgba(91, 70, 54, 0.14), 0 4px 10px rgba(91, 70, 54, 0.07);
+  /* UI 修正批次（2026-07-21）：舊版非 flush 路由（.app-header/.app-main）殼層用的
+     這組顏色，原本各自寫死一套跟品牌色無關的棕/灰階，現在全部改指到 tokens.css
+     的全域標準色，不再有 token 以外的顏色。--color-surface/--shadow-card-hover
+     已搬進 tokens.css（全站唯一來源），這裡不再重覆宣告。 */
+  --color-shell-bg: var(--cream);
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-text-secondary);
 }
 
 * {
@@ -36,13 +31,16 @@ a {
   color: inherit;
 }
 
+/* UI 修正批次：全站按鈕的預設材質——透明底＋品牌綠框線／字色，跟 .pill-btn
+   等膠囊按鈕同一套配色語言，不再各自寫一套棕色系。有更具體樣式需求的按鈕
+   （.btn-frosted 系列等）疊加在這份基礎上，不用重覆宣告配色。 */
 button {
   cursor: pointer;
   font: inherit;
   border-radius: 999px;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-green);
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-green);
   padding: 10px 22px;
   font-size: 0.92rem;
   letter-spacing: 0.02em;
@@ -50,9 +48,9 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: var(--color-accent);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(138, 109, 75, 0.28);
+  background: var(--color-green);
+  color: var(--color-bg);
+  box-shadow: 0 6px 16px rgba(var(--teal-rgb), 0.28);
 }
 
 button:active:not(:disabled) {
@@ -74,7 +72,7 @@ button.icon-btn {
 }
 
 button.icon-btn:hover {
-  background: var(--color-border);
+  background: var(--color-hairline);
   color: var(--color-text);
   box-shadow: none;
 }
@@ -84,9 +82,9 @@ textarea,
 select {
   font: inherit;
   padding: 9px 12px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-hairline);
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-text);
 }
 
@@ -94,8 +92,8 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(138, 109, 75, 0.12);
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(var(--teal-rgb), 0.12);
 }
 
 label {
@@ -113,7 +111,7 @@ label {
   justify-content: center;
   padding: 26px 32px;
   background: var(--color-shell-bg);
-  box-shadow: 0 1px 0 rgba(58, 51, 44, 0.08);
+  box-shadow: 0 1px 0 rgba(var(--ink-rgb), 0.08);
 }
 
 .app-title {
@@ -138,17 +136,19 @@ label {
   color: var(--color-text-muted);
 }
 
+/* UI 修正批次：提示用的芥末黃色調全部從 --mustard token color-mix 出來，
+   不再寫死 #f4ebd9/#6b5410 這組跟 tokens.css 無關的顏色。 */
 .local-mode-banner {
-  background: #f4ebd9;
-  color: #6b5410;
+  background: color-mix(in srgb, var(--mustard) 16%, var(--color-bg));
+  color: color-mix(in srgb, var(--mustard) 55%, var(--color-ink));
   font-size: 0.83rem;
   padding: 10px 32px;
   line-height: 1.6;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .local-mode-banner code {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(var(--ink-rgb), 0.06);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -171,29 +171,12 @@ label {
   font-size: 0.95rem;
 }
 
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(58, 51, 44, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 100;
-  backdrop-filter: blur(2px);
-}
-
-.modal {
-  background: var(--color-surface);
-  border-radius: 18px;
-  padding: 28px;
-  width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-card-hover);
-}
+/* Modal
+   UI 修正批次：舊版 .modal-backdrop/.modal 殼層原本只有 EditBookModal 在用，
+   跟 AddBookModal/NoteModal 的 .add-modal-backdrop/.add-modal 是兩套材質，
+   造成「Edit Book」彈窗配色/圓角/間距都跟其他彈窗不一致（總規格項目 6）。
+   EditBookModal 已改用 .add-modal-backdrop/.add-modal，這兩顆殼層 class
+   沒有呼叫端了，整組移除，不留死 CSS。 */
 
 .modal-header {
   display: flex;
@@ -220,7 +203,7 @@ label {
   padding: 0;
   max-height: 280px;
   overflow-y: auto;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-hairline);
   border-radius: 12px;
 }
 
@@ -228,7 +211,7 @@ label {
   display: flex;
   gap: 12px;
   padding: 10px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-hairline);
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -241,8 +224,10 @@ label {
   background: var(--color-shell-bg);
 }
 
+/* UI 修正批次：選中態改用品牌綠淡底，跟 .pill-btn/.filter-pill 的
+   hover/active 淡綠語言一致，不再是另一顆跟品牌色無關的米色。 */
 .search-result.selected {
-  background: #f1e7d8;
+  background: rgba(var(--teal-rgb), 0.08);
 }
 
 .search-result img {
@@ -250,7 +235,7 @@ label {
   height: 72px;
   object-fit: cover;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(91, 70, 54, 0.15);
+  box-shadow: 0 2px 6px rgba(var(--ink-rgb), 0.15);
 }
 
 .search-result-noimg {
@@ -262,8 +247,8 @@ label {
   justify-content: center;
   font-family: var(--font-serif);
   font-size: 1.1rem;
-  background: #efe7da;
-  color: #b8a78f;
+  background: var(--color-cover-placeholder-bg);
+  color: var(--color-cover-placeholder-ink);
   border-radius: 6px;
 }
 
@@ -282,7 +267,7 @@ label {
 }
 
 .form-error {
-  color: #b3432f;
+  color: var(--color-danger);
   font-size: 0.85rem;
 }
 
@@ -300,21 +285,16 @@ label {
 }
 
 /* 導航鐵則例外 2：fixed 跟隨捲動的磨砂圓形返回鍵。樣式/位置不動——
-   book-detail-redesign-0719 明訂返回鍵維持現狀。 */
-/* N-1-1：.btn-frosted--circle 的 flex 置中對齊的是「‹」這個字元的行框中心，
-   但字型本身的字符度量會讓墨色（實際可見的筆畫）偏下，所以另外做 1-2px
-   光學位移往上修正，肉眼看起來才是真的正中央。 */
+   book-detail-redesign-0719 明訂返回鍵維持現狀。
+   UI 修正批次（總規格項目 7）：「‹」文字字元的字型墨色天生不置中，
+   translateY 光學位移只能治標，換成 SVG 箭頭圖示後用 viewBox 幾何中心
+   對齊，配合 .btn-frosted--circle 的 flex 置中，不需要再手動位移修正。 */
 .book-page-back {
   position: fixed;
   top: calc(var(--safe-top) + 12px);
   left: var(--content-left);
   z-index: 20;
   text-decoration: none;
-}
-
-.book-page-back span {
-  display: block;
-  transform: translateY(-1.5px);
 }
 
 /* 項目 1：海報式書封色塊，全寬、書封置中。不再用 position:absolute 疊版面
@@ -327,16 +307,19 @@ label {
   background: var(--poster-backdrop);
 }
 
-/* N-1-2：圓角維持 8px。柔投影是新指定值（跟 --shadow-cover 不同，海報感更重）。 */
+/* N-1-2：圓角維持 8px。
+   UI 修正批次（總規格項目 3）：原本的柔投影往右下大幅偏移（8px 14px 24px），
+   視覺上會被誤讀成書封右下角「翹起」的頁角效果，改用對稱的 --shadow-cover
+   token（跟其餘卡片同一套陰影語言），書封本身不再有方向性偏移。 */
 .book-page-cover {
   display: block;
   width: 118px;
   aspect-ratio: 2 / 3;
   border-radius: 8px;
   overflow: hidden;
-  background: #efe7da;
-  border: 0.5px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 8px 14px 24px rgba(60, 60, 50, 0.2);
+  background: var(--color-cover-placeholder-bg);
+  border: 0.5px solid rgba(var(--ink-rgb), 0.12);
+  box-shadow: var(--shadow-cover);
 }
 
 .book-page-cover img {
@@ -354,7 +337,7 @@ label {
   justify-content: center;
   font-family: var(--font-serif);
   font-size: 1.6rem;
-  color: #b8a78f;
+  color: var(--color-cover-placeholder-ink);
 }
 
 /* 項目 2：書名區。字體改指定 Noto Serif TC（不是 --font-serif 的 Fraunces-first
@@ -432,40 +415,22 @@ button.book-page-edit-btn:hover {
 /* 段一：綠帶標頭，只放書名（找不到書 fallback 顯示 "Marginalia"），不放作者。
    返回鍵走導航鐵則「預設」（無框無底色，深色底反白），不是 fixed 例外——
    這顆跟著內容走，不需要跟捲動脫鉤。 */
+/* UI 修正批次（總規格項目 8）：橫幅底色由 teal 改標準色米色（--color-bg）。 */
 .note-detail-band {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--color-green);
+  background: var(--color-bg);
   padding: calc(var(--safe-top) + 18px) var(--content-left) 18px;
 }
 
-/* D-1-2：跟 N-1-1 同一個問題——align-items:center 置中的是行框，不是
-   「‹」這個字符本身的墨色，另外包 span 做 1.5px 光學位移往上修正，
-   跟書名的視覺中心線才會真的對齊。間距 14px、左緣 --content-left 不動。 */
+/* UI 修正批次（總規格項目 6/7）：返回鍵改套 .btn-frosted/.btn-frosted--circle，
+   跟 BookDetail 的浮動返回鍵共用同一份配色/材質（深色玻璃圓鈕），不再自己
+   另外定義一套透明底樣式；圖示也換成 SVG 箭頭，靠 flex 置中即可跟書名
+   同一水平線對齊，不需要文字字元的光學位移修正。 */
 .note-detail-back {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  padding: 4px;
-  margin: -4px;
-  color: var(--color-bg);
-  font-size: 22px;
-  line-height: 1;
-}
-
-.note-detail-back span {
-  display: block;
-  transform: translateY(-1.5px);
-}
-
-button.note-detail-back:hover {
-  background: rgba(253, 252, 250, 0.14);
-  color: var(--color-bg);
-  box-shadow: none;
 }
 
 .note-detail-title {
@@ -475,7 +440,7 @@ button.note-detail-back:hover {
   font-family: var(--font-serif);
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-bg);
+  color: var(--color-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -514,8 +479,8 @@ button.note-detail-back:hover {
    優先度（.btn-frosted 本體在樣式表更後面，單純同順位的話會被它蓋掉）。
    位置、尺寸、點擊行為不動。 */
 .note-detail-annotate-btn.btn-frosted {
-  background: rgba(255, 255, 255, 0.14);
-  border: 0.5px solid rgba(255, 255, 255, 0.55);
+  background: rgba(var(--paper-rgb), 0.14);
+  border: 0.5px solid rgba(var(--paper-rgb), 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: none;
@@ -523,7 +488,7 @@ button.note-detail-back:hover {
 }
 
 button.note-detail-annotate-btn.btn-frosted:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(var(--paper-rgb), 0.24);
   color: var(--color-bg);
   box-shadow: none;
 }
@@ -578,13 +543,13 @@ button.note-detail-annotate-btn.btn-frosted:hover {
   margin: 0;
   font-weight: 500;
   font-size: 17px;
-  color: #111;
+  color: var(--color-ink);
 }
 
 .note-detail-date {
   margin-left: auto;
   font-size: 11px;
-  color: #8a8a86;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -661,8 +626,8 @@ button.note-detail-edit-btn:hover {
   display: block;
   width: 100%;
   text-align: left;
-  background: #fff;
-  border: 0.5px solid #e8e5de;
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-hairline);
   border-radius: 4px;
   overflow: hidden;
   padding: 0;
@@ -673,7 +638,7 @@ button.note-detail-edit-btn:hover {
 }
 
 button.note-timeline-card:hover {
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: none;
 }
 
@@ -731,7 +696,7 @@ button.note-timeline-card:hover {
 
 .note-timeline-empty {
   padding: 12px var(--content-left) 140px;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -783,6 +748,16 @@ button.note-timeline-card:hover {
   font-variation-settings: 'opsz' 40;
 }
 
+/* UI 修正批次（總規格項目 2）：放大鏡/篩選器兩顆膠囊搬到跟「Marginalia」
+   同一水平列、靠右對齊，用這層 flex row 包住 over-title 跟 icons 兩塊，
+   下面的「Books」大標題跟插畫不受影響，還是各自 normal flow 往下排。 */
+.brand-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .shelf-illo {
   margin: 8px -4px 0;
   display: block;
@@ -819,19 +794,26 @@ button.note-timeline-card:hover {
   }
 }
 
-/* Patch 01 P-2：篩選列搜尋＋篩選兩顆膠囊。
-   Patch 03 P3-3：書量文字搬到左側，改 space-between；兩顆膠囊包一層
-   .bookshelf-filterrow-icons 維持原本的 gap，不受 space-between 影響。 */
+/* UI 修正批次（總規格項目 1/2）：搜尋/篩選膠囊已搬到 .brand-hero-row（跟
+   「Marginalia」同一列），這裡只剩「N books」＋篩選後的分類膠囊同一列
+   並排。左右不再重複宣告 --content-left——.bookshelf-header 本身已經有
+   這圈 padding，這裡原本又加一次，會讓書量文字左緣比 .shelf-row-header/
+   .shelf-track（兩者是 .bookshelf-header 以外的 sibling，只吃一層
+   --content-left）多縮進一倍，兩者對不齊；改成只留上下 padding，水平方向
+   吃父層的 --content-left，左緣才會真的跟下方書封格線對齊。已選篩選膠囊
+   改 justify-content: flex-end 靠右、margin-left: auto 頂到行尾——即原本
+   放大鏡/篩選器所在的位置；沒有作用中篩選時這列只剩書量文字，靠左。 */
 .bookshelf-filterrow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px var(--content-left) 4px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding: 20px 0 4px;
 }
 
-/* Patch 03 P3-3：書量文字，刻意用斜體 serif——跟 .meta-text（日期標頭/頁碼等
-   metadata 統一非斜體）是不同語意層，這裡是 patch 明確指定的例外，不套
-   .meta-text。 */
+/* 書量文字，刻意用斜體 serif——跟 .meta-text（日期標頭/頁碼等 metadata
+   統一非斜體）是不同語意層，這裡是明確指定的例外，不套 .meta-text。 */
 .bookshelf-count {
   margin: 0;
   font-family: var(--font-serif);
@@ -848,12 +830,15 @@ button.note-timeline-card:hover {
   gap: 10px;
 }
 
-/* Patch 03 P3-3：已選篩選膠囊列，只在有作用中的篩選時渲染，可換行。 */
+/* 已選篩選膠囊列，只在有作用中的篩選時渲染，可換行；靠右對齊、必要時自己
+   換行到第二行，不擠壓左側的書量文字。 */
 .filter-pills-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
   gap: 8px;
-  padding: 10px var(--content-left) 0;
+  margin-left: auto;
 }
 
 .filter-pill {
@@ -870,12 +855,12 @@ button.note-timeline-card:hover {
 }
 
 button.filter-pill:hover {
-  background: rgba(30, 122, 109, 0.08);
+  background: rgba(var(--teal-rgb), 0.08);
   color: var(--color-green);
   box-shadow: none;
 }
 
-/* Patch 01 P-3：pillbtn 按壓狀態——去掉系統預設 tap highlight/外框，改用淡綠底 + teal focus outline。 */
+/* pillbtn 按壓狀態——去掉系統預設 tap highlight/外框，改用淡綠底 + teal focus outline。 */
 .pill-btn {
   display: flex;
   align-items: center;
@@ -895,7 +880,7 @@ button.pill-btn:hover {
 }
 
 button.pill-btn:active {
-  background: rgba(30, 122, 109, 0.08);
+  background: rgba(var(--teal-rgb), 0.08);
   color: var(--color-green);
   box-shadow: none;
 }
@@ -905,14 +890,18 @@ button.pill-btn:focus-visible {
   outline-offset: 2px;
 }
 
+/* 跟 .bookshelf-filterrow 同理：.bookshelf-header 已經有一層 --content-left，
+   這裡不再重複，避免搜尋框比書封格線多縮進一倍。 */
 .bookshelf-search-row {
-  padding: 0 var(--content-left);
   margin-top: 14px;
 }
 
+/* UI 修正批次（總規格項目 4）：搜尋框外框改用全域標準色的淺色 hairline
+   token，原本 1.5px 純黑框太重；聚焦時才提示為品牌綠，跟其餘輸入框
+   （.add-modal input 等）同一套語言。 */
 .bookshelf-search-row input {
   width: 100%;
-  border: 1.5px solid #111;
+  border: 1.5px solid var(--color-hairline);
   border-radius: 999px;
   padding: 10px 18px;
 }
@@ -935,28 +924,18 @@ button.pill-btn:focus-visible {
 }
 
 .shelf-row-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   padding: 0 var(--content-left);
   margin-bottom: 12px;
 }
 
-/* Patch 02 P2-3：排標題字級縮小、改深綠；右側「See all」拿掉連結改純本數數字，
-   跟標題同色同級，font-family/style 交給 .meta-text（跟其餘 metadata 一致，非斜體）。 */
+/* UI 修正批次（總規格項目 1）：右側的本排數量數字（.shelf-row-count）已移除，
+   只保留排標題本身；總數改由上方 .bookshelf-count「N books」單一顯示。 */
 .shelf-row-label {
   font-family: var(--font-serif);
   font-size: 13px;
   font-weight: 600;
   color: var(--forest);
   letter-spacing: 0.02em;
-}
-
-.shelf-row-count {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--forest);
-  white-space: nowrap;
 }
 
 .shelf-scroll {
@@ -1011,8 +990,8 @@ button.pill-btn:focus-visible {
   height: 7px;
   background: var(--color-green-edge);
   border-top: 1px solid var(--shelf-edge-highlight); /* Patch 01 P-4：前緣上緣亮線 */
-  border-bottom: 1px solid #10140f;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--color-ink);
+  box-shadow: 0 10px 20px rgba(var(--ink-rgb), 0.1);
 }
 
 @keyframes shelf-book-enter {
@@ -1046,7 +1025,7 @@ button.pill-btn:focus-visible {
   right: 14%;
   bottom: -3px;
   height: 10px;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  background: radial-gradient(ellipse at center, rgba(var(--ink-rgb), 0.28), transparent 72%);
   filter: blur(3px);
   z-index: -1;
 }
@@ -1057,8 +1036,8 @@ button.pill-btn:focus-visible {
   aspect-ratio: 2 / 3;
   border-radius: 4px 8px 8px 4px;
   overflow: hidden;
-  background: #efe7da;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+  background: var(--color-cover-placeholder-bg);
+  box-shadow: 0 3px 6px rgba(var(--ink-rgb), 0.18);
 }
 
 .shelf-book-cover img {
@@ -1076,8 +1055,8 @@ button.pill-btn:focus-visible {
   justify-content: center;
   font-family: var(--font-serif);
   font-size: 1.8rem;
-  color: #b8a78f;
-  background: #efe7da;
+  color: var(--color-cover-placeholder-ink);
+  background: var(--color-cover-placeholder-bg);
 }
 
 /* v2-E：Reading 排主角化，書封放大 1.25×（92px → 115px，2:3 比例自動跟著放大），
@@ -1144,7 +1123,7 @@ button.pill-btn:focus-visible {
   right: 14%;
   bottom: -3px;
   height: 10px;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.28), transparent 72%);
+  background: radial-gradient(ellipse at center, rgba(var(--ink-rgb), 0.28), transparent 72%);
   filter: blur(3px);
   z-index: -1;
 }
@@ -1155,8 +1134,8 @@ button.pill-btn:focus-visible {
   aspect-ratio: 2 / 3;
   border-radius: 4px 8px 8px 4px;
   overflow: hidden;
-  background: #efe7da;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
+  background: var(--color-cover-placeholder-bg);
+  box-shadow: 0 3px 6px rgba(var(--ink-rgb), 0.18);
 }
 
 .wrap-shelf-book-cover img {
@@ -1174,8 +1153,8 @@ button.pill-btn:focus-visible {
   justify-content: center;
   font-family: var(--font-serif);
   font-size: 1.6rem;
-  color: #b8a78f;
-  background: #efe7da;
+  color: var(--color-cover-placeholder-ink);
+  background: var(--color-cover-placeholder-bg);
 }
 
 /* 跟首頁橫向排/See All 共用頂面/前緣視覺，左右貼齊內容區 */
@@ -1205,18 +1184,18 @@ button.pill-btn:focus-visible {
   padding: 14px 28px;
   border: none;
   border-radius: 999px;
-  background: #000;
-  color: #fff;
+  background: var(--color-ink);
+  color: var(--color-bg);
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 24px rgba(var(--ink-rgb), 0.25);
 }
 
 button.add-book-btn:hover {
-  background: #000;
-  color: #fff;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+  background: var(--color-ink);
+  color: var(--color-bg);
+  box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.3);
 }
 
 button.add-book-btn:active {
@@ -1228,17 +1207,12 @@ button.add-book-btn:active {
   line-height: 1;
 }
 
-/* Patch 02 P2-2：首頁 Add Book／BookDetail New Note（共用 .add-book-btn.btn-frosted）
-   改回膠囊 + 液態玻璃（取消 Patch 01 的直角實色）。這裡不設 border/box-shadow，
-   讓基礎 .btn-frosted 的邊框/陰影透出來（"沿用專案共用 .btn-frosted 模式"），
-   只覆蓋形狀（pill）、材質色（ink 調的毛玻璃）跟文字規格。 */
+/* UI 修正批次（總規格項目 6）：Add Book／New Note／Save 全部共用同一份
+   .btn-frosted 材質（背景/邊框/陰影/blur 不再各自覆蓋一次），這裡只加
+   pill 形狀跟字級規格，顏色交給基礎 .btn-frosted。 */
 .add-book-btn.btn-frosted {
   border-radius: 999px;
   padding: 15px 30px;
-  background: rgba(38, 51, 46, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: var(--cream);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
@@ -1246,40 +1220,37 @@ button.add-book-btn:active {
   text-transform: uppercase;
 }
 
-button.add-book-btn.btn-frosted:hover {
-  background: rgba(38, 51, 46, 0.78);
-  color: var(--cream);
-}
-
 .add-book-btn.btn-frosted .add-book-btn-icon {
   color: var(--hl);
   font-weight: 600;
 }
 
-/* F-6：共用磨砂玻璃 class，唯一來源。首頁 Add Book、筆記頁 New Note 共用；
-   批次 N 的標注編輯小號變體、批次 P 也引用同一份。要能透出下方內容——
-   後面不能再墊一層近乎不透明的白色 scrim（舊版 .bottom-scrim 已整組移除）。 */
+/* 共用磨砂玻璃 class，全站唯一來源——首頁 Add Book、筆記頁 New Note、
+   表單 Save/Add Book 送出鈕、標注編輯小號變體都套這份，不再各自定義
+   一套顏色相近但不同的深色玻璃（總規格項目 5/6：陰影/毛玻璃統一用
+   ink-rgb／paper-rgb 這兩組 token 分量，不再是跟品牌色無關的黑/白）。
+   要能透出下方內容——後面不能再墊一層近乎不透明的白色 scrim。 */
 .btn-frosted {
-  border: 0.5px solid rgba(253, 252, 250, 0.22);
-  background: rgba(62, 74, 61, 0.78);
+  border: 0.5px solid rgba(var(--paper-rgb), 0.22);
+  background: rgba(var(--ink-rgb), 0.78);
   backdrop-filter: blur(14px) saturate(1.15);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.16),
-    0 10px 28px rgba(62, 74, 61, 0.28),
-    inset 0 1px 0 rgba(253, 252, 250, 0.25),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+    0 2px 6px rgba(var(--ink-rgb), 0.16),
+    0 10px 28px rgba(var(--ink-rgb), 0.28),
+    inset 0 1px 0 rgba(var(--paper-rgb), 0.25),
+    inset 0 -1px 0 rgba(var(--ink-rgb), 0.18);
   color: var(--color-bg);
 }
 
 button.btn-frosted:hover {
-  background: rgba(62, 74, 61, 0.78);
+  background: rgba(var(--ink-rgb), 0.78);
   color: var(--color-bg);
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.16),
-    0 10px 28px rgba(62, 74, 61, 0.28),
-    inset 0 1px 0 rgba(253, 252, 250, 0.25),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+    0 2px 6px rgba(var(--ink-rgb), 0.16),
+    0 10px 28px rgba(var(--ink-rgb), 0.28),
+    inset 0 1px 0 rgba(var(--paper-rgb), 0.25),
+    inset 0 -1px 0 rgba(var(--ink-rgb), 0.18);
 }
 
 /* 總規格項目 4：.btn-frosted 修飾 class——圓形變體（fixed 浮動返回鍵，導航鐵則
@@ -1317,7 +1288,7 @@ button.btn-frosted:hover {
 .add-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(26, 26, 26, 0.4);
+  background: rgba(var(--ink-rgb), 0.4);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -1339,7 +1310,7 @@ button.btn-frosted:hover {
   overscroll-behavior: contain;
   box-sizing: border-box;
   background: var(--color-bg);
-  color: #1a1a1a;
+  color: var(--color-ink);
   border-radius: 18px;
   padding: 22px;
   box-shadow: var(--shadow-card-hover);
@@ -1355,11 +1326,11 @@ button.btn-frosted:hover {
 .add-modal select,
 .add-modal textarea {
   width: 100%;
-  background: #fff;
-  border: 1px solid rgba(62, 74, 61, 0.35);
+  background: var(--color-surface);
+  border: 1px solid rgba(var(--ink-rgb), 0.35);
   border-radius: 10px;
   padding: 10px 14px;
-  color: #1a1a1a;
+  color: var(--color-ink);
   font-family: inherit;
 }
 
@@ -1379,7 +1350,7 @@ button.btn-frosted:hover {
 
 .add-modal input::placeholder,
 .add-modal textarea::placeholder {
-  color: #8a8a86;
+  color: var(--color-text-secondary);
 }
 
 .add-modal input:focus,
@@ -1387,7 +1358,7 @@ button.btn-frosted:hover {
 .add-modal textarea:focus {
   outline: none;
   border-color: var(--color-green);
-  box-shadow: 0 0 0 3px rgba(62, 74, 61, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--teal-rgb), 0.15);
 }
 
 .add-modal-search {
@@ -1421,7 +1392,7 @@ button.btn-frosted:hover {
   flex-direction: column;
   gap: 4px;
   font-size: 0.88rem;
-  color: #8a8a86;
+  color: var(--color-text-secondary);
   margin-bottom: 10px;
   width: 100%;
 }
@@ -1434,7 +1405,7 @@ button.btn-frosted:hover {
 .add-modal-label-text {
   display: block;
   font-size: 0.88rem;
-  color: #8a8a86;
+  color: var(--color-text-secondary);
   margin-bottom: 4px;
 }
 
@@ -1452,7 +1423,7 @@ button.btn-frosted:hover {
   max-height: 96px;
   object-fit: cover;
   border-radius: 8px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--color-ink);
   flex-shrink: 0;
 }
 
@@ -1462,7 +1433,7 @@ button.btn-frosted:hover {
   background: transparent;
   border: none;
   padding: 0;
-  color: #1a1a1a;
+  color: var(--color-ink);
   font-size: 0.85rem;
   text-decoration: underline;
   text-align: left;
@@ -1470,7 +1441,7 @@ button.btn-frosted:hover {
 
 button.note-image-annotate-link:hover {
   background: transparent;
-  color: #555;
+  color: var(--color-text-secondary);
   box-shadow: none;
 }
 
@@ -1482,16 +1453,16 @@ button.note-image-annotate-link:hover {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #fff;
-  border: 1px solid #1a1a1a;
-  color: #1a1a1a;
+  background: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
   font-size: 12px;
   padding: 0;
 }
 
 button.note-image-remove-sm:hover {
-  background: #1a1a1a;
-  color: #fff;
+  background: var(--color-ink);
+  color: var(--color-bg);
   box-shadow: none;
 }
 
@@ -1501,7 +1472,7 @@ button.note-image-remove-sm:hover {
   position: fixed;
   inset: 0;
   z-index: 400;
-  background: #000;
+  background: var(--color-darkroom);
   display: flex;
   flex-direction: column;
   touch-action: none;
@@ -1520,8 +1491,8 @@ button.note-image-remove-sm:hover {
    泡泡樣式膠囊——半透明白底 + 白字白邊，跟 Done 一起是上排唯二的動作按鈕。 */
 .annotator-cancel {
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(var(--paper-rgb), 0.14);
+  border: 1px solid rgba(var(--paper-rgb), 0.4);
   border-radius: 999px;
   color: var(--color-bg);
   padding: 9px 18px;
@@ -1530,7 +1501,7 @@ button.note-image-remove-sm:hover {
 }
 
 button.annotator-cancel:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(var(--paper-rgb), 0.24);
   color: var(--color-bg);
   box-shadow: none;
 }
@@ -1572,7 +1543,7 @@ button.annotator-swatch:hover {
 }
 
 .annotator-swatch.selected {
-  box-shadow: 0 0 0 2px #fff;
+  box-shadow: 0 0 0 2px var(--color-bg);
   transform: scale(1.1);
 }
 
@@ -1585,7 +1556,7 @@ button.annotator-swatch:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(var(--paper-rgb), 0.14);
   border: none;
   border-radius: 50%;
   color: var(--color-bg);
@@ -1593,7 +1564,7 @@ button.annotator-swatch:hover {
 
 button.annotator-clear:hover,
 button.annotator-undo:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(var(--paper-rgb), 0.28);
   color: var(--color-bg);
   box-shadow: none;
 }
@@ -1617,7 +1588,7 @@ button.annotator-undo:disabled {
   max-width: 100%;
   max-height: 100%;
   touch-action: none;
-  background: #111;
+  background: var(--color-darkroom);
   border-radius: 4px;
 }
 
@@ -1627,7 +1598,7 @@ button.annotator-undo:disabled {
   background: var(--paper);
   border: none;
   border-radius: 999px;
-  color: #111;
+  color: var(--color-ink);
   padding: 9px 18px;
   font-size: 0.78rem;
   font-weight: 700;
@@ -1635,8 +1606,8 @@ button.annotator-undo:disabled {
 
 button.annotator-done:hover {
   background: var(--paper);
-  color: #111;
-  box-shadow: 0 0 0 2px rgba(253, 252, 250, 0.4);
+  color: var(--color-ink);
+  box-shadow: 0 0 0 2px rgba(var(--paper-rgb), 0.4);
 }
 
 input.add-modal-file-input {
@@ -1678,7 +1649,7 @@ input.add-modal-file-input {
 
 .add-modal-file-name {
   font-size: 0.85rem;
-  color: #8a8a86;
+  color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1693,23 +1664,10 @@ input.add-modal-file-input {
   border: none;
 }
 
-.add-page-btn-secondary {
-  background: #fff;
-  color: #1a1a1a;
-  border: 1px solid #1a1a1a;
-}
-
-button.add-page-btn-secondary:hover:not(:disabled) {
-  background: #1a1a1a;
-  color: #fff;
-  box-shadow: none;
-}
-
-/* M-2：New Note/Edit Note（NoteModal）與 Add Book（AddBookModal）的 Cancel
-   改綠字綠框透明底，對齊 F-3 的 Cancel 綠語言。用修飾 class 疊加而不是直接
-   改 .add-page-btn-secondary 本身——EditBookModal 的 Cancel 也共用那顆基礎
-   class，但 EditBookModal 走的是更早的 .modal 殼層、明確不在這批範圍內，
-   不能連帶被改色。 */
+/* UI 修正批次（總規格項目 6）：Cancel 全站統一綠字綠框透明底這一套——
+   EditBookModal 原本走的黑白 .add-page-btn-secondary/.add-page-btn-primary
+   已改用跟 AddBookModal/NoteModal 相同的 class，兩顆舊變體沒有呼叫端了，
+   整組移除，不留跟品牌色無關的黑/白按鈕。 */
 .add-page-btn-secondary--green {
   background: transparent;
   color: var(--color-green);
@@ -1722,29 +1680,12 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
   box-shadow: none;
 }
 
-.add-page-btn-primary {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-button.add-page-btn-primary:hover:not(:disabled) {
-  background: #000;
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Patch 01 P-5 / Patch 02 P2-2：Add Book modal「Details 頁最下方確認按鈕」
-   （AddBookModal 送出，跟 NoteModal 送出共用同一組 class）teal 底、跟首頁
-   Add Book 同字體規格，P2-2 改回膠囊圓角（取消 Patch 01 的直角）。 */
+/* Add Book/New Note/Save 全部共用 .btn-frosted 材質（見上方共用區塊），
+   這裡只加跟 .add-book-btn.btn-frosted 一致的 pill 形狀跟字級規格，
+   不再自己覆蓋一份實色 teal＋無 blur 的版本。 */
 .add-page-btn.btn-frosted {
-  border: none;
   border-radius: 999px;
   padding: 15px 30px;
-  background: var(--color-green);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  box-shadow: var(--shadow-float);
-  color: var(--cream);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
@@ -1752,18 +1693,12 @@ button.add-page-btn-primary:hover:not(:disabled) {
   text-transform: uppercase;
 }
 
-button.add-page-btn.btn-frosted:hover:not(:disabled) {
-  background: var(--color-green);
-  color: var(--cream);
-  box-shadow: var(--shadow-float);
-}
-
 /* ---- Group-by action sheet ---- */
 
 .action-sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(var(--ink-rgb), 0.35);
   z-index: 200;
   display: flex;
   align-items: flex-end;
@@ -1774,7 +1709,7 @@ button.add-page-btn.btn-frosted:hover:not(:disabled) {
   background: var(--color-bg);
   border-radius: 20px 20px 0 0;
   padding: 10px 20px calc(20px + var(--safe-bottom));
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 -8px 30px rgba(var(--ink-rgb), 0.15);
 }
 
 .action-sheet-title {
@@ -1783,7 +1718,7 @@ button.add-page-btn.btn-frosted:hover:not(:disabled) {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8a8a8a;
+  color: var(--color-text-secondary);
   margin: 8px 0 6px;
 }
 
@@ -1795,21 +1730,21 @@ button.add-page-btn.btn-frosted:hover:not(:disabled) {
   background: transparent;
   border: none;
   border-radius: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
   padding: 14px 4px;
   font-size: 1rem;
-  color: #1a1a1a;
+  color: var(--color-ink);
   text-align: left;
 }
 
 button.action-sheet-option:hover {
   background: transparent;
-  color: #1a1a1a;
+  color: var(--color-ink);
   box-shadow: none;
 }
 
 .action-sheet-check {
-  color: #1a1a1a;
+  color: var(--color-ink);
   font-weight: 700;
 }
 
@@ -1832,11 +1767,11 @@ button.action-sheet-option:hover {
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
   padding: 12px 4px;
   font-family: var(--font-sans);
   font-size: 16px;
-  color: #1a1a1a;
+  color: var(--color-ink);
   text-align: left;
 }
 
@@ -1846,7 +1781,7 @@ button.action-sheet-option:hover {
 
 button.action-sheet-suboption:hover {
   background: transparent;
-  color: #1a1a1a;
+  color: var(--color-ink);
   box-shadow: none;
 }
 
@@ -1854,7 +1789,7 @@ button.action-sheet-suboption:hover {
   display: block;
   width: 100%;
   margin-top: 12px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1.5px solid var(--color-green);
   border-radius: 14px;
   padding: 14px;
@@ -1866,102 +1801,17 @@ button.action-sheet-suboption:hover {
 
 button.action-sheet-cancel:hover {
   background: var(--color-green);
-  color: #fff;
+  color: var(--color-bg);
   box-shadow: none;
 }
 
-/* ---- Edit Book modal ---- */
-
-.edit-modal-form {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.edit-modal-form input,
-.edit-modal-form select {
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff;
-  border: 1px solid #1a1a1a;
-  border-radius: 10px;
-  padding: 12px 14px;
-  color: #1a1a1a;
-}
-
-.edit-modal-form input:focus,
-.edit-modal-form select:focus {
-  outline: none;
-  border-color: #1a1a1a;
-  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.12);
-}
-
-.edit-modal-label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.88rem;
-  color: #555;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.edit-modal-field {
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.edit-modal-label-text {
-  display: block;
-  font-size: 0.88rem;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-input.edit-modal-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.edit-modal-file-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.edit-modal-file-btn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #1a1a1a;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.88rem;
-  color: #1a1a1a;
-  background: #fff;
-  cursor: pointer;
-}
-
-.edit-modal-file-btn:hover {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-.edit-modal-file-name {
-  font-size: 0.85rem;
-  color: #555;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
+/* ---- Edit Book modal ----
+   UI 修正批次（總規格項目 5/6）：EditBookModal 原本自帶一套黑白邊框的表單
+   樣式（.edit-modal-form input/.edit-modal-label/.edit-modal-file-btn…），
+   跟 AddBookModal/NoteModal 的 .add-modal-* 系統完全不同調。EditBookModal
+   已改用 .add-modal-* 系列 class（見元件），這幾顆重覆定義的表單樣式沒有
+   呼叫端了，整組移除；.edit-modal-delete 是「刪除書/刪除筆記」共用的
+   危險動作連結，NoteModal 也在用，保留並改用 --color-danger token。 */
 .edit-modal-delete {
   display: block;
   margin: 18px auto 0;
@@ -1971,12 +1821,13 @@ input.edit-modal-file-input {
   padding: 6px;
   font-size: 0.82rem;
   font-weight: 400;
-  color: #b3432f;
+  color: var(--color-danger);
   text-decoration: underline;
 }
 
 .edit-modal-delete:hover {
   background: transparent;
-  color: #8a2f1f;
+  color: var(--color-danger);
   box-shadow: none;
+  opacity: 0.8;
 }

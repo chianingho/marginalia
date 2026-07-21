@@ -11,6 +11,17 @@ function statusLabel(book) {
   return SHELF_DEFS.find((def) => def.key === resolveShelfKey(book))?.label ?? 'Reading'
 }
 
+// UI 修正批次（總規格項目 7）：「‹」文字字元的字型墨色天生不置中，換成
+// SVG 箭頭用幾何中心對齊，配合 .btn-frosted--circle 的 flex 置中就是真正的
+// 水平垂直置中，不用再靠 translateY 之類的光學位移去猜。
+function ChevronLeftIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 // /book/:id — 點任何書封直達的筆記流頁面，沒有中間層「書籍詳情頁」。
 export default function BookDetail() {
   const { id } = useParams()
@@ -77,7 +88,7 @@ export default function BookDetail() {
   return (
     <div className="book-page">
       <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
-        <span>‹</span>
+        <ChevronLeftIcon />
       </Link>
 
       {/* book-detail-redesign-0719 項目 1：海報式書封區——底色 var(--poster-backdrop)、

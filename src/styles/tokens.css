@@ -29,6 +29,10 @@
   /* book-detail-redesign-0719：海報式書封區底色，跟 --paper/--cream 都不同，各自獨立 token。 */
   --poster-backdrop: #efebe2;
 
+  /* UI 修正批次（2026-07-21）：書封無圖時的預留占位色，四處書封 placeholder 共用同一組。 */
+  --color-cover-placeholder-bg: var(--poster-backdrop);
+  --color-cover-placeholder-ink: #b8a78f;
+
   /* 字體 */
   --font-serif: 'Fraunces', 'Noto Serif TC', serif; /* 中文標題 fallback 不變，P-1：全站標題統一用這個，不再有 Apple Garamond */
   --font-sans: 'Archivo', -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; /* 中文內文 fallback 不變 */
@@ -46,9 +50,24 @@
   --color-darkroom: #16171a; /* 特例：詳情頁暗室照片區底色，刻意維持接近純黑，不套品牌色 */
   --color-ink-on-yellow: #1c231b; /* 特例：黃痕上的字色，極少用到，維持原值 */
 
+  /* UI 修正批次（2026-07-21）：全站唯一的「白/淺色卡面」token，取代原本散落在
+     各元件裡的 #fff／#fffdfa／#fbf8f0 寫死值。 */
+  --color-surface: var(--paper);
+  /* 錯誤/刪除等危險狀態文字色，語意別名指到品牌紅，不再各自寫 #b3432f 之類的值。 */
+  --color-danger: var(--red);
+
+  /* RGB 分量版本，給需要透明度的 rgba() 用——來源都是上面同一顆 hex token，
+     不是另外調色，全站陰影/毛玻璃/遮罩統一從這三組出，不再用 rgba(0,0,0,x) 或
+     其他跟品牌色無關的黑/白/棕色。 */
+  --ink-rgb: 38, 51, 46;
+  --teal-rgb: 30, 122, 109;
+  --paper-rgb: 251, 248, 240;
+
   /* P-5/P-6：陰影 */
-  --shadow-cover: 0 6px 16px rgba(38, 51, 46, 0.14), 0 1px 3px rgba(38, 51, 46, 0.1);
-  --shadow-float: 0 10px 26px rgba(38, 51, 46, 0.28);
+  --shadow-cover: 0 6px 16px rgba(var(--ink-rgb), 0.14), 0 1px 3px rgba(var(--ink-rgb), 0.1);
+  --shadow-float: 0 10px 26px rgba(var(--ink-rgb), 0.28);
+  /* UI 修正批次：舊版 .modal/.add-modal 共用的浮起陰影，原本是棕色調（跟品牌色無關），改用 ink-rgb。 */
+  --shadow-card-hover: 0 16px 36px rgba(var(--ink-rgb), 0.14), 0 4px 10px rgba(var(--ink-rgb), 0.07);
 
   /* 佈局 */
   --content-left: 20px; /* 內容左邊界，書封左緣／時間軸欄共用（原 --shelf-inset） */
