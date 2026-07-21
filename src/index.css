@@ -791,10 +791,10 @@ button.note-timeline-card:hover {
 /* UI 修正批次（總規格項目 1/2）：搜尋/篩選膠囊已搬到 .brand-hero-row（跟
    「Marginalia」同一列），這裡只剩「N books」＋篩選後的分類膠囊同一列
    並排。左右不再重複宣告 --content-left——.bookshelf-header 本身已經有
-   這圈 padding，這裡原本又加一次，會讓書量文字左緣比 .shelf-row-header/
-   .shelf-track（兩者是 .bookshelf-header 以外的 sibling，只吃一層
-   --content-left）多縮進一倍，兩者對不齊；改成只留上下 padding，水平方向
-   吃父層的 --content-left，左緣才會真的跟下方書封格線對齊。已選篩選膠囊
+   這圈 padding，這裡原本又加一次，會讓書量文字左緣比下方 .wrap-shelf-rows
+   （是 .bookshelf-header 以外的 sibling，只吃一層 --content-left）多縮進
+   一倍，兩者對不齊；改成只留上下 padding，水平方向吃父層的 --content-left，
+   左緣才會真的跟下方書封格線對齊。已選篩選膠囊
    改 justify-content: flex-end 靠右、margin-left: auto 頂到行尾——即原本
    放大鏡/篩選器所在的位置；沒有作用中篩選時這列只剩書量文字，靠左。 */
 .bookshelf-filterrow {
@@ -917,55 +917,8 @@ button.pill-btn:focus-visible {
   padding: 8px 0 170px;
 }
 
-.shelf-row-header {
-  padding: 0 var(--content-left);
-  margin-bottom: 12px;
-}
-
-/* UI 修正批次（總規格項目 1）：右側的本排數量數字（.shelf-row-count）已移除，
-   只保留排標題本身；總數改由上方 .bookshelf-count「N books」單一顯示。 */
-.shelf-row-label {
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--forest);
-  letter-spacing: 0.02em;
-}
-
-.shelf-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.shelf-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.shelf-track {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  width: max-content;
-  min-width: 100%;
-  /* 92px 書封（2:3）+ 上下 padding，固定住高度，讓空排也撐出完整的排版，不會跟有書的排高度不一致 */
-  min-height: 158px;
-  padding: 6px var(--content-left) 14px var(--content-left);
-}
-
-/* 書架層板：頂面（梯形，做出景深感）+ 前緣（垂直長條）+ 投影，隨書一起橫向滑動 */
-.shelf-plank {
-  position: absolute;
-  left: var(--content-left);
-  right: 0;
-  bottom: 0;
-  height: 19px;
-  pointer-events: none;
-  z-index: 0;
-}
-
+/* 書架層板：頂面（梯形，做出景深感）+ 前緣（垂直長條）+ 投影，
+   .wrap-shelf-plank 沿用這兩顆顏色/形狀規則。 */
 .shelf-plank-top {
   position: absolute;
   top: 0;
@@ -988,99 +941,10 @@ button.pill-btn:focus-visible {
   box-shadow: 0 10px 20px rgba(var(--ink-rgb), 0.1);
 }
 
-@keyframes shelf-book-enter {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.shelf-book {
-  position: relative;
-  flex: 0 0 auto;
-  width: 92px;
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  z-index: 1;
-  opacity: 0;
-  animation: shelf-book-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* 每本書底部的小橢圓接觸陰影，落在層板頂面上 */
-.shelf-book::after {
-  content: '';
-  position: absolute;
-  left: 14%;
-  right: 14%;
-  bottom: -3px;
-  height: 10px;
-  background: radial-gradient(ellipse at center, rgba(var(--ink-rgb), 0.28), transparent 72%);
-  filter: blur(3px);
-  z-index: -1;
-}
-
-.shelf-book-cover {
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  border-radius: 4px 8px 8px 4px;
-  overflow: hidden;
-  background: var(--color-cover-placeholder-bg);
-  box-shadow: 0 3px 6px rgba(var(--ink-rgb), 0.18);
-}
-
-.shelf-book-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.shelf-book-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-serif);
-  font-size: 1.8rem;
-  color: var(--color-cover-placeholder-ink);
-  background: var(--color-cover-placeholder-bg);
-}
-
-/* v2-E：Reading 排主角化，書封放大 1.25×（92px → 115px，2:3 比例自動跟著放大），
-   墨綠 3D 書架結構（梯形頂面/前緣厚度/投影）完全不拆不改，只有層板高度隨書封
-   等比放大，寬度本來就是撐滿整排、不用另外調。只影響依 status 分組時的
-   Reading 排，其他排（To Read/Finished）跟 year/category 分組模式完全不受影響。 */
-.shelf-row--hero .shelf-book {
-  width: 115px;
-}
-
-.shelf-row--hero .shelf-track {
-  min-height: 193px; /* 115px 書封（2:3 = 172.5px 高）+ 上下 padding 20px，等比推算 */
-}
-
-.shelf-row--hero .shelf-plank {
-  height: 23.75px; /* 19px * 1.25 */
-}
-
-.shelf-row--hero .shelf-plank-top {
-  height: 15px; /* 12px * 1.25 */
-}
-
-.shelf-row--hero .shelf-plank-front {
-  height: 8.75px; /* 7px * 1.25 */
-}
-
-/* 增補項 8-2/8-7：換行書架。Patch 03：現在只服務「有篩選條件」時的攤平結果，
-   書量已經搬到篩選列左側顯示（.bookshelf-count），這裡不再需要自己的標頭/count。
-   書封每層 3 本，用跟 See All 頁一樣的 grid + 3D 層板語言，只是欄數從 4
-   改 3（書封因此更大一些，呼應「書從架上抽出」的主角化語感）。 */
+/* UI 修正批次（書櫃頁預設狀態修正）：橫向捲動的分組書架（.shelf-row 系列，
+   含層板/書封放大版動畫）已整組退場——不管有沒有篩選，畫面一律是下面這套
+   換行書架（WrapShelf），不再有「預設＝分組橫滑／有篩選＝換行平鋪」兩套
+   並存的邏輯，見 Bookshelf.jsx。 */
 .wrap-shelf-rows {
   display: flex;
   flex-direction: column;
@@ -1092,13 +956,15 @@ button.pill-btn:focus-visible {
   position: relative;
 }
 
+/* 書櫃頁預設狀態修正 1/2/3：一列固定 4 本（原本 3 本），min-height 隨欄數變窄
+   跟著等比重新估算（書封變窄、2:3 比例下高度也跟著變矮）。 */
 .wrap-shelf-track {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   align-items: end;
   gap: 12px;
-  min-height: 178px;
+  min-height: 134px;
   padding-bottom: 14px;
 }
 

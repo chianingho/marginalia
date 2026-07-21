@@ -55,54 +55,18 @@ function FilterIcon() {
   )
 }
 
-// v2-E：isHero = Reading 排主角化，書封放大 1.25×、層板跟著等比調整。
-// B-4：「各組一排橫滑」視圖已從 Year/Category 移除（改全館換行書架），
-// ShelfRow 現在只服務預設（無篩選）狀態。
-// Patch 02 P2-3：「See all ›」拿掉，右側改純本數數字。
-function ShelfRow({ label, books, isHero = false }) {
-  return (
-    <div className={`shelf-row ${isHero ? 'shelf-row--hero' : ''}`}>
-      <div className="shelf-row-header">
-        <span className="shelf-row-label">{label}</span>
-      </div>
-      <div className="shelf-scroll">
-        <div className="shelf-track">
-          {books.map((book, index) => (
-            <Link
-              to={`/book/${book.id}`}
-              className="shelf-book"
-              key={book.id}
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <span className="shelf-book-cover">
-                {book.cover_url ? (
-                  <img src={book.cover_url} alt={book.title} loading="lazy" />
-                ) : (
-                  <span className="shelf-book-placeholder">{book.title.slice(0, 1)}</span>
-                )}
-              </span>
-            </Link>
-          ))}
-          <div className="shelf-plank" aria-hidden="true">
-            <div className="shelf-plank-top" />
-            <div className="shelf-plank-front" />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 增補項 8-2/8-7：換行書架，沿用跟首頁橫向排一樣的墨綠 3D 層板元件，不拆不簡化；
+// 換行書架，沿用跟首頁橫向排一樣的墨綠 3D 層板元件，不拆不簡化；
 // 最後一層不足額時 grid 自然靠左，層板照樣 left:0/right:0 滿寬。
-// Patch 03：現在只服務「有篩選條件」時的攤平結果，書量已經搬到篩選列左側
-// 顯示，這裡不再需要自己的標頭/count，簽名跟著簡化成只吃 books。
+// 書櫃頁預設狀態修正：不管有沒有作用中的篩選都走這個元件——沒有篩選＝
+// 「All」，顯示全館書；有篩選（例如透過「篩選」面板加選 Reading）就顯示
+// 該分類的書，一律平鋪、一列固定 4 本，不再有分組橫滑書架（.shelf-row，
+// 已整組移除）跟這個換行書架並存的兩套邏輯。
 function WrapShelf({ books }) {
-  const rowsOf3 = chunk(books, 3)
+  const rowsOf4 = chunk(books, 4)
   return (
-    <div className="wrap-shelf" aria-label="Filtered results">
+    <div className="wrap-shelf" aria-label="書籍列表">
       <div className="wrap-shelf-rows">
-        {rowsOf3.map((group, index) => (
+        {rowsOf4.map((group, index) => (
           <div className="wrap-shelf-row" key={index}>
             <div className="wrap-shelf-track">
               {group.map((book) => (
@@ -246,8 +210,6 @@ export default function Bookshelf() {
     return searchFilteredBooks.filter((book) => allowedByFacet.every((ids) => ids === null || ids.has(book.id)))
   }, [searchFilteredBooks, activeFilters, selectedSlugsByFacet])
 
-  const statusRows = useMemo(() => buildShelfRows(searchFilteredBooks, 'status'), [searchFilteredBooks])
-
   return (
     <div className="bookshelf-page">
       <header className="bookshelf-header">
@@ -314,17 +276,9 @@ export default function Bookshelf() {
         <p className="bookshelf-status empty-hint">沒有符合篩選條件的書。</p>
       )}
 
-      {status === 'ready' && activeFilters.length > 0 && visibleBooks.length > 0 && (
+      {status === 'ready' && visibleBooks.length > 0 && (
         <div className="shelf-rows">
           <WrapShelf books={visibleBooks} />
-        </div>
-      )}
-
-      {status === 'ready' && books.length > 0 && activeFilters.length === 0 && (
-        <div className="shelf-rows">
-          {statusRows.map((row) => (
-            <ShelfRow key={row.key} label={row.label} books={row.books} isHero={row.key === 'reading'} />
-          ))}
         </div>
       )}
 
