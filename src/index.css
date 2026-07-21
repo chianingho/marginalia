@@ -1794,111 +1794,144 @@ button.action-sheet-cancel:hover {
   color: var(--color-bg);
 }
 
-/* ---- 開場動畫（app 內首次入場動畫，改版：打字→畫書→小鳥→眨眼→轉場，
-   總長約 2.7s）----
-   取代舊的四拍版（淡入字標→螢光筆掃過→縮小淡出），整組 class 換新。
+/* ---- 開場動畫（app 內首次入場動畫）----
+   忠實移植 marginalia-splash-prototype.html：打字機字標→墨線畫出攤開的書→
+   小鳥登場→眨一下眼→lockup 微縮+overlay 淡出。CSS 數值/時間常數直接照抄
+   原型，不是重新設計一版；只把顏色換成對應的全域 token（--color-tour-bg＝
+   原型 --cream #FDFCFA、--color-ink-soft＝原型 --green #3E4A3D，數值一樣，
+   只是本站已經有 token 名稱可以借用）。
    跟 public/ 的 PWA manifest 靜態 splash 是兩回事，這裡不動 manifest。
    reduced-motion：Splash.jsx 在 JS 層直接讓字標/書一開始就是完成態、
-   從不進入 blink 階段，這裡的 CSS 只需要額外擋掉小鳥的「pop」進場動畫
-   （小鳥本身的顯示/隱藏是 opacity，不受影響，只有動態的那段 keyframe
-   包進 @media (prefers-reduced-motion: no-preference)）。 */
+   從不排 eye wink；這裡的 CSS 額外處理打字用的逐字 span／游標（原型本身
+   就是這樣分工：JS 決定要不要跑動畫序列，CSS media query 再保底一次）。 */
 .splash-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg);
+  background: var(--color-tour-bg);
   cursor: pointer;
-  opacity: 1;
+  transition: opacity 0.45s ease;
 }
 
-.splash-overlay--exiting {
+.splash-overlay--fading {
   opacity: 0;
-  transition-property: opacity;
-  transition-timing-function: ease;
+  pointer-events: none;
 }
 
 .splash-lockup {
-  width: min(86vw, 420px);
-  height: auto;
-  overflow: visible;
+  position: relative;
+  width: min(86vw, 440px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.splash-lockup--exiting {
+.splash-lockup--settling {
   transform: scale(0.92);
-  transition-property: transform;
-  transition-timing-function: ease;
 }
 
-.splash-wordmark-text {
+.splash-word {
   font-family: var(--font-splash);
-  font-weight: 500;
-  font-size: 46px;
-  fill: var(--color-green);
+  font-weight: 600;
+  font-size: clamp(48px, 15vw, 88px);
+  line-height: 1;
+  color: var(--color-ink-soft);
   letter-spacing: 0.01em;
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
 }
 
-.splash-cursor {
-  fill: var(--color-green);
-  animation: splash-cursor-blink 0.5s step-end infinite;
+.splash-ch {
+  opacity: 0;
+  transform: translateY(0.06em);
+  display: inline-block;
 }
 
-@keyframes splash-cursor-blink {
+.splash-ch--on {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.05s linear;
+}
+
+.splash-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.82em;
+  margin-left: 0.04em;
+  background: var(--color-ink-soft);
+  opacity: 0;
+  align-self: center;
+}
+
+.splash-caret--blink {
+  animation: splash-caret-blink 0.62s step-end infinite;
+}
+
+.splash-caret--gone {
+  opacity: 0 !important;
+  animation: none;
+}
+
+@keyframes splash-caret-blink {
+  50% {
+    opacity: 0;
+  }
   0%,
   100% {
     opacity: 1;
   }
-  50% {
-    opacity: 0;
-  }
 }
 
-/* 手繪線：spec 指定 #3E4A3D，跟導覽 popover 文字同一顆 --color-ink-soft
-   token（不是 --color-ink／#26332e，數值不同，各自獨立）。
-   stroke-dashoffset 的實際數值/transition 由 Splash.jsx 的 BookLine 用
-   getTotalLength() 量出來後 inline 設定，這裡只管線條本身的視覺規格。 */
+/* 手繪那一筆（攤開的書） */
+.splash-stroke-wrap {
+  width: 100%;
+  margin-top: 0.12em;
+  display: flex;
+  justify-content: center;
+}
+
+.splash-stroke {
+  width: 78%;
+  height: auto;
+  overflow: visible;
+}
+
 .splash-book-line {
   fill: none;
   stroke: var(--color-ink-soft);
-  stroke-width: 3.5;
+  stroke-width: 4.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition-property: stroke-dashoffset, opacity;
-  transition-timing-function: ease;
+  transition: stroke-dashoffset 0.68s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* 手繪粉紅小鳥（站在書右端，抬頭看），眨一下眼 */
 .splash-bird {
+  position: absolute;
+  right: 9%;
+  bottom: -14px;
+  width: clamp(50px, 14vw, 72px);
   opacity: 0;
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
+  transform: translateY(7px) scale(0.9);
+}
+
+.splash-bird svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .splash-bird--in {
   opacity: 1;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .splash-bird--in {
-    animation: splash-bird-pop 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
-}
-
-@keyframes splash-bird-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  transform: none;
+  transition: opacity 0.32s ease, transform 0.34s cubic-bezier(0.34, 1.4, 0.5, 1);
 }
 
 .splash-eye {
@@ -1906,17 +1939,29 @@ button.action-sheet-cancel:hover {
   transform-origin: center;
 }
 
-.splash-eye--blink {
-  animation: splash-blink 250ms ease-in-out 1;
+.splash-eye--wink {
+  animation: splash-wink 0.28s ease-in-out 1;
 }
 
-@keyframes splash-blink {
+@keyframes splash-wink {
   0%,
   100% {
     transform: scaleY(1);
   }
-  50% {
+  45%,
+  55% {
     transform: scaleY(0.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-ch {
+    opacity: 1;
+    transform: none;
+  }
+
+  .splash-caret {
+    display: none;
   }
 }
 

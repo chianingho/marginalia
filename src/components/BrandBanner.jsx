@@ -114,8 +114,13 @@ export default function BrandBanner({ actions }) {
           />
         </g>
 
-        {/* pink bird + caption */}
-        <BirdDoodle />
+        {/* pink bird + caption
+            修正批次：換成 marginalia-splash-prototype.html 那隻新鳥（見
+            BirdDoodle.jsx），原生座標是 0–100/0–110，這裡縮放＋平移到舊鳥
+            原本站的位置。 */}
+        <g transform="translate(361,98) scale(0.85)">
+          <BirdDoodle />
+        </g>
         <text x="318" y="112" fontFamily="Gloria Hallelujah" fontSize="11" fill="#26332E" transform="rotate(-3 318 112)">i must</text>
         <text x="322" y="128" fontFamily="Gloria Hallelujah" fontSize="11" fill="#26332E" transform="rotate(2 322 128)">read</text>
 
