@@ -1836,13 +1836,18 @@ button.action-sheet-cancel:hover {
   transform: scale(0.92);
 }
 
+/* 字體改跟首頁 BrandBanner 的「Marginalia」標題同一套（--font-serif／
+   Fraunces，weight 300 + 同樣的 letter-spacing/optical sizing 修正），
+   不再用原型指定的 Cormorant——使用者看過覺得要跟首頁一致。 */
 .splash-word {
-  font-family: var(--font-splash);
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-weight: 300;
   font-size: clamp(48px, 15vw, 88px);
   line-height: 1;
   color: var(--color-ink-soft);
-  letter-spacing: 0.01em;
+  letter-spacing: -0.045em;
+  font-optical-sizing: none;
+  font-variation-settings: 'opsz' 40;
   display: flex;
   align-items: baseline;
   white-space: nowrap;

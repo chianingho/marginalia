@@ -37,7 +37,6 @@
   --font-serif: 'Fraunces', 'Noto Serif TC', serif; /* 中文標題 fallback 不變，P-1：全站標題統一用這個，不再有 Apple Garamond */
   --font-sans: 'Archivo', -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; /* 中文內文 fallback 不變 */
   --font-hand: 'Gloria Hallelujah', cursive; /* 只給書架插畫手寫字用 */
-  --font-splash: 'Cormorant', serif; /* 只給開場動畫（Splash.jsx）的打字字標用，不是全站標題字體 */
 
   /* 色彩：語意別名指到上面的原始色票 */
   --color-bg: var(--cream); /* 全站背景 */
