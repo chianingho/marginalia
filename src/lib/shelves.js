@@ -21,10 +21,16 @@ export function resolveShelfKey(book) {
 const UNCATEGORIZED_SLUG = 'uncategorized'
 const UNCATEGORIZED_LABEL = 'Uncategorized'
 
-function resolveYear(book) {
-  const source = book.finished_at || book.created_at
-  const year = source ? new Date(source).getFullYear() : NaN
-  return Number.isFinite(year) ? String(year) : 'Unknown'
+// 修正批次（加入月份自動記錄）：年/月篩選一律以 added_at（新增書籍當下自動寫入
+// 的完整 ISO 時間戳）為準，不是 finished_at/created_at。舊資料沒有 added_at
+// 時回傳 null——呼叫端要把這種書當「無日期」處理，不能進任何年/月分組，
+// 也不能生出一顆「Unknown」可選值（跟 category 的 Uncategorized 桶不同，
+// 年/月這裡沒有「無日期」這個可篩選的選項，spec 明講「不進年/月篩選結果」）。
+function resolveAddedAtParts(book) {
+  if (!book.added_at) return null
+  const date = new Date(book.added_at)
+  if (Number.isNaN(date.getTime())) return null
+  return { year: date.getFullYear(), month: date.getMonth() + 1 }
 }
 
 // 依目前分組模式把書分成一排一排，每排附上該排的網址 slug，供首頁跟 See all 共用。
@@ -34,19 +40,36 @@ function resolveYear(book) {
 // 真正組網址（<Link to=...>）時才需要另外 encodeURIComponent。
 export function buildShelfRows(books, groupBy) {
   if (groupBy === 'year') {
+    // 只列資料中「實際存在」的年份（動態），沒有 added_at 的書直接跳過，
+    // 不產生任何列可以選到它們。
     const map = new Map()
     for (const book of books) {
-      const year = resolveYear(book)
+      const parts = resolveAddedAtParts(book)
+      if (!parts) continue
+      const year = String(parts.year)
       if (!map.has(year)) map.set(year, [])
       map.get(year).push(book)
     }
     return [...map.entries()]
-      .sort((a, b) => {
-        if (a[0] === 'Unknown') return 1
-        if (b[0] === 'Unknown') return -1
-        return b[0].localeCompare(a[0]) // 新到舊
-      })
+      .sort((a, b) => b[0].localeCompare(a[0])) // 新到舊
       .map(([year, list]) => ({ key: year, slug: year, label: year, books: list }))
+  }
+
+  if (groupBy === 'month') {
+    // 月份固定 1–12 月，不管資料裡有沒有書一律列出全部 12 個選項
+    // （跟 year 的「動態只列實際存在的值」不同，month 是行事曆式固定集合）。
+    const buckets = new Map(Array.from({ length: 12 }, (_, i) => [i + 1, []]))
+    for (const book of books) {
+      const parts = resolveAddedAtParts(book)
+      if (!parts) continue
+      buckets.get(parts.month).push(book)
+    }
+    return [...buckets.entries()].map(([month, list]) => ({
+      key: String(month),
+      slug: String(month),
+      label: `${month}月`,
+      books: list,
+    }))
   }
 
   if (groupBy === 'category') {

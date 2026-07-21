@@ -5,7 +5,7 @@ import 'driver.js/dist/driver.css'
 // 首次進站導覽（driver.js coach mark）。localStorage flag 存「使用者是否已經
 // 看過導覽」，flag 存在就不再自動跑——略過跟完成都算「已看過」（見 buildTour
 // 的 onDestroyed，兩條路徑最後都會經過同一個 destroy 生命週期）。
-export const ONBOARDING_STORAGE_KEY = 'marginalia_onboarded'
+const ONBOARDING_STORAGE_KEY = 'marginalia_onboarded'
 
 // 目前只有 2 步：ADD BOOK 按鈕、右上搜尋/篩選工具。「篩選膠囊列」那一步
 // 文案還在調整中（書架頁預設狀態沒有常駐的分類膠囊可以指），先不上，
@@ -14,7 +14,7 @@ const TOUR_STEPS = [
   {
     element: '[data-tour="add-book"]',
     popover: {
-      description: '從這裡加入第一本書 — 打書名就能自動帶入封面與作者',
+      description: '從這裡加入第一本書',
     },
   },
   {
@@ -34,9 +34,8 @@ function allTargetsPresent() {
 }
 
 // 建立一輪新的 driver.js 導覽實例。每次呼叫都是全新 instance——driver.js
-// 沒有「reset 現有 instance 的 steps」以外的乾淨重跑方式，重看導覽（dev
-// 按鈕）也是直接呼叫這個函式重新 drive 一輪，跟自動觸發共用同一份設定。
-export function buildOnboardingTour() {
+// 沒有「reset 現有 instance 的 steps」以外的乾淨重跑方式。
+function buildOnboardingTour() {
   let driverObj
 
   driverObj = driver({
@@ -87,16 +86,20 @@ export function useOnboarding(ready) {
 
     // 資料是 async 的，載入完成後 React 還要再走一輪 render/commit，
     // data-tour 目標不一定在這個 effect 執行當下就已經在 DOM 上，
-    // 用 rAF 輪詢確認兩個目標都存在才真的 start，最多等約 2 秒。
+    // 用 rAF 輪詢確認兩個目標都存在才真的 start。另外首次進站還會疊一層
+    // 開場動畫（Splash.jsx，總長 1.2s，z-index 蓋過整個畫面）——driver.js
+    // 的 popover/overlay z-index 高達 10 億，導覽如果在開場動畫還沒收掉
+    // 前就 start，coach mark 會直接穿透蓋在動畫上面，所以這裡也一併等
+    // .splash-overlay 從 DOM 上消失，最多等約 5 秒。
     function tryStart() {
       if (cancelled || startedRef.current) return
-      if (allTargetsPresent()) {
+      if (!document.querySelector('.splash-overlay') && allTargetsPresent()) {
         startedRef.current = true
         buildOnboardingTour().drive()
         return
       }
       attempts += 1
-      if (attempts > 120) return
+      if (attempts > 300) return
       requestAnimationFrame(tryStart)
     }
 

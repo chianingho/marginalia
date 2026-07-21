@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import autoAnimate from '@formkit/auto-animate'
 import AddBookModal from '../components/AddBookModal.jsx'
 import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { buildShelfRows } from '../lib/shelves.js'
-import { ONBOARDING_STORAGE_KEY, buildOnboardingTour, useOnboarding } from '../onboarding/useOnboarding.js'
+import { useOnboarding } from '../onboarding/useOnboarding.js'
 
 function chunk(list, size) {
   const out = []
@@ -62,6 +63,14 @@ function FilterIcon() {
 // 「All」，顯示全館書；有篩選（例如透過「篩選」面板加選 Reading）就顯示
 // 該分類的書，一律平鋪、一列固定 4 本，不再有分組橫滑書架（.shelf-row，
 // 已整組移除）跟這個換行書架並存的兩套邏輯。
+// 修正批次（切換篩選重排動畫）：.wrap-shelf-track 是書卡（.wrap-shelf-book）
+// 的直接父層，用 autoAnimate 掛上去——每列的欄數是固定的，切換 status/
+// 年/月篩選時實際變動的是「這個位置的列裡有哪些書」，讓 auto-animate 觀察
+// 這一層的子節點增減/搬動，書卡才會平滑補位而不是硬切。用 ref callback
+// 直接呼叫 vanilla autoAnimate()（不是 useAutoAnimate() hook）是因為列數
+// 會隨篩選結果動態增減，不是單一固定容器，hook 版本只設計給單一容器用。
+// prefers-reduced-motion：auto-animate 預設就會偵測並自動停用動畫，這裡
+// 沒有傳 disrespectUserMotionPreference，維持預設行為，不用另外處理。
 function WrapShelf({ books }) {
   const rowsOf4 = chunk(books, 4)
   return (
@@ -69,7 +78,7 @@ function WrapShelf({ books }) {
       <div className="wrap-shelf-rows">
         {rowsOf4.map((group, index) => (
           <div className="wrap-shelf-row" key={index}>
-            <div className="wrap-shelf-track">
+            <div className="wrap-shelf-track" ref={(el) => el && autoAnimate(el)}>
               {group.map((book) => (
                 <Link to={`/book/${book.id}`} className="wrap-shelf-book" key={book.id}>
                   <span className="wrap-shelf-book-cover">
@@ -123,10 +132,13 @@ function FilterGroup({ facet, label, rows, expanded, onToggleExpand, isActive, o
   )
 }
 
+// 修正批次（加入月份自動記錄）：Status/Category 維持原本可複選；Year/Month
+// 改單選（multi:false）——選同一個 facet 裡的新值會直接取代舊值，不是疊加。
 const FACETS = [
-  { facet: 'status', label: 'Status' },
-  { facet: 'category', label: 'Category' },
-  { facet: 'year', label: 'Year' },
+  { facet: 'status', label: 'Status', multi: true },
+  { facet: 'category', label: 'Category', multi: true },
+  { facet: 'year', label: 'Year', multi: false },
+  { facet: 'month', label: 'Month', multi: false },
 ]
 
 export default function Bookshelf() {
@@ -160,6 +172,16 @@ export default function Bookshelf() {
     setActiveFilters((prev) => {
       const exists = prev.some((f) => f.facet === facet && f.slug === slug)
       return exists ? prev.filter((f) => !(f.facet === facet && f.slug === slug)) : [...prev, { facet, slug, label }]
+    })
+  }
+
+  // Year/Month 單選：選新值會先清掉這個 facet 原本選的值再放新的；再點一次
+  // 目前已選中的值＝取消選取，這個 facet 回到「不限制」（清除選取後回到全部）。
+  function toggleSingleFilter(facet, slug, label) {
+    setActiveFilters((prev) => {
+      const withoutFacet = prev.filter((f) => f.facet !== facet)
+      const alreadySelected = prev.some((f) => f.facet === facet && f.slug === slug)
+      return alreadySelected ? withoutFacet : [...withoutFacet, { facet, slug, label }]
     })
   }
 
@@ -198,7 +220,7 @@ export default function Bookshelf() {
   )
 
   const selectedSlugsByFacet = useMemo(() => {
-    const map = { status: new Set(), category: new Set(), year: new Set() }
+    const map = { status: new Set(), category: new Set(), year: new Set(), month: new Set() }
     for (const f of activeFilters) map[f.facet].add(f.slug)
     return map
   }, [activeFilters])
@@ -236,19 +258,6 @@ export default function Bookshelf() {
             </div>
           }
         />
-
-        {/* DEV ONLY: remove after onboarding QA */}
-        <button
-          type="button"
-          className="tour-replay-btn"
-          onClick={() => {
-            localStorage.removeItem(ONBOARDING_STORAGE_KEY)
-            buildOnboardingTour().drive()
-          }}
-        >
-          重看導覽
-        </button>
-        {/* END DEV ONLY */}
 
         <div className="bookshelf-filterrow">
           <p className="bookshelf-count">{visibleBooks.length} books</p>
@@ -316,7 +325,7 @@ export default function Bookshelf() {
         <div className="action-sheet-backdrop" onClick={closeFilterSheet}>
           <div className="action-sheet" onClick={(e) => e.stopPropagation()}>
             <p className="action-sheet-title">Filter</p>
-            {FACETS.map(({ facet, label }) => (
+            {FACETS.map(({ facet, label, multi }) => (
               <FilterGroup
                 key={facet}
                 facet={facet}
@@ -325,7 +334,7 @@ export default function Bookshelf() {
                 expanded={expandedFacets.has(facet)}
                 onToggleExpand={() => toggleFacetExpanded(facet)}
                 isActive={isFilterActive}
-                onToggleValue={toggleFilter}
+                onToggleValue={multi ? toggleFilter : toggleSingleFilter}
               />
             ))}
             <button type="button" className="action-sheet-cancel" onClick={closeFilterSheet}>

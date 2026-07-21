@@ -1794,13 +1794,119 @@ button.action-sheet-cancel:hover {
   color: var(--color-bg);
 }
 
-/* DEV ONLY: remove after onboarding QA — 「重看導覽」暫時性按鈕，樣式從簡，
-   不套全站按鈕規範。驗收通過後這段跟著 Bookshelf.jsx 的按鈕一起整段刪除。 */
-.tour-replay-btn {
-  border: 1px dashed var(--color-text-secondary);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 11px;
-  color: var(--color-text-secondary);
-  background: transparent;
+/* ---- 開場動畫（app 內首次入場動畫，四拍版總長 1.2s）----
+   跟 public/ 的 PWA manifest 靜態 splash 是兩回事，這裡不動 manifest。
+   reduced-motion 分支完全在 Splash.jsx 用不同 class／不渲染 .splash-sweep
+   處理，這裡的 @keyframes 只會套到「沒有偏好減少動態」的使用者身上。 */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  cursor: pointer;
+  animation: splash-overlay-out 1.2s linear forwards;
+}
+
+@keyframes splash-overlay-out {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.splash-overlay--reduced {
+  animation: none;
+}
+
+/* 0–0.4s 字標淡入；0.9–1.2s 微縮＋（透過 .splash-overlay 本身淡出）首頁疊上。 */
+.splash-wordmark {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(40px, 13vw, 64px);
+  color: var(--color-green);
+  letter-spacing: -0.045em;
+  opacity: 0;
+  transform: scale(1);
+  animation: splash-wordmark-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes splash-wordmark-in {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  33.34% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(0.88);
+  }
+}
+
+.splash-wordmark--static {
+  opacity: 1;
+  animation: none;
+}
+
+/* 0.4–0.9s：螢光筆黃掃過字標——招牌閱讀痕跡，這裡是唯一允許在功能性 UI
+   之外使用高亮黃的地方（總規格限制）。scaleX 從左往右長出，不用 clip-path。 */
+.splash-sweep {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 18%;
+  height: 62%;
+  background: var(--color-highlight);
+  opacity: 0;
+  transform: scaleX(0) skewX(-8deg);
+  transform-origin: left center;
+  z-index: -1;
+  animation: splash-sweep-in 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes splash-sweep-in {
+  0%,
+  33.34% {
+    opacity: 0;
+    transform: scaleX(0) skewX(-8deg);
+  }
+  34% {
+    opacity: 0.55;
+  }
+  75%,
+  100% {
+    opacity: 0.55;
+    transform: scaleX(1) skewX(-8deg);
+  }
+}
+
+/* 已看過 splash 的回訪：不放 overlay，直接對整個 app 套一個約 0.2s 的
+   淡入（實際秒數由 Splash.jsx inline style 的 animation-duration 決定）。 */
+@keyframes app-enter-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.app-enter-fade {
+  animation-name: app-enter-fade;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
 }

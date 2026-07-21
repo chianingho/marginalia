@@ -107,6 +107,7 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
 
   const finalStatus = status || 'to_read'
   const { started_at, finished_at } = deriveStatusDates(finalStatus, {})
+  const now = new Date().toISOString()
 
   const book = {
     id: crypto.randomUUID(),
@@ -118,7 +119,11 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
     category: category || null,
     started_at,
     finished_at,
-    created_at: new Date().toISOString(),
+    created_at: now,
+    // 修正批次（加入月份自動記錄）：新增書籍當下自動寫入，年/月篩選唯一依據
+    // ——不提供手動輸入年份的欄位。只在「新增」寫入，編輯不會補寫/覆寫這個
+    // 欄位，舊資料（這次改動之前建立的書）沒有這個值，讀取時當「無日期」。
+    added_at: now,
   }
 
   const books = readAll(BOOKS_KEY)

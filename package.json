@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.10.0",
     "@supabase/supabase-js": "^2.45.0",
     "driver.js": "^1.8.0",
     "idb-keyval": "^6.3.0",
