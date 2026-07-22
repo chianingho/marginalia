@@ -1,9 +1,9 @@
-import { supabase, COVERS_BUCKET, hasSupabaseConfig } from '../lib/supabaseClient.js'
+import { supabase, COVERS_BUCKET, hasActiveSupabaseSession } from '../lib/supabaseClient.js'
 import * as localStore from '../lib/localStore.js'
 import { deriveStatusDates } from '../lib/bookStatus.js'
 
 export async function fetchBooks() {
-  if (!hasSupabaseConfig) return localStore.fetchBooks()
+  if (!(await hasActiveSupabaseSession())) return localStore.fetchBooks()
 
   const { data, error } = await supabase
     .from('books')
@@ -15,7 +15,7 @@ export async function fetchBooks() {
 }
 
 export async function fetchBookById(bookId) {
-  if (!hasSupabaseConfig) return localStore.fetchBookById(bookId)
+  if (!(await hasActiveSupabaseSession())) return localStore.fetchBookById(bookId)
 
   const { data, error } = await supabase.from('books').select('*').eq('id', bookId).single()
 
@@ -29,7 +29,7 @@ export async function fetchBookById(bookId) {
  * 若兩者都有，優先使用手動上傳的檔案。
  */
 export async function createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category }) {
-  if (!hasSupabaseConfig) {
+  if (!(await hasActiveSupabaseSession())) {
     return localStore.createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category })
   }
 
@@ -41,6 +41,7 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
 
   const finalStatus = status || 'to_read'
   const { started_at, finished_at } = deriveStatusDates(finalStatus, {})
+  const addedAt = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('books')
@@ -53,6 +54,7 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
       category: category || null,
       started_at,
       finished_at,
+      added_at: addedAt,
     })
     .select()
     .single()
@@ -66,7 +68,7 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
  * 已經有值的日期不會被清除（例如手動把 Finished 改回 Reading）。
  */
 export async function updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category }) {
-  if (!hasSupabaseConfig) {
+  if (!(await hasActiveSupabaseSession())) {
     return localStore.updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category })
   }
 
@@ -103,7 +105,7 @@ export async function updateBook(bookId, { title, author, coverFile, coverUrl, g
 }
 
 export async function deleteBook(bookId) {
-  if (!hasSupabaseConfig) return localStore.deleteBook(bookId)
+  if (!(await hasActiveSupabaseSession())) return localStore.deleteBook(bookId)
 
   const { error } = await supabase.from('books').delete().eq('id', bookId)
   if (error) throw error

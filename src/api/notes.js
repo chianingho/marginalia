@@ -1,8 +1,8 @@
-import { supabase, hasSupabaseConfig } from '../lib/supabaseClient.js'
+import { supabase, hasActiveSupabaseSession } from '../lib/supabaseClient.js'
 import * as localStore from '../lib/localStore.js'
 
 export async function getNotesByBook(bookId) {
-  if (!hasSupabaseConfig) return localStore.getNotesByBook(bookId)
+  if (!(await hasActiveSupabaseSession())) return localStore.getNotesByBook(bookId)
 
   const { data, error } = await supabase
     .from('notes')
@@ -15,7 +15,7 @@ export async function getNotesByBook(bookId) {
 }
 
 export async function getNoteById(noteId) {
-  if (!hasSupabaseConfig) return localStore.getNoteById(noteId)
+  if (!(await hasActiveSupabaseSession())) return localStore.getNoteById(noteId)
 
   const { data, error } = await supabase.from('notes').select('*').eq('id', noteId).maybeSingle()
 
@@ -28,7 +28,7 @@ export async function getNoteById(noteId) {
 // key 平移，這裡先保留參數介面對齊，實際 insert/update 欄位等真的啟用時再對到
 // Storage path 命名規則。
 export async function addNote({ id, bookId, content, imageKey, noteDate, page }) {
-  if (!hasSupabaseConfig) return localStore.addNote({ id, bookId, content, imageKey, noteDate, page })
+  if (!(await hasActiveSupabaseSession())) return localStore.addNote({ id, bookId, content, imageKey, noteDate, page })
 
   const { data, error } = await supabase
     .from('notes')
@@ -50,7 +50,7 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
 }
 
 export async function updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation }) {
-  if (!hasSupabaseConfig) {
+  if (!(await hasActiveSupabaseSession())) {
     return localStore.updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation })
   }
 
@@ -74,7 +74,7 @@ export async function updateNote(noteId, { content, imageKey, noteDate, page, im
 }
 
 export async function deleteNote(noteId) {
-  if (!hasSupabaseConfig) return localStore.deleteNote(noteId)
+  if (!(await hasActiveSupabaseSession())) return localStore.deleteNote(noteId)
 
   const { error } = await supabase.from('notes').delete().eq('id', noteId)
   if (error) throw error
