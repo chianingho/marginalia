@@ -44,6 +44,23 @@
 之後要加新的圖片種類（例如封面圖存 IndexedDB），比照這個模式在 `imageStore.js` 加一個
 `xxxImageKey(id)` 函式即可，get/set/delete 這幾個通用讀寫函式不用動，呼叫端也不用改。
 
+### 訪客模式（登入體驗批次，2026-07-23 定案）
+訪客是獨立於「已登入（Supabase）」「未登入本機預覽（無 env）」之外的**第三種**資料層狀態，
+不是 `hasActiveSupabaseSession()` 回傳 false 的隱含推論：
+
+- 旗標：`lib/guestMode.js` 的 `marginalia_guest_mode`（localStorage），獨立且明確，`App.jsx`
+  跟 `api/books.js`／`api/notes.js` 都靠這支旗標判斷，不是猜的。
+- 命名空間：`lib/localStore.js` 把原本寫死的 `BOOKS_KEY`/`NOTES_KEY`/`SEEDED_FLAG_KEY` 抽成
+  `createLocalStore(keys)` 工廠，`lib/guestStore.js` 用另一組 key
+  （`reading-notes:guest:books`/`notes`/`seeded`）呼叫同一個工廠，不重寫邏輯。訪客不 seed
+  範例書。
+- **這個命名空間隔離是第 2 階段一次性遷移函式能不能安全上線的前提**：遷移函式只讀
+  `reading-notes:books`/`notes`，永遠不會掃到訪客資料，訪客隨手加的書不會污染使用者本人
+  登入後的雲端書櫃。之後若要改動 `localStore.js`/`guestStore.js` 的 key 命名，務必同步確認
+  遷移函式（尚未實作）沒有寫死引用舊 key。
+- 訪客中途登入：`App.jsx` 監看 `session`，一旦變真就呼叫 `exitGuestMode()`——旗標清掉，
+  訪客資料留著當無害殘留（不上傳、不清除），避免之後單純登出被誤判成訪客而跳過登入頁。
+
 ## 全站共用機制
 
 - **Modal 容器**：`.add-modal-backdrop` / `.add-modal`（見 `index.css`），
