@@ -2,8 +2,10 @@ import { Routes, Route, Link, Navigate, useLocation, useParams } from 'react-rou
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetail from './pages/BookDetail.jsx'
 import NoteDetail from './pages/NoteDetail.jsx'
+import Login from './pages/Login.jsx'
 import Splash from './components/Splash.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
+import { useAuthSession } from './lib/useAuthSession.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
 function isFlushRoute(pathname) {
@@ -19,6 +21,14 @@ function LegacyBookRedirect() {
 export default function App() {
   const location = useLocation()
   const isFlush = isFlushRoute(location.pathname)
+  const { session, loading } = useAuthSession()
+
+  // 有設定 Supabase env 才需要登入：初次判斷 session 前先不畫任何畫面，避免先
+  // 閃一下書櫃（或登入頁）才又切換。沒有 env（本機預覽模式）完全不受影響，
+  // loading 一開始就是 false，直接照舊流程進 app。
+  if (hasSupabaseConfig && loading) return null
+
+  if (hasSupabaseConfig && !session) return <Login />
 
   return (
     <Splash>

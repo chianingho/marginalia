@@ -6,6 +6,7 @@ import BrandBanner from '../components/BrandBanner.jsx'
 import { fetchBooks } from '../api/books.js'
 import { buildShelfRows } from '../lib/shelves.js'
 import { useOnboarding } from '../onboarding/useOnboarding.js'
+import { hasSupabaseConfig, supabase } from '../lib/supabaseClient.js'
 
 function chunk(list, size) {
   const out = []
@@ -53,6 +54,18 @@ function FilterIcon() {
       <circle cx="9" cy="7" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
       <circle cx="16" cy="12" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
       <circle cx="10" cy="17" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  )
+}
+
+// 本階段最小可測版本：登出入口先借用跟 Search/Filter 同一視覺重量的圓形 icon
+// 按鈕。正式位置/視覺留到 8 月放大鏡改類別篩選器時一併設計。
+function LogoutIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 17l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
@@ -214,6 +227,11 @@ export default function Bookshelf() {
     })
   }
 
+  async function handleLogout() {
+    if (!confirm('確定要登出嗎？')) return
+    await supabase.auth.signOut()
+  }
+
   const searchFilteredBooks = useMemo(
     () => books.filter((book) => matchesQuery(book, query)),
     [books, query],
@@ -255,6 +273,11 @@ export default function Bookshelf() {
               <button type="button" className="pill-btn" onClick={() => setFilterOpen(true)} aria-label="篩選">
                 <FilterIcon />
               </button>
+              {hasSupabaseConfig && (
+                <button type="button" className="pill-btn" onClick={handleLogout} aria-label="登出">
+                  <LogoutIcon />
+                </button>
+              )}
             </div>
           }
         />

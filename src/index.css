@@ -136,6 +136,25 @@ label {
   color: var(--color-text-muted);
 }
 
+/* 登入頁：純版面置中殼層，顏色/字體/按鈕材質都沿用既有 token 跟 .btn-frosted，
+   這裡不宣告任何新的顏色或按鈕樣式。 */
+.login-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-shell-bg);
+  padding: 24px;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
 /* UI 修正批次：提示用的芥末黃色調全部從 --mustard token color-mix 出來，
    不再寫死 #f4ebd9/#6b5410 這組跟 tokens.css 無關的顏色。 */
 .local-mode-banner {
