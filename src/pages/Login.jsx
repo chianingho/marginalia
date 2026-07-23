@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient.js'
 
-// 未登入時的唯一畫面：不透出書櫃內容。單一按鈕觸發 Supabase Auth 的 Google
-// OAuth（全頁導向 Google 再導回來，session 由 supabaseClient.js 的
-// autoRefreshToken/detectSessionInUrl 預設行為自動接住，不用在這裡另外解析
-// callback）。按鈕材質沿用全站 .btn-frosted（跟 Add Book/Save 同一份材質），
-// 不自訂新樣式；.login-page/.login-card 只是版面置中用的殼層，顏色/字體
-// 全部指到 tokens.css 既有變數。
-export default function Login() {
+// 登入體驗批次（2026-07-23）第 2 節：登入頁改版。
+// 未登入時的唯一畫面：不透出書櫃內容。onGuest 是訪客模式的入口（第 3 節），
+// 由 App.jsx 傳入——實際的旗標讀寫在 lib/guestMode.js，這裡只負責觸發。
+//
+// Google OAuth 觸發後是全頁導向，session 由 supabaseClient.js 的
+// autoRefreshToken/detectSessionInUrl 預設行為自動接住，這裡不用另外解析
+// callback。
+export default function Login({ onGuest }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -28,12 +29,31 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <p className="app-name">Marginalia</p>
-        <p className="app-subtitle">閱讀筆記</p>
-        <button type="button" className="add-page-btn btn-frosted" onClick={handleLogin} disabled={loading}>
-          {loading ? '連接中…' : '使用 Google 繼續'}
+        <p className="login-wordmark">Marginalia</p>
+        <p className="login-subtitle">閱讀筆記</p>
+
+        <div className="login-cta-block">
+          <button type="button" className="login-google-btn" onClick={handleLogin} disabled={loading}>
+            <span className="login-google-icon">
+              <img src="/google-color.svg" alt="" width="16" height="16" />
+            </span>
+            {loading ? '連接中…' : '使用 Google 繼續'}
+          </button>
+          {error && <p className="form-error">{error}</p>}
+        </div>
+
+        <div className="login-divider">
+          <span className="login-divider-line" />
+          <p className="login-divider-label">或</p>
+          <span className="login-divider-line" />
+        </div>
+
+        <button type="button" className="login-guest-btn" onClick={onGuest}>
+          Continue as guest
         </button>
-        {error && <p className="form-error">{error}</p>}
+        <p className="login-guest-warning">
+          訪客模式的書與筆記僅存於此裝置，不會同步，登入後不會保留
+        </p>
       </div>
     </div>
   )

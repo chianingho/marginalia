@@ -1,6 +1,13 @@
 import { supabase, NOTE_IMAGES_BUCKET, getSupabaseSession } from '../lib/supabaseClient.js'
 import * as localStore from '../lib/localStore.js'
+import * as guestStore from '../lib/guestStore.js'
+import { isGuestMode } from '../lib/guestMode.js'
 import { getNoteImage, noteOriginalImageKey } from '../lib/imageStore.js'
+
+// 見 api/books.js 的同名函式：訪客跟「單純沒登入」要走不同命名空間。
+function localModeStore() {
+  return isGuestMode() ? guestStore : localStore
+}
 
 // DB 的 notes 表沒有 image_original/image_display/note_date 這幾個欄位（定案 schema
 // 只有 image_path，決策 C 也講明 note_date 不入庫）。但 NoteList/NoteDetail/
@@ -19,7 +26,7 @@ function toClientNote(row) {
 
 export async function getNotesByBook(bookId) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.getNotesByBook(bookId)
+  if (!session) return localModeStore().getNotesByBook(bookId)
 
   const { data, error } = await supabase
     .from('notes')
@@ -33,7 +40,7 @@ export async function getNotesByBook(bookId) {
 
 export async function getNoteById(noteId) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.getNoteById(noteId)
+  if (!session) return localModeStore().getNoteById(noteId)
 
   const { data, error } = await supabase.from('notes').select('*').eq('id', noteId).maybeSingle()
 
@@ -43,7 +50,7 @@ export async function getNoteById(noteId) {
 
 export async function addNote({ id, bookId, content, imageKey, noteDate, page }) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.addNote({ id, bookId, content, imageKey, noteDate, page })
+  if (!session) return localModeStore().addNote({ id, bookId, content, imageKey, noteDate, page })
 
   const noteId = id || crypto.randomUUID()
   // imageKey 是呼叫端（NoteModal）已經存進本機 IndexedDB 的 key，這裡撈回 blob
@@ -72,7 +79,7 @@ export async function addNote({ id, bookId, content, imageKey, noteDate, page })
 export async function updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation }) {
   const session = await getSupabaseSession()
   if (!session) {
-    return localStore.updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation })
+    return localModeStore().updateNote(noteId, { content, imageKey, noteDate, page, imageDisplay, strokes, resetAnnotation })
   }
 
   const patch = {}
@@ -97,7 +104,7 @@ export async function updateNote(noteId, { content, imageKey, noteDate, page, im
 
 export async function deleteNote(noteId) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.deleteNote(noteId)
+  if (!session) return localModeStore().deleteNote(noteId)
 
   const { error } = await supabase.from('notes').delete().eq('id', noteId)
   if (error) throw error

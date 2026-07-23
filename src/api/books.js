@@ -1,7 +1,16 @@
 import { supabase, COVERS_BUCKET, getSupabaseSession, isExternalUrl, resolveStoragePaths } from '../lib/supabaseClient.js'
 import * as localStore from '../lib/localStore.js'
+import * as guestStore from '../lib/guestStore.js'
+import { isGuestMode } from '../lib/guestMode.js'
 import { compressImage } from '../lib/imageStore.js'
 import { deriveStatusDates } from '../lib/bookStatus.js'
+
+// 沒有 session 時，訪客模式跟「單純沒登入」是兩種不同狀態，不能共用同一個
+// 分支語意——訪客資料要進獨立命名空間（guestStore），不能混進一般 localStore，
+// 否則之後遷移函式會把訪客隨手加的書當成使用者本人的資料上雲。
+function localModeStore() {
+  return isGuestMode() ? guestStore : localStore
+}
 
 // cover_url 在 DB 存的是「Google Books 外部 URL」或「book-covers bucket 內的路徑」，
 // 兩種值混在同一欄位，靠 isExternalUrl 分流。私有 bucket 的路徑要在讀取當下換成
@@ -18,7 +27,7 @@ async function withResolvedCovers(books) {
 
 export async function fetchBooks() {
   const session = await getSupabaseSession()
-  if (!session) return localStore.fetchBooks()
+  if (!session) return localModeStore().fetchBooks()
 
   const { data, error } = await supabase
     .from('books')
@@ -31,7 +40,7 @@ export async function fetchBooks() {
 
 export async function fetchBookById(bookId) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.fetchBookById(bookId)
+  if (!session) return localModeStore().fetchBookById(bookId)
 
   const { data, error } = await supabase.from('books').select('*').eq('id', bookId).single()
 
@@ -48,7 +57,7 @@ export async function fetchBookById(bookId) {
 export async function createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category }) {
   const session = await getSupabaseSession()
   if (!session) {
-    return localStore.createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category })
+    return localModeStore().createBook({ title, author, coverFile, coverUrl, googleBooksId, status, category })
   }
 
   // id 先在本機產生（不吃 DB default），因為使用者上傳封面的 Storage 路徑需要
@@ -94,7 +103,7 @@ export async function createBook({ title, author, coverFile, coverUrl, googleBoo
 export async function updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category }) {
   const session = await getSupabaseSession()
   if (!session) {
-    return localStore.updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category })
+    return localModeStore().updateBook(bookId, { title, author, coverFile, coverUrl, googleBooksId, status, category })
   }
 
   // 刻意不透過 fetchBookById 撈舊資料——那支函式會把 cover_url 換成簽名 URL，
@@ -140,7 +149,7 @@ export async function updateBook(bookId, { title, author, coverFile, coverUrl, g
 
 export async function deleteBook(bookId) {
   const session = await getSupabaseSession()
-  if (!session) return localStore.deleteBook(bookId)
+  if (!session) return localModeStore().deleteBook(bookId)
 
   const { error } = await supabase.from('books').delete().eq('id', bookId)
   if (error) throw error

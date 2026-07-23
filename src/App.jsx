@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Routes, Route, Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetail from './pages/BookDetail.jsx'
@@ -6,6 +7,7 @@ import Login from './pages/Login.jsx'
 import Splash from './components/Splash.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 import { useAuthSession } from './lib/useAuthSession.js'
+import { isGuestMode, enterGuestMode, exitGuestMode } from './lib/guestMode.js'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
 function isFlushRoute(pathname) {
@@ -22,13 +24,29 @@ export default function App() {
   const location = useLocation()
   const isFlush = isFlushRoute(location.pathname)
   const { session, loading } = useAuthSession()
+  const [guestMode, setGuestMode] = useState(() => isGuestMode())
 
-  // 有設定 Supabase env 才需要登入：初次判斷 session 前先不畫任何畫面，避免先
-  // 閃一下書櫃（或登入頁）才又切換。沒有 env（本機預覽模式）完全不受影響，
-  // loading 一開始就是 false，直接照舊流程進 app。
+  // 訪客中途登入成功後，guest 旗標要跟著清掉——資料本身不動（獨立命名空間留著
+  // 當無害殘留），只是不讓這個旗標繼續代表「目前是訪客」，避免之後單純登出時
+  // 被誤判成訪客而略過登入頁（登入頁 gate 條件見下）。
+  useEffect(() => {
+    if (session) {
+      exitGuestMode()
+      setGuestMode(false)
+    }
+  }, [session])
+
+  function handleGuest() {
+    enterGuestMode()
+    setGuestMode(true)
+  }
+
+  // TODO（本批次第 4 項會處理）：這裡的 loading 目前是先不畫任何畫面，
+  // 跟 splash 動畫是分開的兩段——第 4 項會把這段改成「splash 播放的同時在背景
+  // 判斷 session」，不再是現在這種先空白再決定的暫時寫法。
   if (hasSupabaseConfig && loading) return null
 
-  if (hasSupabaseConfig && !session) return <Login />
+  if (hasSupabaseConfig && !session && !guestMode) return <Login onGuest={handleGuest} />
 
   return (
     <Splash>
