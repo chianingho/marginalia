@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import autoAnimate from '@formkit/auto-animate'
 import AddBookModal from '../components/AddBookModal.jsx'
 import BrandBanner from '../components/BrandBanner.jsx'
+import AvatarMenu from '../components/AvatarMenu.jsx'
 import { fetchBooks } from '../api/books.js'
 import { buildShelfRows } from '../lib/shelves.js'
 import { useOnboarding } from '../onboarding/useOnboarding.js'
 import { hasSupabaseConfig, supabase } from '../lib/supabaseClient.js'
+import { useAuthSession } from '../lib/useAuthSession.js'
+import { isGuestMode } from '../lib/guestMode.js'
 
 function chunk(list, size) {
   const out = []
@@ -54,18 +57,6 @@ function FilterIcon() {
       <circle cx="9" cy="7" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
       <circle cx="16" cy="12" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
       <circle cx="10" cy="17" r="2" fill="var(--color-bg)" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  )
-}
-
-// 本階段最小可測版本：登出入口先借用跟 Search/Filter 同一視覺重量的圓形 icon
-// 按鈕。正式位置/視覺留到 8 月放大鏡改類別篩選器時一併設計。
-function LogoutIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M16 17l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
@@ -164,6 +155,8 @@ export default function Bookshelf() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const { session } = useAuthSession()
+  const filterBtnRef = useRef(null)
 
   useEffect(() => {
     load()
@@ -227,9 +220,12 @@ export default function Bookshelf() {
     })
   }
 
-  async function handleLogout() {
-    if (!confirm('確定要登出嗎？')) return
-    await supabase.auth.signOut()
+  // 訪客模式下的登入入口（3-3）：跟登入頁同一顆 Google OAuth 觸發，走一般流程。
+  async function handleGuestSignIn() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
   }
 
   const searchFilteredBooks = useMemo(
@@ -270,12 +266,19 @@ export default function Bookshelf() {
               >
                 <SearchIcon />
               </button>
-              <button type="button" className="pill-btn" onClick={() => setFilterOpen(true)} aria-label="篩選">
+              <button
+                type="button"
+                className="pill-btn"
+                ref={filterBtnRef}
+                onClick={() => setFilterOpen(true)}
+                aria-label="篩選"
+              >
                 <FilterIcon />
               </button>
-              {hasSupabaseConfig && (
-                <button type="button" className="pill-btn" onClick={handleLogout} aria-label="登出">
-                  <LogoutIcon />
+              {hasSupabaseConfig && session && <AvatarMenu session={session} sizeRefTarget={filterBtnRef} />}
+              {hasSupabaseConfig && !session && isGuestMode() && (
+                <button type="button" className="guest-signin-btn" onClick={handleGuestSignIn}>
+                  Sign in
                 </button>
               )}
             </div>

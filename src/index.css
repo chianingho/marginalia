@@ -275,6 +275,114 @@ button.login-guest-btn:hover:not(:disabled) {
   margin: 0;
 }
 
+/* 頭像 + 登出下拉（登入體驗批次第 5 節）。頭像屬身分識別元件，不納入導覽
+   按鈕的 tier 系統，跟 .pill-btn 只是視覺對齊，不是同一套元件（見
+   ARCHITECTURE.md 記錄）。直徑用 JS 量測 sizeRefTarget 帶進來的 inline
+   style，這裡不寫死尺寸。 */
+.avatar-menu {
+  position: relative;
+}
+
+.avatar-trigger {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-green);
+  color: var(--color-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.avatar-trigger:hover {
+  background: var(--color-green);
+  box-shadow: none;
+  transform: none;
+}
+
+.avatar-trigger img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-fallback {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 下拉不被裁切：父層鏈（.bookshelf-header/.brand-hero/.brand-hero-row/
+   .bookshelf-filterrow-icons）都沒有 overflow:hidden，這裡用 absolute 定位
+   即可，不需要額外處理祖先層。safe-area：靠右對齊時額外扣掉右側安全區，
+   避免在有圓角/瀏海的機型上貼著螢幕邊緣。 */
+.avatar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: max(0px, env(safe-area-inset-right));
+  z-index: 20;
+  min-width: 200px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card-hover);
+  padding: 14px 16px;
+}
+
+.avatar-dropdown-email {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  word-break: break-all;
+}
+
+.avatar-dropdown-divider {
+  height: 1px;
+  background: var(--color-hairline);
+  margin: 12px 0;
+}
+
+button.avatar-dropdown-logout {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  color: var(--color-green);
+  font-size: 0.92rem;
+}
+
+button.avatar-dropdown-logout:hover {
+  background: none;
+  color: var(--color-green);
+  box-shadow: none;
+  transform: none;
+  text-decoration: underline;
+}
+
+/* 訪客模式：頭像位置改顯示純文字 Sign in 入口，導覽按鈕階層的最低階，
+   跟登入頁的 Continue as guest 同一視覺語言（無邊框/底線/背景）。 */
+button.guest-signin-btn {
+  border: none;
+  background: none;
+  padding: 7px 4px;
+  color: var(--color-green);
+  font-size: 0.9rem;
+}
+
+button.guest-signin-btn:hover {
+  background: none;
+  color: var(--color-green);
+  box-shadow: none;
+  transform: none;
+  text-decoration: underline;
+}
+
 /* UI 修正批次：提示用的芥末黃色調全部從 --mustard token color-mix 出來，
    不再寫死 #f4ebd9/#6b5410 這組跟 tokens.css 無關的顏色。 */
 .local-mode-banner {

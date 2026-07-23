@@ -70,6 +70,12 @@
      `.btn-frosted` 圓形變體（墨綠磨砂圓底）+ 白 `‹`——綠帶上、白底上都可見。
      目前僅筆記頁（`/book/:id`）適用。
   3. 標注畫面（`ImageAnnotator`）：無 `‹` 也無 X，離開一律走 Cancel／Done 膠囊。
+- **頭像不納入導覽按鈕 tier 系統（登入體驗批次，2026-07-23 定案）**：前一批次
+  （Supabase 上雲第 1 階段）遺留的爭議項——登出鈕 spec 文字寫「chevron tier」、
+  實作是 `.pill-btn` 圓形圖示——因本批次改成頭像 + 登出下拉而失效，不再追認
+  亦不退回。頭像（`AvatarMenu.jsx`）是身分識別元件，只是視覺上跟 `.pill-btn`
+  對齊高度（`getBoundingClientRect()` 量測，不寫死尺寸），不屬於上面的返回鍵
+  tier 系統，也不比照 `.pill-btn`/`.btn-frosted` 的材質規則。
 - **首頁橫幅（2026-07-13 定案，取代 0712 總規格第 1 項「沿用頁面邊距」）**：
   `BrandBanner` 改 full-bleed 貼齊螢幕邊（不再吃 `.bookshelf-header` 左右
   padding）——原本的 Group by 疊字機制（absolute 疊在圖上顯示模式名/選中值）
