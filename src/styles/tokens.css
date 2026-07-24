@@ -56,10 +56,11 @@
   /* 錯誤/刪除等危險狀態文字色，語意別名指到品牌紅，不再各自寫 #b3432f 之類的值。 */
   --color-danger: var(--red);
 
-  /* 首次導覽（driver.js coach mark）spec 指定的精確色值，跟現有
-     --paper 不同（不是同一顆數值換名字，是刻意給的獨立色），
-     所以在這裡建成正式 token，不是散落在導覽元件裡的寫死值。 */
-  --color-tour-bg: #fdfcfa;
+  /* UI Token 統一化批次（2026-07-24）：先前導覽 popover／splash 遮罩背景用的
+     那顆大面積背景 token 已移除——跟 --cream 角色完全重疊、無功能分工，
+     兩處背景都已改用 --cream。
+     --color-ink-soft 不在此次調整範圍內：它是線條/文字用色，跟 --cream
+     這種大面積背景色分工不同，繼續保留。 */
   /* 品牌綠的柔和版，比 --ink 淺一階——導覽 popover 文字跟開場動畫
      （Splash.jsx）手繪書線都指定同一顆 #3E4A3D，所以用通用名稱，
      不是 tour 專屬。 */
@@ -82,4 +83,12 @@
   --content-left: 20px; /* 內容左邊界，書封左緣／時間軸欄共用（原 --shelf-inset） */
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
+  --safe-right: env(safe-area-inset-right);
+
+  /* UI Token 統一化批次（2026-07-24）：.avatar-trigger／.btn-frosted--circle／
+     .annotator-clear／.annotator-undo 這幾個圓形 icon 按鈕原本各自寫死
+     36px，抽成同一個變數，純粹去重複，不代表這幾顆按鈕現在共用同一套
+     元件邏輯。.pill-btn 不吃這個變數——它是橢圓形（padding 撐開），不是
+     固定尺寸的圓，兩者是不同形狀，不能套同一個值。 */
+  --size-circle-btn: 36px;
 }

@@ -170,7 +170,7 @@ label {
 }
 
 .login-subtitle {
-  font-family: 'Noto Serif TC', serif;
+  font-family: var(--font-serif);
   font-weight: 400;
   font-size: 15px;
   letter-spacing: normal;
@@ -185,6 +185,10 @@ label {
 /* 2-4：不沿用 .btn-frosted——frosted glass 需要背景有內容可模糊，登入頁是
    純色背景，backdrop-filter 無作用，只會留下半透明色＋過重陰影，是元件層級
    誤用。這裡改實心品牌綠膠囊，獨立一個 class，不動 .btn-frosted 本身。 */
+/* UI Token 統一化批次（2026-07-24）：font-family 改回 var(--font-serif)。
+   這顆按鈕的文案「使用 Google 繼續」含拉丁字「Google」，改用這個 token 後
+   「Google」這個詞會落到 Fraunces、其餘中文字落到 Noto Serif TC——裁示是
+   接受中英文各自用各自的字體渲染，不強求兩者視覺統一。 */
 button.login-google-btn {
   width: 100%;
   height: 52px;
@@ -196,7 +200,7 @@ button.login-google-btn {
   align-items: center;
   justify-content: center;
   gap: 11px;
-  font-family: 'Noto Serif TC', serif;
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   padding: 0 22px;
   box-shadow: none;
@@ -284,8 +288,8 @@ button.login-guest-btn:hover:not(:disabled) {
 }
 
 .avatar-trigger {
-  width: 36px;
-  height: 36px;
+  width: var(--size-circle-btn);
+  height: var(--size-circle-btn);
   border-radius: 50%;
   border: none;
   padding: 0;
@@ -587,16 +591,19 @@ button.guest-signin-btn:hover {
   color: var(--color-cover-placeholder-ink);
 }
 
-/* 項目 2：書名區。字體改指定 Noto Serif TC（不是 --font-serif 的 Fraunces-first
-   堆疊——這裡刻意跳過 Fraunces，確保中英文書名字重視覺一致），字級加大、
-   拿掉 line-clamp 改自然換行。 */
+/* 項目 2：書名區，字級加大、拿掉 line-clamp 改自然換行。
+   UI Token 統一化批次（2026-07-24）：字體改回 var(--font-serif)，推翻原本
+   「刻意跳過 Fraunces、確保中英文書名字重視覺一致」的決定。book.title 是
+   使用者輸入的資料，可能是中文或英文書名（例如「小王子」vs「The Little
+   Prince」）——裁示是接受中英文書名各自用各自的字體渲染（英文落 Fraunces、
+   中文落 Noto Serif TC），不再要求兩者字重統一。 */
 .book-page-titleblock {
   padding: 20px var(--content-left) 0;
 }
 
 .book-page-title {
   margin: 0;
-  font-family: 'Noto Serif TC', serif;
+  font-family: var(--font-serif);
   font-size: 24px;
   font-weight: 700;
   line-height: 1.3;
@@ -1110,6 +1117,13 @@ button.filter-pill:hover {
 }
 
 /* pillbtn 按壓狀態——去掉系統預設 tap highlight/外框，改用淡綠底 + teal focus outline。 */
+/* UI Token 統一化批次（2026-07-24）：這裡刻意沒有套用 --size-circle-btn。
+   跟 .avatar-trigger／.btn-frosted--circle／.annotator-clear／.annotator-undo
+   那四個「寫死 36px 的正圓」不同，.pill-btn 沒有固定 width/height，是靠
+   padding: 7px 18px 撐開的橢圓形膠囊（實測渲染 58×36）。若比照那四個改成
+   width/height: var(--size-circle-btn)，會把搜尋/篩選按鈕從橢圓硬改成
+   36×36 正圓，是真正的視覺改變，不是這批次「零視覺變更」該做的事。
+   要不要把 .pill-btn 也統一成正圓，留給下一個批次當設計決策處理。 */
 .pill-btn {
   display: flex;
   align-items: center;
@@ -1372,8 +1386,8 @@ button.btn-frosted:hover {
    例外 2）、小號變體（詳情頁 Edit annotation，icon+文字）。疊在 .btn-frosted
    之上只加尺寸/形狀，磨砂質感（背景/邊/陰影/blur）繼續共用同一份。 */
 .btn-frosted--circle {
-  width: 36px;
-  height: 36px;
+  width: var(--size-circle-btn);
+  height: var(--size-circle-btn);
   padding: 0;
   border-radius: 50%;
   display: flex;
@@ -1665,8 +1679,8 @@ button.annotator-swatch:hover {
 .annotator-clear,
 .annotator-undo {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: var(--size-circle-btn);
+  height: var(--size-circle-btn);
   padding: 0;
   display: flex;
   align-items: center;
@@ -1949,14 +1963,16 @@ button.action-sheet-cancel:hover {
 
 /* ---- 首次進站導覽（driver.js coach mark）----
    driver.js 自己有一份 driver.css（在 useOnboarding.js import），這裡只覆寫
-   它暴露出來的 class，套全域標準色 token（--color-tour-bg/--color-ink-soft，
+   它暴露出來的 class，套全域標準色 token（--cream/--color-ink-soft，
    見 tokens.css）跟共用按鈕材質，不引入 token 以外的顏色、也不自訂新的
    按鈕視覺語言——「下一步/完成」直接借 .btn-frosted 那份深色玻璃的視覺
    （border/background/blur/文字色都是同一組 token），「略過」借
-   .add-page-btn-secondary--green 的綠字綠框透明底那份。 */
+   .add-page-btn-secondary--green 的綠字綠框透明底那份。
+   UI Token 統一化批次（2026-07-24）：背景原本用另一顆跟 --cream 角色完全
+   重疊的歷史殘留 token，已合併改用 --cream，該 token 本身從 tokens.css 移除。 */
 .driver-popover.marginalia-tour {
   font-family: var(--font-sans);
-  background: var(--color-tour-bg);
+  background: var(--cream);
   color: var(--color-ink-soft);
   border-radius: 18px;
   padding: 18px 20px;
@@ -1980,19 +1996,19 @@ button.action-sheet-cancel:hover {
 /* 箭頭底色跟 popover 本體同色，四個方向各自只蓋掉「有顏色那一邊」的
    border-*-color，其餘三邊維持 driver.css 原本設的 transparent 不動。 */
 .marginalia-tour .driver-popover-arrow-side-left {
-  border-left-color: var(--color-tour-bg);
+  border-left-color: var(--cream);
 }
 
 .marginalia-tour .driver-popover-arrow-side-right {
-  border-right-color: var(--color-tour-bg);
+  border-right-color: var(--cream);
 }
 
 .marginalia-tour .driver-popover-arrow-side-top {
-  border-top-color: var(--color-tour-bg);
+  border-top-color: var(--cream);
 }
 
 .marginalia-tour .driver-popover-arrow-side-bottom {
-  border-bottom-color: var(--color-tour-bg);
+  border-bottom-color: var(--cream);
 }
 
 .marginalia-tour .driver-popover-footer {
@@ -2044,9 +2060,11 @@ button.action-sheet-cancel:hover {
 /* ---- 開場動畫（app 內首次入場動畫）----
    忠實移植 marginalia-splash-prototype.html：打字機字標→墨線畫出攤開的書→
    小鳥登場→眨一下眼→lockup 微縮+overlay 淡出。CSS 數值/時間常數直接照抄
-   原型，不是重新設計一版；只把顏色換成對應的全域 token（--color-tour-bg＝
-   原型 --cream #FDFCFA、--color-ink-soft＝原型 --green #3E4A3D，數值一樣，
-   只是本站已經有 token 名稱可以借用）。
+   原型，不是重新設計一版；只把顏色換成對應的全域 token（--color-ink-soft＝
+   原型 --green #3E4A3D，數值一樣，只是本站已經有 token 名稱可以借用）。
+   UI Token 統一化批次（2026-07-24）：背景原本用另一顆對應原型米色的歷史
+   殘留 token，跟 --cream 角色完全重疊，已合併改用 --cream，該 token 本身
+   從 tokens.css 移除。
    跟 public/ 的 PWA manifest 靜態 splash 是兩回事，這裡不動 manifest。
    reduced-motion：Splash.jsx 在 JS 層直接讓字標/書一開始就是完成態、
    從不排 eye wink；這裡的 CSS 額外處理打字用的逐字 span／游標（原型本身
@@ -2059,7 +2077,7 @@ button.action-sheet-cancel:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--color-tour-bg);
+  background: var(--cream);
   cursor: pointer;
   transition: opacity 0.45s ease;
 }
