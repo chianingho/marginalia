@@ -2103,13 +2103,16 @@ button.action-sheet-cancel:hover {
 
 /* 字體改跟首頁 BrandBanner 的「Marginalia」標題同一套（--font-serif／
    Fraunces，weight 300 + 同樣的 letter-spacing/optical sizing 修正），
-   不再用原型指定的 Cormorant——使用者看過覺得要跟首頁一致。 */
+   不再用原型指定的 Cormorant——使用者看過覺得要跟首頁一致。
+   品牌綠統一批次（2026-07-27）：color 比照同樣理由改成 var(--color-green)，
+   跟首頁橫幅/登入頁 wordmark 同一顆綠，不再用 --color-ink-soft。
+   .splash-caret／.splash-book-line 不在這次調整範圍內，維持 --color-ink-soft。 */
 .splash-word {
   font-family: var(--font-serif);
   font-weight: 300;
   font-size: clamp(48px, 15vw, 88px);
   line-height: 1;
-  color: var(--color-ink-soft);
+  color: var(--color-green);
   letter-spacing: -0.045em;
   font-optical-sizing: none;
   font-variation-settings: 'opsz' 40;
