@@ -46,7 +46,7 @@
 | `--color-surface` | `var(--paper)` | tokens.css:55 |
 | `--color-danger` | `var(--red)` | tokens.css:57 |
 | ~~`--color-tour-bg`~~ | ~~`#fdfcfa`~~ | **已移除(2026-07-27)**,原 tokens.css:62,併入 `--cream`,見 UI Token 統一化批次 |
-| `--color-ink-soft` | `#3e4a3d` | tokens.css:67 |
+| `--color-ink-accent` | `#3e4a3d` | tokens.css:67(**改名紀錄**:2026-07-27 由 `--color-ink-soft` 純改名而來,值未變,見 `marginalia-ink-soft-rename-batch-0727`) |
 | `--ink-rgb` | `38, 51, 46` | tokens.css:72 |
 | `--teal-rgb` | `30, 122, 109` | tokens.css:73 |
 | `--paper-rgb` | `251, 248, 240` | tokens.css:74 |
@@ -75,7 +75,7 @@
 | `--color-hairline` | 分隔線、input 邊框、`.avatar-dropdown-divider`、`.login-divider-line` |
 | `--color-surface` | input/textarea/select 背景、`.avatar-dropdown` 背景 |
 | `--ink-rgb`/`--teal-rgb`/`--paper-rgb` | 全站陰影、`.btn-frosted` 系列毛玻璃、hover 光暈 |
-| ~~`--color-tour-bg`~~/`--color-ink-soft` | 07-23 稽核當時:僅 `.splash-overlay`、`.splash-word`、`.marginalia-tour` 系列。**事實更正(2026-07-27):** `--color-tour-bg` 已移除,`.splash-overlay` 背景改用 `--cream`;`.splash-word` 也已改用 `--color-green`(見 7-6 Ruling 1)。`--color-ink-soft` 現況只剩 `.splash-caret`、`.splash-book-line`、`.marginalia-tour` 系列三處,詳見下方 07-27 補充的對照表。 |
+| ~~`--color-tour-bg`~~/`--color-ink-accent` | 07-23 稽核當時:僅 `.splash-overlay`、`.splash-word`、`.marginalia-tour` 系列。**事實更正(2026-07-27):** `--color-tour-bg` 已移除,`.splash-overlay` 背景改用 `--cream`;`.splash-word` 也已改用 `--color-green`(見 7-6 Ruling 1)。`--color-ink-accent` 現況只剩 `.splash-caret`、`.splash-book-line`、`.marginalia-tour` 系列三處,詳見下方 07-27 補充的對照表。 |
 
 ### 硬編碼的顏色值(檔案:行號:色碼)
 
@@ -88,7 +88,7 @@
 以下三處是**註解裡提到色碼**,不是實際 CSS 宣告,不算硬編碼:
 - `src/index.css:140`(我自己這次寫的登入頁註解,說明 `--color-green` 實際值跟規格文字給的 `#3C786D` 不同)
 - `src/index.css:391`(2026-07-27 核對,原文誤植 387;註解說明 `#f4ebd9`/`#6b5410` 是已移除的舊值)
-- `src/index.css:2047-2048`(07-23 稽核當時的內容:註解說明 `--color-tour-bg`/`--color-ink-soft` 對應原型的 `#FDFCFA`/`#3E4A3D`。**事實更正(2026-07-27):** 這段註解本身已在 UI Token 統一化批次改寫,現在只剩 `#3E4A3D` 一處提及,`#FDFCFA` 的字面提及已經連同 `--color-tour-bg` 一起從註解裡拿掉,原內容見 `src/index.css:2064` 附近)
+- `src/index.css:2047-2048`(07-23 稽核當時的內容:註解說明 `--color-tour-bg`/`--color-ink-accent` 對應原型的 `#FDFCFA`/`#3E4A3D`。**事實更正(2026-07-27):** 這段註解本身已在 UI Token 統一化批次改寫,現在只剩 `#3E4A3D` 一處提及,`#FDFCFA` 的字面提及已經連同 `--color-tour-bg` 一起從註解裡拿掉,原內容見 `src/index.css:2064` 附近)
 
 全專案 `grep` 找不到任何 `rgb()`/`rgba()` 使用原始數字而非 `var(--xxx-rgb)` 的情況——陰影/毛玻璃全部透過 token 的 rgb 分量组出。
 
@@ -105,7 +105,7 @@ App 圖示設計曾假設鳥的粉紅、喙的橘紅是「系統外例外色」,
 
 三個色碼跟三個既有 token 逐位元組相同,不是「系統外」的新顏色,是 `BirdDoodle.jsx` 直接寫死 hex 字面值、沒有引用 `var(--pink)`/`var(--red)`/`var(--ink)`——跟本節上方 `.login-google-icon`/`.note-timeline-content` 是同一種「硬編碼而非引用 token」模式,不是需要新增例外的情況。**沒有修改 `BirdDoodle.jsx`**,這裡只記錄色碼比對結果。
 
-### 補充(2026-07-27):`--color-green` / `--color-ink-soft` 現況對照表
+### 補充(2026-07-27):`--color-green` / `--color-ink-accent` 現況對照表
 
 盤點兩顆綠在全專案的實際用法,供「新元件照最接近的類比走」查表用(不是新訂門檻值,是把現況如實列出):
 
@@ -114,22 +114,22 @@ App 圖示設計曾假設鳥的粉紅、喙的橘紅是「系統外例外色」,
 | 類別 | 元件 |
 |---|---|
 | 互動元件(按鈕/連結,含所有 hover/active/focus 態) | 全站 `button` 基礎樣式、`.pill-btn`、`.filter-pill`、`.avatar-dropdown-logout`、`.guest-signin-btn`、`.note-detail-edit-btn`、`.add-modal-file-btn`、`.add-page-btn-secondary--green`、`.action-sheet-cancel`、`.marginalia-tour .tour-skip-btn`、input/select/textarea 的 focus 邊框 |
-| 品牌大字(首頁橫幅、登入頁、開場動畫) | `.brand-title`、`.brand-title-over`(首頁「Marginalia / Books」)、`.login-wordmark`(登入頁)、`.splash-word`(開場動畫,2026-07-27 品牌綠統一批次改過來的,原本是 `--color-ink-soft`) |
+| 品牌大字(首頁橫幅、登入頁、開場動畫) | `.brand-title`、`.brand-title-over`(首頁「Marginalia / Books」)、`.login-wordmark`(登入頁)、`.splash-word`(開場動畫,2026-07-27 品牌綠統一批次改過來的,原本是 `--color-ink-accent`) |
 | 裝飾插畫填色 | `.shelf-plank-top`(書架層板頂面) |
 | Modal 內部標題文字 | `.add-modal-section-title`、`.add-modal-title` |
 
-**`--color-ink-soft`(`#3e4a3d`)**:只出現在兩個語境,沒有例外:
+**`--color-ink-accent`(`#3e4a3d`)**:只出現在兩個語境,沒有例外:
 
 | 類別 | 元件 |
 |---|---|
 | 首次導覽 popover(driver.js) | `.driver-popover.marginalia-tour` 背景/文字、`.driver-popover-title`、`.driver-popover-description` |
 | 開場動畫(Splash)手繪線條/游標 | `.splash-caret`(游標)、`.splash-book-line`(手繪墨線)——注意 `.splash-word` 本身已改用 `--color-green`,同一個開場動畫裡文字跟線條現在是兩種不同的綠 |
 
-**可歸納的規則**(從現況反推,不是訂門檻值):`--color-ink-soft` 目前的適用範圍精準對應「splash 開場動畫的手繪線條/游標」跟「首次導覽 popover」這兩個特定語境,除此之外(所有一般互動元件、品牌大字、裝飾填色)一律是 `--color-green`。
+**可歸納的規則**(從現況反推,不是訂門檻值):`--color-ink-accent` 目前的適用範圍精準對應「splash 開場動畫的手繪線條/游標」跟「首次導覽 popover」這兩個特定語境,除此之外(所有一般互動元件、品牌大字、裝飾填色)一律是 `--color-green`。
 
 ### 同一用途出現多個不同色值的情況
 
-- **「品牌綠」**:`--color-green`(`#1e7a6d`,用在按鈕/標題等大多數地方)跟 `--color-ink-soft`(`#3e4a3d`,只用在 splash 動畫文字跟導覽 popover 文字)是兩個不同的綠,都可以被稱為「品牌綠」但數值不同,使用範圍不重疊。
+- **「品牌綠」**:`--color-green`(`#1e7a6d`,用在按鈕/標題等大多數地方)跟 `--color-ink-accent`(`#3e4a3d`,只用在 splash 動畫文字跟導覽 popover 文字)是兩個不同的綠,都可以被稱為「品牌綠」但數值不同,使用範圍不重疊。
 - ~~**「米色背景」**:`--cream`(`#f6f1e6`,全站殼層/登入頁背景)跟 `--color-tour-bg`(`#fdfcfa`,只用在 splash 遮罩跟導覽 popover 背景)是兩個不同的米色,都可能被稱為「頁面背景」但數值不同。~~ **(2026-07-27 事實更正:此不一致已消失。`--color-tour-bg` 已移除併入 `--cream`,現況全站只有一種「頁面背景米色」,不再有兩種寫法並存。)**
 - **本批次(登入體驗批次)規格文字給的色碼**(`#F5F1E7` 頁面背景、`#3C786D` 品牌綠)在專案裡都沒有對應的既有變數是這兩個精確值——這件事已在前一份報告(遷移前現況盤點外的另一份對話回報)記錄過,這裡只是重複列出以求 7-5 完整。
 
@@ -274,7 +274,7 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 1. **圓形 icon 按鈕直徑,三處各自獨立宣告 `36px`,沒有共用 token**(07-23 稽核當時的原始狀況,行號已於 2026-07-27 核對:原文 287-288/1375-1376/1113-1123 現況分別是 291-292/1389-1390/1127-1137):`.avatar-trigger` 與 `.btn-frosted--circle`(當時都是 `width/height: 36px`)字面值相同但各自寫死;`.pill-btn` 則完全沒有固定 width/height,靠 `padding: 7px 18px` 撐開,實測渲染出來是 58×36(見下方第 2 點),高度剛好也是 36,但這是 padding 加總的結果,不是宣告值。三者「看起來對齊」純屬巧合疊加,不是共用同一個尺寸來源。此條目前狀態見上方警示框與 7-6 Ruling 2——`.avatar-trigger`/`.btn-frosted--circle` 已改用 `var(--size-circle-btn)`,`.pill-btn` 裁定維持不變。
 
-2. **「品牌綠」有兩種寫法**:`--color-green`(`#1e7a6d`,tokens.css:43,用在 `.brand-title`/`.brand-title-over`/`.login-wordmark`/全站按鈕等大多數地方)與 `--color-ink-soft`(`#3e4a3d`,tokens.css:67,2026-07-27 核對原文誤植 66),兩者差異為:數值不同(前者偏亮綠、後者偏暗墨綠),使用範圍不重疊。**事實更正(2026-07-27):** 原文舉例「`--color-ink-soft` 只用在 `.splash-word`/`.marginalia-tour` 系列」已過時——`.splash-word` 已改用 `--color-green`(見 7-6 Ruling 1),`--color-ink-soft` 現況範圍是 `.splash-caret`/`.splash-book-line`/`.marginalia-tour` 系列,見上方 07-27 補充的完整對照表。這條「兩種寫法並存」的核心觀察本身沒有消失,只是其中一個舉例過時。
+2. **「品牌綠」有兩種寫法**:`--color-green`(`#1e7a6d`,tokens.css:43,用在 `.brand-title`/`.brand-title-over`/`.login-wordmark`/全站按鈕等大多數地方)與 `--color-ink-accent`(`#3e4a3d`,tokens.css:67,2026-07-27 核對原文誤植 66),兩者差異為:數值不同(前者偏亮綠、後者偏暗墨綠),使用範圍不重疊。**事實更正(2026-07-27):** 原文舉例「`--color-ink-accent` 只用在 `.splash-word`/`.marginalia-tour` 系列」已過時——`.splash-word` 已改用 `--color-green`(見 7-6 Ruling 1),`--color-ink-accent` 現況範圍是 `.splash-caret`/`.splash-book-line`/`.marginalia-tour` 系列,見上方 07-27 補充的完整對照表。這條「兩種寫法並存」的核心觀察本身沒有消失,只是其中一個舉例過時。
 
 3. ~~**「頁面/遮罩背景米色」有兩種寫法**:`--cream`(`#f6f1e6`,tokens.css:11,全站殼層背景、登入頁背景)與 `--color-tour-bg`(`#fdfcfa`,tokens.css:62,只用在 splash 遮罩跟導覽 popover 背景),兩者差異為:數值不同(後者略白略亮),使用範圍不重疊。~~ **(2026-07-27 事實更正:此不一致已消失,見 7-6 · UI Token 統一化批次,`--color-tour-bg` 已移除併入 `--cream`。)**
 
@@ -282,7 +282,7 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 5. **Safe-area 的「變數引用」跟「直接呼叫 env()」兩種寫法並存**:`--safe-top`/`--safe-bottom`(tokens.css:84-85)這 6 處既有用法都透過變數間接引用;`.avatar-dropdown`(index.css:332)則直接寫 `env(safe-area-inset-right)`,沒有透過變數。**事實更正(2026-07-27):** 原文說「沒有 `--safe-left`/`--safe-right`」已經過時——`--safe-right` 已在 UI Token 統一化批次補上(tokens.css:86)。但這條不一致本身**沒有消失**:`--safe-right` 這個 token 現在存在了,`.avatar-dropdown` 卻沒有跟著改用它,所以「變數引用 vs 直接呼叫 env()」這兩種寫法並存的情況依然成立,只是原因從「當時沒有 token 可用」變成「token 已存在但既有程式碼沒有採用」。仍然沒有 `--safe-left`。
 
-6. **登入體驗批次規格文字給的色碼,跟專案現行 token 都對不上**(已在前一份報告記錄,這裡重複列出湊齊 7-5):規格文字給的「頁面背景 `#F5F1E7`」不等於現行 `--cream`(`#f6f1e6`);規格文字給的「品牌綠 `#3C786D`」不等於現行 `--color-green`(`#1e7a6d`),也不等於 `--color-ink-soft`(`#3e4a3d`)。三者兩兩都不同值,差異純粹是數值不同,不是同一色的不同寫法。
+6. **登入體驗批次規格文字給的色碼,跟專案現行 token 都對不上**(已在前一份報告記錄,這裡重複列出湊齊 7-5):規格文字給的「頁面背景 `#F5F1E7`」不等於現行 `--cream`(`#f6f1e6`);規格文字給的「品牌綠 `#3C786D`」不等於現行 `--color-green`(`#1e7a6d`),也不等於 `--color-ink-accent`(`#3e4a3d`)。三者兩兩都不同值,差異純粹是數值不同,不是同一色的不同寫法。
 
 ---
 
@@ -292,17 +292,17 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 ### Ruling 1 · 品牌字綠色統一(2026-07-27)
 
-**裁決:** 品牌字「Marginalia」的大字呈現,一律使用 `--font-serif`(Fraunces)+ `--color-green`(`#1e7a6d`),不分出現位置。此規則收掉現況中唯一的例外——開場動畫 `.splash-word` 原用 `--color-ink-soft`,改齊到 `--color-green`。
+**裁決:** 品牌字「Marginalia」的大字呈現,一律使用 `--font-serif`(Fraunces)+ `--color-green`(`#1e7a6d`),不分出現位置。此規則收掉現況中唯一的例外——開場動畫 `.splash-word` 原用 `--color-ink-accent`,改齊到 `--color-green`。
 
-**動到的元件(唯一一處):** `.splash-word` — color 由 `--color-ink-soft` → `--color-green`;font 統一為 `--font-serif`。
+**動到的元件(唯一一處):** `.splash-word` — color 由 `--color-ink-accent` → `--color-green`;font 統一為 `--font-serif`。
 
 **明確不動:**
-- `.splash-caret`、`.splash-book-line` 維持 `--color-ink-soft`(子決定:留 ink-soft)。
+- `.splash-caret`、`.splash-book-line` 維持 `--color-ink-accent`(子決定:留 ink-accent)。
 - `.brand-title`、`.brand-title-over`、`.login-wordmark` 本來就是目標規格,不動。
 
-**對 `--color-ink-soft` 的意義(誠實記錄,非新訂門檻):** 改完後 ink-soft 的適用範圍收斂為一張明確白名單,不硬套語意標籤,就是三個元件——`.splash-caret`、`.splash-book-line`、`.driver-popover.marginalia-tour`(含 title/description)。規則寫成「預設 `--color-green`;`--color-ink-soft` 僅限此白名單」,比硬給它「手寫墨痕質感」的標籤更誠實(tour popover 其實不算墨痕質感,勉強套會失真)。
+**對 `--color-ink-accent` 的意義(誠實記錄,非新訂門檻):** 改完後 ink-accent 的適用範圍收斂為一張明確白名單,不硬套語意標籤,就是三個元件——`.splash-caret`、`.splash-book-line`、`.driver-popover.marginalia-tour`(含 title/description)。規則寫成「預設 `--color-green`;`--color-ink-accent` 僅限此白名單」,比硬給它「手寫墨痕質感」的標籤更誠實(tour popover 其實不算墨痕質感,勉強套會失真)。
 
-**連帶:** 品牌字規則從此無例外,可一句話寫死。ink-soft 少了 `.splash-word` 這個破例者,白名單更乾淨。
+**連帶:** 品牌字規則從此無例外,可一句話寫死。ink-accent 少了 `.splash-word` 這個破例者,白名單更乾淨。
 
 **實作狀態:** 已交付 CC(batch `marginalia-brand-green-unify-batch-0727`),以 iPhone Safari 實機截圖為唯一驗收標準。
 
@@ -322,9 +322,9 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 ### Ruling 3 · 綠色門檻值 — 作廢(2026-07-27)
 
-**裁決:** 原「綠色尺寸門檻」構想(從 Google 登入按鈕雙色並列推出「多大面積用 `--color-ink-soft`、多小用 `--color-green`」的門檻值)予以作廢,不再進行雙色並列校準。
+**裁決:** 原「綠色尺寸門檻」構想(從 Google 登入按鈕雙色並列推出「多大面積用 `--color-ink-accent`、多小用 `--color-green`」的門檻值)予以作廢,不再進行雙色並列校準。
 
-**理由:** Ruling 1 已將 `--color-ink-soft` 的定義從「尺寸/語意門檻」改為明確白名單(見 Ruling 1)。白名單成立後,ink-soft 用在哪不再由面積決定,門檻規則的存在理由已被抽除。全站規則簡化為:**預設 `--color-green`;`--color-ink-soft` 僅限白名單。**
+**理由:** Ruling 1 已將 `--color-ink-accent` 的定義從「尺寸/語意門檻」改為明確白名單(見 Ruling 1)。白名單成立後,ink-accent 用在哪不再由面積決定,門檻規則的存在理由已被抽除。全站規則簡化為:**預設 `--color-green`;`--color-ink-accent` 僅限白名單。**
 
 **連帶:** 先前作為門檻校準參考錨點的「全寬 Google 登入按鈕」不再承擔校準用途,回歸為一般 `--color-green` 元件。
 
