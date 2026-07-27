@@ -101,6 +101,28 @@ App 圖示設計曾假設鳥的粉紅、喙的橘紅是「系統外例外色」,
 
 三個色碼跟三個既有 token 逐位元組相同,不是「系統外」的新顏色,是 `BirdDoodle.jsx` 直接寫死 hex 字面值、沒有引用 `var(--pink)`/`var(--red)`/`var(--ink)`——跟本節上方 `.login-google-icon`/`.note-timeline-content` 是同一種「硬編碼而非引用 token」模式,不是需要新增例外的情況。**沒有修改 `BirdDoodle.jsx`**,這裡只記錄色碼比對結果。
 
+### 補充(2026-07-27):`--color-green` / `--color-ink-soft` 現況對照表
+
+盤點兩顆綠在全專案的實際用法,供「新元件照最接近的類比走」查表用(不是新訂門檻值,是把現況如實列出):
+
+**`--color-green`(`#1e7a6d`)**:
+
+| 類別 | 元件 |
+|---|---|
+| 互動元件(按鈕/連結,含所有 hover/active/focus 態) | 全站 `button` 基礎樣式、`.pill-btn`、`.filter-pill`、`.avatar-dropdown-logout`、`.guest-signin-btn`、`.note-detail-edit-btn`、`.add-modal-file-btn`、`.add-page-btn-secondary--green`、`.action-sheet-cancel`、`.marginalia-tour .tour-skip-btn`、input/select/textarea 的 focus 邊框 |
+| 品牌大字(首頁橫幅、登入頁、開場動畫) | `.brand-title`、`.brand-title-over`(首頁「Marginalia / Books」)、`.login-wordmark`(登入頁)、`.splash-word`(開場動畫,2026-07-27 品牌綠統一批次改過來的,原本是 `--color-ink-soft`) |
+| 裝飾插畫填色 | `.shelf-plank-top`(書架層板頂面) |
+| Modal 內部標題文字 | `.add-modal-section-title`、`.add-modal-title` |
+
+**`--color-ink-soft`(`#3e4a3d`)**:只出現在兩個語境,沒有例外:
+
+| 類別 | 元件 |
+|---|---|
+| 首次導覽 popover(driver.js) | `.driver-popover.marginalia-tour` 背景/文字、`.driver-popover-title`、`.driver-popover-description` |
+| 開場動畫(Splash)手繪線條/游標 | `.splash-caret`(游標)、`.splash-book-line`(手繪墨線)——注意 `.splash-word` 本身已改用 `--color-green`,同一個開場動畫裡文字跟線條現在是兩種不同的綠 |
+
+**可歸納的規則**(從現況反推,不是訂門檻值):`--color-ink-soft` 目前的適用範圍精準對應「splash 開場動畫的手繪線條/游標」跟「首次導覽 popover」這兩個特定語境,除此之外(所有一般互動元件、品牌大字、裝飾填色)一律是 `--color-green`。
+
 ### 同一用途出現多個不同色值的情況
 
 - **「品牌綠」**:`--color-green`(`#1e7a6d`,用在按鈕/標題等大多數地方)跟 `--color-ink-soft`(`#3e4a3d`,只用在 splash 動畫文字跟導覽 popover 文字)是兩個不同的綠,都可以被稱為「品牌綠」但數值不同,使用範圍不重疊。
