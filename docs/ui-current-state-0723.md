@@ -2,6 +2,8 @@
 
 > 只讀盤點,不做任何修改、不做設計裁決。發現的不一致只記錄在 7-5,不挑代表值、不建議採用哪一個。
 > 來源一律是現行程式碼(`src/styles/tokens.css`、`src/index.css`),不是舊文件。
+>
+> **定位補記(2026-07-27):** 本檔原為 07-23 當日的純快照。自 07-27 起,7-1~7-5 的盤點本文中已有少數處反映了 07-24 之後的實作改動(例如 7-1 對照表已記入 `.splash-word` 改綠),因此本檔已非嚴格的單日快照,而是「盤點本文 + 已知改動標註」。所有**設計裁決**一律收在新增的 **7-6 裁決紀錄**,不寫入 7-1~7-5 本文;裁決的增補與推翻只動 7-6。盤點本文僅在事實過期時做最小更正。
 
 ---
 
@@ -261,7 +263,9 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 > `.btn-frosted--circle` 連同另外發現的 `.annotator-clear`/`.annotator-undo`
 > 收成共用變數 `--size-circle-btn: 36px`;`.pill-btn` **明確排除**於此變數
 > 之外——若比照套用會把它從橢圓硬改成正圓,是形狀改變,不是變數收斂。
-> `.pill-btn` 的尺寸處置留待下一批次當設計決策處理。
+>
+> **更新(2026-07-27):** `.pill-btn` 的尺寸處置**已裁決**,不再是「待下一批次的設計決策」。
+> 結論為維持 padding 驅動、不綁任何固定尺寸 token。完整裁決見本檔 **7-6 · Ruling 2**。
 >
 > **原文以下保留,不刪除,僅標記歸類錯誤。**
 
@@ -276,3 +280,49 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 5. **Safe-area 變數只覆蓋上下,沒有左右**:`--safe-top`/`--safe-bottom` 是既有 token(tokens.css:83-84),但沒有 `--safe-left`/`--safe-right`。本批次新增的 `.avatar-dropdown`(index.css:328)需要處理右側安全區時,只能直接寫 `env(safe-area-inset-right)`,跟其餘 6 處走 `--safe-top`/`--safe-bottom` 變數的寫法不是同一種模式,差異為:前者(既有 6 處)透過 tokens.css 的變數間接引用,後者(本批次新增這 1 處)直接呼叫 CSS 環境函式,沒有變數包一層。
 
 6. **登入體驗批次規格文字給的色碼,跟專案現行 token 都對不上**(已在前一份報告記錄,這裡重複列出湊齊 7-5):規格文字給的「頁面背景 `#F5F1E7`」不等於現行 `--cream`(`#f6f1e6`);規格文字給的「品牌綠 `#3C786D`」不等於現行 `--color-green`(`#1e7a6d`),也不等於 `--color-ink-soft`(`#3e4a3d`)。三者兩兩都不同值,差異純粹是數值不同,不是同一色的不同寫法。
+
+---
+
+## 7-6 裁決紀錄
+
+> 本章節收設計/token 治理裁決,與 7-1~7-5 的現況盤點分離。盤點記錄「現況曾是什麼」,本章記錄「決定改成什麼、為什麼」。裁決的增補、覆蓋、作廢一律只動本章,不回頭改盤點本文(維持盤點作為時間快照的性質)。
+
+### Ruling 1 · 品牌字綠色統一(2026-07-27)
+
+**裁決:** 品牌字「Marginalia」的大字呈現,一律使用 `--font-serif`(Fraunces)+ `--color-green`(`#1e7a6d`),不分出現位置。此規則收掉現況中唯一的例外——開場動畫 `.splash-word` 原用 `--color-ink-soft`,改齊到 `--color-green`。
+
+**動到的元件(唯一一處):** `.splash-word` — color 由 `--color-ink-soft` → `--color-green`;font 統一為 `--font-serif`。
+
+**明確不動:**
+- `.splash-caret`、`.splash-book-line` 維持 `--color-ink-soft`(子決定:留 ink-soft)。
+- `.brand-title`、`.brand-title-over`、`.login-wordmark` 本來就是目標規格,不動。
+
+**對 `--color-ink-soft` 的意義(誠實記錄,非新訂門檻):** 改完後 ink-soft 的適用範圍收斂為一張明確白名單,不硬套語意標籤,就是三個元件——`.splash-caret`、`.splash-book-line`、`.driver-popover.marginalia-tour`(含 title/description)。規則寫成「預設 `--color-green`;`--color-ink-soft` 僅限此白名單」,比硬給它「手寫墨痕質感」的標籤更誠實(tour popover 其實不算墨痕質感,勉強套會失真)。
+
+**連帶:** 品牌字規則從此無例外,可一句話寫死。ink-soft 少了 `.splash-word` 這個破例者,白名單更乾淨。
+
+**實作狀態:** 已交付 CC(batch `marginalia-brand-green-unify-batch-0727`),以 iPhone Safari 實機截圖為唯一驗收標準。
+
+---
+
+### Ruling 2 · `.pill-btn` 維持 padding 驅動,不綁固定尺寸(2026-07-27)
+
+**裁決:** `.pill-btn` 維持 padding 驅動,不綁任何固定尺寸 token;圓按鈕/膠囊「各自一版」的差異由「圓吃直徑 token、膠囊吃 padding」體現,不透過共用高度 token 耦合。等高需求(若有)屬個別版面責任,不入 token 規格。
+
+**理由:** 圓與膠囊有時同排、有時不同排,「等高」不該是規格層級的鐵律;硬立全域高度規則會在不同排時製造無謂耦合,日後想單獨調膠囊還得繞過該規則。
+
+**與先前修正案的關係:** 此裁決收掉先前 `.pill-btn` 修正案(見 7-5 第 1 條警示框)的完整結論——當初發現不能把 `--size-circle-btn` 套上 `.pill-btn`(會把橢圓硬改成正圓),完整結論是:不套,也不替它另立任何固定尺寸。
+
+**實作狀態:** 純裁決,無實作項,不進 CC batch(明確不立規則,而非待辦)。
+
+---
+
+### Ruling 3 · 綠色門檻值 — 作廢(2026-07-27)
+
+**裁決:** 原「綠色尺寸門檻」構想(從 Google 登入按鈕雙色並列推出「多大面積用 `--color-ink-soft`、多小用 `--color-green`」的門檻值)予以作廢,不再進行雙色並列校準。
+
+**理由:** Ruling 1 已將 `--color-ink-soft` 的定義從「尺寸/語意門檻」改為明確白名單(見 Ruling 1)。白名單成立後,ink-soft 用在哪不再由面積決定,門檻規則的存在理由已被抽除。全站規則簡化為:**預設 `--color-green`;`--color-ink-soft` 僅限白名單。**
+
+**連帶:** 先前作為門檻校準參考錨點的「全寬 Google 登入按鈕」不再承擔校準用途,回歸為一般 `--color-green` 元件。
+
+**實作狀態:** 純裁決,無實作項,不進 CC batch。
