@@ -9,9 +9,9 @@
      線稿(眼、腿) ink #26332e。 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#f6f1e6"/>
-  <rect x="126" y="348" width="260" height="80" rx="10" fill="#1e7a6d"/>
-  <line x1="256" y1="348" x2="256" y2="428" stroke="#175e53" stroke-width="3"/>
-  <g transform="translate(-1306,-404) scale(4)">
+  <rect x="116" y="400" width="280" height="22" rx="4" fill="#1e7a6d"/>
+  <line x1="256" y1="400" x2="256" y2="422" stroke="#175e53" stroke-width="2"/>
+  <g transform="translate(-1618.4,-502.4) scale(4.8)">
     <path d="M394 132c8 1 14 6 15.5 14 1.6 8.5-2.5 16-9.5 19.5 1.5 2.5 4 4 7 4.5-3.5 2.5-8 3-12 1.5-2 .6-4 .9-6.5.7-9.5-.8-16.5-7.5-17-16.5-.5-9 4.5-16.5 12.5-19.5-2-2.5-2.5-5.5-1.5-8.5 3.5.5 6 2 7.5 4.3z" fill="#e9a0b6"/>
     <path d="M383 124l-7-1.5 6 5" fill="#d8502c"/>
     <circle cx="386.5" cy="130.5" r="1.7" fill="#26332e"/>
