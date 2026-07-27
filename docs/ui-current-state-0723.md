@@ -212,6 +212,24 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 ## 7-5 不一致清單
 
+> ## ⚠️ 第 1 條的 `.pill-btn` 歸類已更正(2026-07-24)
+>
+> **第 1 條原文把 `.pill-btn` 跟 `.avatar-trigger`、`.btn-frosted--circle` 並列為
+> 「三處各自寫死 `36px`」,這個歸類不正確。**
+>
+> `.pill-btn` 沒有 `width`/`height` 宣告,更沒有寫死 `36px`。它是靠
+> `padding: 7px 18px` 撐開的橢圓形膠囊,實測渲染 58×36——高度剛好是
+> 36 是 padding 加總的**結果**,不是宣告值,跟另外兩處「明確寫
+> `width: 36px; height: 36px`」是完全不同性質的事。
+>
+> UI Token 統一化批次(2026-07-24)已將 `.avatar-trigger`、
+> `.btn-frosted--circle` 連同另外發現的 `.annotator-clear`/`.annotator-undo`
+> 收成共用變數 `--size-circle-btn: 36px`;`.pill-btn` **明確排除**於此變數
+> 之外——若比照套用會把它從橢圓硬改成正圓,是形狀改變,不是變數收斂。
+> `.pill-btn` 的尺寸處置留待下一批次當設計決策處理。
+>
+> **原文以下保留,不刪除,僅標記歸類錯誤。**
+
 1. **圓形 icon 按鈕直徑,三處各自獨立宣告 `36px`,沒有共用 token**:`.avatar-trigger`(index.css:287-288,`width/height: 36px` 作為量測失敗時的 fallback 值)與 `.btn-frosted--circle`(index.css:1375-1376,`width/height: 36px`)兩者字面值相同但各自寫死;`.pill-btn`(index.css:1113-1123)則完全沒有固定 width/height,靠 `padding: 7px 18px` 撐開,實測渲染出來是 58×36(見下方第 2 點),高度剛好也是 36,但這是 padding 加總的結果,不是宣告值。三者「看起來對齊」純屬巧合疊加,不是共用同一個尺寸來源。
 
 2. **「品牌綠」有兩種寫法**:`--color-green`(`#1e7a6d`,tokens.css:43,用在 `.brand-title`/`.brand-title-over`/`.login-wordmark`/全站按鈕等大多數地方)與 `--color-ink-soft`(`#3e4a3d`,tokens.css:66,只用在 `.splash-word`/`.marginalia-tour` 系列),兩者差異為:數值不同(前者偏亮綠、後者偏暗墨綠),使用範圍不重疊(前者是全站通用,後者只給 splash 開場動畫跟首次導覽 popover)。
