@@ -1,0 +1,23 @@
+<!-- Marginalia App 圖示(2026-07-27 定稿)：粉紅鳥站在闔上的書上。
+     鳥的形狀直接沿用 src/components/BirdDoodle.jsx 的路徑資料(全站唯一一份
+     鳥插畫資產),只做位移/縮放，沒有重畫。色碼固定寫死 hex（icon 檔案是
+     獨立於 app 之外的靜態資產，不在 index.css 的 CSS 變數作用範圍內，
+     無法用 var 引用）。四個值分別對應 tokens.css 的 cream、color green、
+     pink、red、ink，若這幾個 token 之後改值，這裡要手動同步。
+     底色 cream #f6f1e6；書 color green #1e7a6d 實心，書脊線用書架同色系
+     的 shelf edge #175e53；鳥身 pink #e9a0b6 不描邊；喙 red #d8502c；
+     線稿(眼、腿) ink #26332e。 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#f6f1e6"/>
+  <rect x="126" y="348" width="260" height="80" rx="10" fill="#1e7a6d"/>
+  <line x1="256" y1="348" x2="256" y2="428" stroke="#175e53" stroke-width="3"/>
+  <g transform="translate(-1306,-404) scale(4)">
+    <path d="M394 132c8 1 14 6 15.5 14 1.6 8.5-2.5 16-9.5 19.5 1.5 2.5 4 4 7 4.5-3.5 2.5-8 3-12 1.5-2 .6-4 .9-6.5.7-9.5-.8-16.5-7.5-17-16.5-.5-9 4.5-16.5 12.5-19.5-2-2.5-2.5-5.5-1.5-8.5 3.5.5 6 2 7.5 4.3z" fill="#e9a0b6"/>
+    <path d="M383 124l-7-1.5 6 5" fill="#d8502c"/>
+    <circle cx="386.5" cy="130.5" r="1.7" fill="#26332e"/>
+    <g stroke="#26332e" stroke-width="1.8" stroke-linecap="round">
+      <path d="M390 171v14M390 185l-4 3M390 185l4 3"/>
+      <path d="M400 170v15M400 185l-4 3M400 185l4 3"/>
+    </g>
+  </g>
+</svg>
