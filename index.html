@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/book.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA：加到主畫面後的啟動體驗（圖示/全螢幕），重點不在離線策略，
+         沒有 service worker。manifest 的 background_color/theme_color
+         跟 apple-mobile-web-app 這組 meta 都要填 --cream #f6f1e6，
+         不是已經併掉的 --color-tour-bg #fdfcfa。 -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/app-icon-180.png" />
+    <meta name="theme-color" content="#f6f1e6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Marginalia" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- 開場動畫「Marginalia」打字字標改跟首頁標題同一套 --font-serif（Fraunces），
