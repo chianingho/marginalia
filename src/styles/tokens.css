@@ -91,4 +91,14 @@
      元件邏輯。.pill-btn 不吃這個變數——它是橢圓形（padding 撐開），不是
      固定尺寸的圓，兩者是不同形狀，不能套同一個值。 */
   --size-circle-btn: 36px;
+
+  /* Radius token 統一化批次（2026-07-27）：全站 border-radius 收斂成這 5 個
+     語意值，取代原本散落各處的字面 px/50%/999px。個別元件的一次性造型
+     （單一按鈕的特殊圓角、不對稱造型、sheet 上圓下方等）不套用這幾個 token，
+     維持各自寫死，不強求納入這套規格。 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --radius-full: 50%;
 }

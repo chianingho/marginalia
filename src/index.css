@@ -37,7 +37,7 @@ a {
 button {
   cursor: pointer;
   font: inherit;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-green);
   background: transparent;
   color: var(--color-green);
@@ -65,7 +65,7 @@ button:disabled {
 button.icon-btn {
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--color-text-muted);
   padding: 4px 8px;
   font-size: 1rem;
@@ -83,7 +83,7 @@ select {
   font: inherit;
   padding: 9px 12px;
   border: 1px solid var(--color-hairline);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
 }
@@ -217,7 +217,7 @@ button.login-google-btn:hover:not(:disabled) {
 .login-google-icon {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: #fff;
   display: flex;
   align-items: center;
@@ -290,7 +290,7 @@ button.login-guest-btn:hover:not(:disabled) {
 .avatar-trigger {
   width: var(--size-circle-btn);
   height: var(--size-circle-btn);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: none;
   padding: 0;
   overflow: hidden;
@@ -333,7 +333,7 @@ button.login-guest-btn:hover:not(:disabled) {
   z-index: 20;
   min-width: 200px;
   background: var(--color-surface);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-card-hover);
   padding: 14px 16px;
 }
@@ -401,7 +401,7 @@ button.guest-signin-btn:hover {
 .local-mode-banner code {
   background: rgba(var(--ink-rgb), 0.06);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .app-main {
@@ -455,7 +455,7 @@ button.guest-signin-btn:hover {
   max-height: 280px;
   overflow-y: auto;
   border: 1px solid var(--color-hairline);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .search-result {
@@ -485,7 +485,7 @@ button.guest-signin-btn:hover {
   width: 48px;
   height: 72px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(var(--ink-rgb), 0.15);
 }
 
@@ -500,7 +500,7 @@ button.guest-signin-btn:hover {
   font-size: 1.1rem;
   background: var(--color-cover-placeholder-bg);
   color: var(--color-cover-placeholder-ink);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .search-result-title {
@@ -566,7 +566,7 @@ button.guest-signin-btn:hover {
   display: block;
   width: 118px;
   aspect-ratio: 2 / 3;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--color-cover-placeholder-bg);
   border: 0.5px solid rgba(var(--ink-rgb), 0.12);
@@ -876,7 +876,7 @@ button.note-detail-edit-btn:hover {
   text-align: left;
   background: var(--color-surface);
   border: 0.5px solid var(--color-hairline);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   padding: 0;
 }
@@ -1102,7 +1102,7 @@ button.note-timeline-card:hover {
   align-items: center;
   gap: 6px;
   border: 1.2px solid var(--color-green);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 6px 14px;
   font-family: var(--font-sans);
   font-size: 14px;
@@ -1129,7 +1129,7 @@ button.filter-pill:hover {
   align-items: center;
   justify-content: center;
   padding: 7px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1.2px solid var(--color-green);
   background: transparent;
   color: var(--color-green);
@@ -1165,7 +1165,7 @@ button.pill-btn:focus-visible {
 .bookshelf-search-row input {
   width: 100%;
   border: 1.5px solid var(--color-hairline);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 10px 18px;
 }
 
@@ -1312,7 +1312,7 @@ button.pill-btn:focus-visible {
   gap: 6px;
   padding: 14px 28px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--color-ink);
   color: var(--color-bg);
   font-size: 0.95rem;
@@ -1340,7 +1340,7 @@ button.add-book-btn:active {
    .btn-frosted 材質（背景/邊框/陰影/blur 不再各自覆蓋一次），這裡只加
    pill 形狀跟字級規格，顏色交給基礎 .btn-frosted。 */
 .add-book-btn.btn-frosted {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 15px 30px;
   font-family: var(--font-sans);
   font-weight: 500;
@@ -1389,7 +1389,7 @@ button.btn-frosted:hover {
   width: var(--size-circle-btn);
   height: var(--size-circle-btn);
   padding: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1404,7 +1404,7 @@ button.btn-frosted:hover {
   padding: 7px 13px;
   font-size: 11px;
   font-weight: 600;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 /* Patch 03：.chip-row/.chip（Year 專用膠囊列）已移除——Status/Category/Year
@@ -1440,7 +1440,7 @@ button.btn-frosted:hover {
   box-sizing: border-box;
   background: var(--color-bg);
   color: var(--color-ink);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 22px;
   box-shadow: var(--shadow-card-hover);
 }
@@ -1457,7 +1457,7 @@ button.btn-frosted:hover {
   width: 100%;
   background: var(--color-surface);
   border: 1px solid rgba(var(--ink-rgb), 0.35);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 10px 14px;
   color: var(--color-ink);
   font-family: inherit;
@@ -1551,7 +1551,7 @@ button.btn-frosted:hover {
   height: 72px;
   max-height: 96px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-ink);
   flex-shrink: 0;
 }
@@ -1581,7 +1581,7 @@ button.note-image-annotate-link:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid var(--color-ink);
   color: var(--color-ink);
@@ -1622,7 +1622,7 @@ button.note-image-remove-sm:hover {
   flex-shrink: 0;
   background: rgba(var(--paper-rgb), 0.14);
   border: 1px solid rgba(var(--paper-rgb), 0.4);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--color-bg);
   padding: 9px 18px;
   font-size: 0.78rem;
@@ -1661,7 +1661,7 @@ button.annotator-cancel:hover {
   height: 28px;
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   box-shadow: none;
   transform: scale(1);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -1687,7 +1687,7 @@ button.annotator-swatch:hover {
   justify-content: center;
   background: rgba(var(--paper-rgb), 0.14);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   color: var(--color-bg);
 }
 
@@ -1718,7 +1718,7 @@ button.annotator-undo:disabled {
   max-height: 100%;
   touch-action: none;
   background: var(--color-darkroom);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* F-8：Done 改白底黑字（黃色讓給筆跡與選中色票，不再用來標示動作按鈕）。 */
@@ -1726,7 +1726,7 @@ button.annotator-undo:disabled {
   flex-shrink: 0;
   background: var(--paper);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--color-ink);
   padding: 9px 18px;
   font-size: 0.78rem;
@@ -1763,7 +1763,7 @@ input.add-modal-file-input {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--color-green);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 10px 16px;
   font-size: 0.88rem;
   color: var(--color-green);
@@ -1785,7 +1785,7 @@ input.add-modal-file-input {
 }
 
 .add-page-btn {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 14px 28px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -1813,7 +1813,7 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
    這裡只加跟 .add-book-btn.btn-frosted 一致的 pill 形狀跟字級規格，
    不再自己覆蓋一份實色 teal＋無 blur 的版本。 */
 .add-page-btn.btn-frosted {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 15px 30px;
   font-family: var(--font-sans);
   font-weight: 500;
@@ -1920,7 +1920,7 @@ button.action-sheet-suboption:hover {
   margin-top: 12px;
   background: var(--color-surface);
   border: 1.5px solid var(--color-green);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 14px;
   font-size: 1rem;
   font-weight: 600;
@@ -1946,7 +1946,7 @@ button.action-sheet-cancel:hover {
   margin: 18px auto 0;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 6px;
   font-size: 0.82rem;
   font-weight: 400;
@@ -1974,7 +1974,7 @@ button.action-sheet-cancel:hover {
   font-family: var(--font-sans);
   background: var(--cream);
   color: var(--color-ink-accent);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 18px 20px;
   box-shadow: var(--shadow-float);
   max-width: 280px;
@@ -2024,7 +2024,7 @@ button.action-sheet-cancel:hover {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 9px 18px;
   font-family: var(--font-sans);
   font-size: 13px;
