@@ -1963,7 +1963,7 @@ button.action-sheet-cancel:hover {
 
 /* ---- 首次進站導覽（driver.js coach mark）----
    driver.js 自己有一份 driver.css（在 useOnboarding.js import），這裡只覆寫
-   它暴露出來的 class，套全域標準色 token（--cream/--color-ink-soft，
+   它暴露出來的 class，套全域標準色 token（--cream/--color-ink-accent，
    見 tokens.css）跟共用按鈕材質，不引入 token 以外的顏色、也不自訂新的
    按鈕視覺語言——「下一步/完成」直接借 .btn-frosted 那份深色玻璃的視覺
    （border/background/blur/文字色都是同一組 token），「略過」借
@@ -1973,7 +1973,7 @@ button.action-sheet-cancel:hover {
 .driver-popover.marginalia-tour {
   font-family: var(--font-sans);
   background: var(--cream);
-  color: var(--color-ink-soft);
+  color: var(--color-ink-accent);
   border-radius: 18px;
   padding: 18px 20px;
   box-shadow: var(--shadow-float);
@@ -1984,13 +1984,13 @@ button.action-sheet-cancel:hover {
   font-family: var(--font-serif);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--color-ink-accent);
 }
 
 .marginalia-tour .driver-popover-description {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--color-ink-soft);
+  color: var(--color-ink-accent);
 }
 
 /* 箭頭底色跟 popover 本體同色，四個方向各自只蓋掉「有顏色那一邊」的
@@ -2060,7 +2060,7 @@ button.action-sheet-cancel:hover {
 /* ---- 開場動畫（app 內首次入場動畫）----
    忠實移植 marginalia-splash-prototype.html：打字機字標→墨線畫出攤開的書→
    小鳥登場→眨一下眼→lockup 微縮+overlay 淡出。CSS 數值/時間常數直接照抄
-   原型，不是重新設計一版；只把顏色換成對應的全域 token（--color-ink-soft＝
+   原型，不是重新設計一版；只把顏色換成對應的全域 token（--color-ink-accent＝
    原型 --green #3E4A3D，數值一樣，只是本站已經有 token 名稱可以借用）。
    UI Token 統一化批次（2026-07-24）：背景原本用另一顆對應原型米色的歷史
    殘留 token，跟 --cream 角色完全重疊，已合併改用 --cream，該 token 本身
@@ -2105,8 +2105,8 @@ button.action-sheet-cancel:hover {
    Fraunces，weight 300 + 同樣的 letter-spacing/optical sizing 修正），
    不再用原型指定的 Cormorant——使用者看過覺得要跟首頁一致。
    品牌綠統一批次（2026-07-27）：color 比照同樣理由改成 var(--color-green)，
-   跟首頁橫幅/登入頁 wordmark 同一顆綠，不再用 --color-ink-soft。
-   .splash-caret／.splash-book-line 不在這次調整範圍內，維持 --color-ink-soft。 */
+   跟首頁橫幅/登入頁 wordmark 同一顆綠，不再用 --color-ink-accent。
+   .splash-caret／.splash-book-line 不在這次調整範圍內，維持 --color-ink-accent。 */
 .splash-word {
   font-family: var(--font-serif);
   font-weight: 300;
@@ -2146,7 +2146,7 @@ button.action-sheet-cancel:hover {
   transform: translateY(-50%);
   width: 0.06em;
   height: 0.82em;
-  background: var(--color-ink-soft);
+  background: var(--color-ink-accent);
   opacity: 0;
 }
 
@@ -2185,7 +2185,7 @@ button.action-sheet-cancel:hover {
 
 .splash-book-line {
   fill: none;
-  stroke: var(--color-ink-soft);
+  stroke: var(--color-ink-accent);
   stroke-width: 4.5;
   stroke-linecap: round;
   stroke-linejoin: round;

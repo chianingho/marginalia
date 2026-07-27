@@ -59,12 +59,12 @@
   /* UI Token 統一化批次（2026-07-24）：先前導覽 popover／splash 遮罩背景用的
      那顆大面積背景 token 已移除——跟 --cream 角色完全重疊、無功能分工，
      兩處背景都已改用 --cream。
-     --color-ink-soft 不在此次調整範圍內：它是線條/文字用色，跟 --cream
+     --color-ink-accent 不在此次調整範圍內：它是線條/文字用色，跟 --cream
      這種大面積背景色分工不同，繼續保留。 */
   /* 品牌綠的柔和版，比 --ink 淺一階——導覽 popover 文字跟開場動畫
      （Splash.jsx）手繪書線都指定同一顆 #3E4A3D，所以用通用名稱，
      不是 tour 專屬。 */
-  --color-ink-soft: #3e4a3d;
+  --color-ink-accent: #3e4a3d;
 
   /* RGB 分量版本，給需要透明度的 rgba() 用——來源都是上面同一顆 hex token，
      不是另外調色，全站陰影/毛玻璃/遮罩統一從這三組出，不再用 rgba(0,0,0,x) 或
