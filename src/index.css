@@ -2119,6 +2119,7 @@ button.action-sheet-cancel:hover {
   display: flex;
   align-items: baseline;
   white-space: nowrap;
+  position: relative;
 }
 
 .splash-ch {
@@ -2133,14 +2134,20 @@ button.action-sheet-cancel:hover {
   transition: opacity 0.05s linear;
 }
 
+/* 游標改絕對定位、水平位置由 JS 量測「目前已顯示的最後一個字母」右緣算出
+   （見 Splash.jsx），不再是 flex 排列裡固定在最後一個字母後面的靜態節點——
+   不然字母只是淡入（版面寬度從一開始就是整個字的寬度，避免打字時版面
+   跳動），游標會一路停在「Marginalia」打完的最終位置，看起來像自己在
+   閃、跟打字進度沒關係。 */
 .splash-caret {
-  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   width: 0.06em;
   height: 0.82em;
-  margin-left: 0.04em;
   background: var(--color-ink-soft);
   opacity: 0;
-  align-self: center;
 }
 
 .splash-caret--blink {

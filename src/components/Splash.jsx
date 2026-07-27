@@ -78,6 +78,9 @@ export default function Splash({ children, ready }) {
 
   const [typedCount, setTypedCount] = useState(0)
   const [caretPhase, setCaretPhase] = useState('blink') // blink | gone
+  const [caretLeft, setCaretLeft] = useState(0)
+  const wordRef = useRef(null)
+  const charRefs = useRef([])
   const [strokeDrawing, setStrokeDrawing] = useState(false)
   const [birdIn, setBirdIn] = useState(false)
   const [eyeWink, setEyeWink] = useState(false)
@@ -88,6 +91,19 @@ export default function Splash({ children, ready }) {
   const exitingRef = useRef(false)
   const readyRef = useRef(ready)
   const timelineDoneRef = useRef(false)
+
+  // 游標要跟著打字進度走，不能固定釘在最後一格：字母 span 從一開始就全部
+  // 掛在 DOM 上（只是 opacity 淡入，避免整行寬度隨打字跳動），所以游標的
+  // 水平位置得靠量測「目前已顯示的最後一個字母」的右緣，不能單純疊在
+  // flex 排列的最後一個 DOM 節點後面（那會永遠停在整個字打完的位置）。
+  useLayoutEffect(() => {
+    if (typedCount === 0 || !wordRef.current) return
+    const lastChar = charRefs.current[typedCount - 1]
+    if (!lastChar) return
+    const wordRect = wordRef.current.getBoundingClientRect()
+    const charRect = lastChar.getBoundingClientRect()
+    setCaretLeft(charRect.right - wordRect.left)
+  }, [typedCount])
 
   function schedule(fn, ms) {
     const id = setTimeout(fn, ms)
@@ -203,9 +219,13 @@ export default function Splash({ children, ready }) {
         >
           {showFullAnimation ? (
             <div className={`splash-lockup ${settling ? 'splash-lockup--settling' : ''}`}>
-              <div className="splash-word">
+              <div className="splash-word" ref={wordRef}>
                 {[...WORD].map((ch, i) => (
-                  <span key={i} className={`splash-ch ${i < typedCount ? 'splash-ch--on' : ''}`}>
+                  <span
+                    key={i}
+                    ref={(el) => (charRefs.current[i] = el)}
+                    className={`splash-ch ${i < typedCount ? 'splash-ch--on' : ''}`}
+                  >
                     {ch}
                   </span>
                 ))}
@@ -214,6 +234,7 @@ export default function Splash({ children, ready }) {
                     className={`splash-caret ${caretPhase === 'blink' ? 'splash-caret--blink' : ''} ${
                       caretPhase === 'gone' ? 'splash-caret--gone' : ''
                     }`}
+                    style={{ left: `calc(${caretLeft}px + 0.04em)` }}
                   />
                 )}
               </div>
