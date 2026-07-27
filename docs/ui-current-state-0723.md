@@ -88,6 +88,19 @@
 
 全專案 `grep` 找不到任何 `rgb()`/`rgba()` 使用原始數字而非 `var(--xxx-rgb)` 的情況——陰影/毛玻璃全部透過 token 的 rgb 分量组出。
 
+### 補充(2026-07-27):`BirdDoodle.jsx` 的硬編碼色碼,均已存在對應 token
+
+App 圖示設計曾假設鳥的粉紅、喙的橘紅是「系統外例外色」,需要另外寫進 token 規範。
+從原始碼(`src/components/BirdDoodle.jsx:19-26`)取得精確色碼後確認**這個假設不成立**:
+
+| 位置 | 色碼(原始碼字面值) | 對應既有 token |
+|---|---|---|
+| `BirdDoodle.jsx:20`(鳥身,`fill`) | `#E9A0B6` | `--pink`(tokens.css:20) |
+| `BirdDoodle.jsx:22`(鳥喙,`fill`) | `#D8502C` | `--red`(tokens.css:15) |
+| `BirdDoodle.jsx:23,24`(眼睛/描邊,`fill`/`stroke`) | `#26332E` | `--ink`(tokens.css:14) |
+
+三個色碼跟三個既有 token 逐位元組相同,不是「系統外」的新顏色,是 `BirdDoodle.jsx` 直接寫死 hex 字面值、沒有引用 `var(--pink)`/`var(--red)`/`var(--ink)`——跟本節上方 `.login-google-icon`/`.note-timeline-content` 是同一種「硬編碼而非引用 token」模式,不是需要新增例外的情況。**沒有修改 `BirdDoodle.jsx`**,這裡只記錄色碼比對結果。
+
 ### 同一用途出現多個不同色值的情況
 
 - **「品牌綠」**:`--color-green`(`#1e7a6d`,用在按鈕/標題等大多數地方)跟 `--color-ink-soft`(`#3e4a3d`,只用在 splash 動畫文字跟導覽 popover 文字)是兩個不同的綠,都可以被稱為「品牌綠」但數值不同,使用範圍不重疊。
