@@ -423,6 +423,17 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 **反寫死延伸:** 此後新增字級一律引用 `--text-*`;無對應者 CC 停手回報。
 
+### Ruling 8 · i18n 收尾三修(語言鈕位置/狀態文字/按鈕換行)  2026-07-28
+
+**裁決:** 主 i18n 批(Ruling 7 之後、無獨立 Ruling 編號的 `ad1f9fe`)之後的三處收尾修正,實作完成。
+- commit `76ccd93`
+
+**A · 語言切換鈕位置:** `LocaleToggle` 從頭像下拉選單移到書櫃頁 `.bookshelf-filterrow-icons`,跟搜尋/篩選並列成第三顆 pill,共用 `.pill-btn`。因三顆並列,`.pill-btn` padding 從 `var(--space-6) var(--space-18)`(6×18)縮到 `var(--space-4) var(--space-16)`(4×16);`.bookshelf-filterrow-icons` gap 從 `var(--space-10)` 加到 `var(--space-12)`,給三顆並排留呼吸空間。此調整不改變 Ruling 2「`.pill-btn` 維持 padding 驅動、不綁固定尺寸」的原則,只動 padding 數值。
+
+**B · 狀態文字 i18n:** 字典新增 `status.to_read`/`status.reading`/`status.finished`(key 對齊 `SHELF_DEFS`/`resolveShelfKey` 的 snake_case,取代原本 camelCase 的 `toRead`)。狀態的**儲存值維持 snake_case 不變**,只有下列四處顯示文字改讀 `t('status.<key>')`:Status 篩選群組子選項與已選篩選膠囊(`Bookshelf.jsx`)、Add/Edit Book modal 的狀態下拉選項、書籍詳情頁狀態文字。`BookDetail.jsx` 原本讀 `SHELF_DEFS`+`?? 'Reading'` fallback 的 `statusLabel()` 已移除,改直接用 `resolveShelfKey()` 取 key 再查字典(`resolveShelfKey` 本身已有預設值,不需要重複 fallback)。
+
+**C · Add Book 按鈕英文換行:** `shelf.addBook` 字典值由「Add a book」縮短為「Add book」(uppercase 後為 ADD BOOK,較短)。`.add-book-btn` 加 `white-space: nowrap` 作為多語言長度保險——此 class 由首頁「Add Book」跟書籍詳情頁「New Note」共用,兩顆按鈕都套用。
+
 ### 治理里程碑
 
-顏色(Ruling 1/4)、圓角(Ruling 5)、間距(Ruling 6)、字級(Ruling 7)四個 token 系統至此全數收斂完成。
+顏色(Ruling 1/4)、圓角(Ruling 5)、間距(Ruling 6)、字級(Ruling 7)四個 token 系統,以及 i18n 執行時切換(主批 + Ruling 8 收尾)至此全數完成。狀態/類別的資料模型收斂留待 D7 批;tour 文案另開批處理。
