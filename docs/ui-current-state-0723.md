@@ -400,3 +400,29 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 **反寫死延伸:** 此後新增間距一律引用 `--space-*`;無對應 token 的值,CC 須停手回報,不得自行補值或正規化。
 
 **流程註記:** 本批盤點源與實檔有均勻 +1 行號偏移,貼 CC 前已 -1 校正。下一批(字級)開工前應請 CC 對現行 index.css 重新盤點,勿沿用舊行號。
+
+### Ruling 7 · 字級 scale token 化(--text-*)  2026-07-28
+
+**裁決:** 全站 font-size 收斂為 11 個 `--text-*` token。此批性質為「重設」非「去重」(27 相異值多為手調 rem,無系統)。實作完成、iPhone 實機驗收通過。
+- commit `5ad5eb0`(main 已同步 origin/main)
+- tokens.css 新增 14 行(11 token:6 size + 1 body 別名 + 4 display);index.css 66 處 font-size 全引用化 + 輸入框修正 1 條
+
+**前置裁決:** R1 全 px｜R2 clamp 保留(流動大標)｜R3 size scale + body 別名(角色由 family+weight 承載,尺寸解耦)｜R4 納入輸入框 iOS 放大修正
+
+**size scale:** `--text-xs` 12 / `sm` 14 / `md` 16 / `lg` 18 / `xl` 20 / `2xl` 24
+
+**語意別名:** `--text-body` = `var(--text-sm)`(僅 `.note-detail-content`、`.note-timeline-content` 兩處閱讀正文,好單獨調)
+
+**display/brand(Fraunces,保留流動):** `--text-wordmark` 46px、`--text-brand-over` clamp(30,9vw,38)、`--text-brand-hero` clamp(50,15.5vw,68)、`--text-brand-splash` clamp(48,15vw,88)
+
+**占位字母/頁碼(原 ? 角色):** 折入 scale(占位字母隨容器大小落 lg/2xl,頁碼落 sm/lg)
+
+42 處有位移(多 sub-1px),僅 3 處 ≥1.5px(modal 標題 22.4→24、書封占位字母 25.6→24 ×2);24 處零變動。
+
+**輸入框修正(R4):** `input`/`textarea`/`select` 補 `font-size: var(--text-md)`(16px)防 iOS focus 放大——先前全站無 input 字級、吃 UA 預設。
+
+**反寫死延伸:** 此後新增字級一律引用 `--text-*`;無對應者 CC 停手回報。
+
+### 治理里程碑
+
+顏色(Ruling 1/4)、圓角(Ruling 5)、間距(Ruling 6)、字級(Ruling 7)四個 token 系統至此全數收斂完成。
