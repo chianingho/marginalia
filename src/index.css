@@ -1084,7 +1084,7 @@ button.note-timeline-card:hover {
 .bookshelf-filterrow-icons {
   display: flex;
   align-items: center;
-  gap: var(--space-10);
+  gap: var(--space-12);
 }
 
 /* 已選篩選膠囊列，只在有作用中的篩選時渲染，可換行；靠右對齊、必要時自己
@@ -1129,7 +1129,7 @@ button.filter-pill:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-6) var(--space-18);
+  padding: var(--space-4) var(--space-16);
   border-radius: var(--radius-pill);
   border: 1.2px solid var(--color-green);
   background: transparent;
@@ -1317,6 +1317,7 @@ button.pill-btn:focus-visible {
   background: var(--color-ink);
   color: var(--color-bg);
   font-size: var(--text-md);
+  white-space: nowrap;
   font-weight: 600;
   letter-spacing: 0.02em;
   box-shadow: 0 8px 24px rgba(var(--ink-rgb), 0.25);

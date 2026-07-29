@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, isExternalUrl } from '../lib/supabaseClient.js'
-import { useLocale, LocaleToggle } from '../i18n/i18n'
+import { useLocale } from '../i18n/i18n'
 
 // 登入體驗批次（2026-07-23）第 5 節：頭像 + 登出下拉。
 // sizeRefTarget 是書櫃頁相鄰 .pill-btn 的 ref——頭像直徑用 getBoundingClientRect()
@@ -72,7 +72,6 @@ export default function AvatarMenu({ session, sizeRefTarget }) {
       {open && (
         <div className="avatar-dropdown" role="menu">
           <p className="avatar-dropdown-email meta-text">{email}</p>
-          <LocaleToggle className="avatar-dropdown-email meta-text" />
           <div className="avatar-dropdown-divider" />
           <button type="button" className="avatar-dropdown-logout" onClick={handleLogout} role="menuitem">
             {t('common.signOut')}

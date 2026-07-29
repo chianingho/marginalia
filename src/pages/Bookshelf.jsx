@@ -10,7 +10,7 @@ import { useOnboarding } from '../onboarding/useOnboarding.js'
 import { hasSupabaseConfig, supabase } from '../lib/supabaseClient.js'
 import { useAuthSession } from '../lib/useAuthSession.js'
 import { isGuestMode } from '../lib/guestMode.js'
-import { useLocale } from '../i18n/i18n'
+import { useLocale, LocaleToggle } from '../i18n/i18n'
 
 function chunk(list, size) {
   const out = []
@@ -113,6 +113,7 @@ function WrapShelf({ books }) {
 // .action-sheet-sublist/.action-sheet-suboption，只是從「只有 Category 用」
 // 變成三組共用。
 function FilterGroup({ facet, label, rows, expanded, onToggleExpand, isActive, onToggleValue }) {
+  const { t } = useLocale()
   return (
     <div className="action-sheet-group">
       <button type="button" className="action-sheet-option" onClick={onToggleExpand} aria-expanded={expanded}>
@@ -126,9 +127,9 @@ function FilterGroup({ facet, label, rows, expanded, onToggleExpand, isActive, o
               key={row.slug}
               type="button"
               className="action-sheet-suboption"
-              onClick={() => onToggleValue(facet, row.slug, row.label)}
+              onClick={() => onToggleValue(facet, row.slug, row.label, row.key)}
             >
-              {row.label}
+              {facet === 'status' ? t(`status.${row.key}`) : row.label}
               {isActive(facet, row.slug) && <span className="action-sheet-check">✓</span>}
             </button>
           ))}
@@ -177,20 +178,20 @@ export default function Bookshelf() {
     }
   }
 
-  function toggleFilter(facet, slug, label) {
+  function toggleFilter(facet, slug, label, key) {
     setActiveFilters((prev) => {
       const exists = prev.some((f) => f.facet === facet && f.slug === slug)
-      return exists ? prev.filter((f) => !(f.facet === facet && f.slug === slug)) : [...prev, { facet, slug, label }]
+      return exists ? prev.filter((f) => !(f.facet === facet && f.slug === slug)) : [...prev, { facet, slug, label, key }]
     })
   }
 
   // Year/Month 單選：選新值會先清掉這個 facet 原本選的值再放新的；再點一次
   // 目前已選中的值＝取消選取，這個 facet 回到「不限制」（清除選取後回到全部）。
-  function toggleSingleFilter(facet, slug, label) {
+  function toggleSingleFilter(facet, slug, label, key) {
     setActiveFilters((prev) => {
       const withoutFacet = prev.filter((f) => f.facet !== facet)
       const alreadySelected = prev.some((f) => f.facet === facet && f.slug === slug)
-      return alreadySelected ? withoutFacet : [...withoutFacet, { facet, slug, label }]
+      return alreadySelected ? withoutFacet : [...withoutFacet, { facet, slug, label, key }]
     })
   }
 
@@ -278,6 +279,7 @@ export default function Bookshelf() {
               >
                 <FilterIcon />
               </button>
+              <LocaleToggle className="pill-btn" />
               {hasSupabaseConfig && session && <AvatarMenu session={session} sizeRefTarget={filterBtnRef} />}
               {hasSupabaseConfig && !session && isGuestMode() && (
                 <button type="button" className="guest-signin-btn" onClick={handleGuestSignIn}>
@@ -297,9 +299,9 @@ export default function Bookshelf() {
                   key={`${f.facet}:${f.slug}`}
                   type="button"
                   className="filter-pill"
-                  onClick={() => toggleFilter(f.facet, f.slug, f.label)}
+                  onClick={() => toggleFilter(f.facet, f.slug, f.label, f.key)}
                 >
-                  {f.label}
+                  {f.facet === 'status' ? t(`status.${f.key}`) : f.label}
                   <span aria-hidden="true">×</span>
                 </button>
               ))}

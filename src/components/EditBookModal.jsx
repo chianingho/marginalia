@@ -117,9 +117,9 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
               style={{ fontSize: '16px' }}
               required
             >
-              <option value="to_read">To Read</option>
-              <option value="reading">Reading</option>
-              <option value="finished">Finished</option>
+              <option value="to_read">{t('status.to_read')}</option>
+              <option value="reading">{t('status.reading')}</option>
+              <option value="finished">{t('status.finished')}</option>
             </select>
           </label>
 

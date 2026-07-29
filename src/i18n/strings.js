@@ -2,6 +2,7 @@
 // Marginalia UI 字串字典。EN + ZH(繁中)。
 // 保留英文(不進字典、JSX 直接寫死):Marginalia、Books、BrandBanner 裝飾 SVG 字。
 // 動態值以 {name} 佔位,由 t(key, vars) 內插。ZH 全形標點。
+// tour.*:暫定文案。現況 useOnboarding 為 2 步,需對齊實際流程後於 tour 批定案,主 i18n 批不接。
 
 export const strings = {
   en: {
@@ -38,11 +39,11 @@ export const strings = {
       searchPlaceholder: 'Search by title or author',
       emptyAll: 'Your shelves are empty. Tap below to add your first book.',
       emptyFiltered: 'No books match your filters.',
-      addBook: 'Add a book',
+      addBook: 'Add book',
       filterTitle: 'Filter',
     },
     facet: { status: 'Status', category: 'Category', year: 'Year', month: 'Month' },
-    status: { toRead: 'To read', reading: 'Reading', finished: 'Finished' },
+    status: { to_read: 'To read', reading: 'Reading', finished: 'Finished' },
     category: {
       none: 'None', custom: 'Custom…', customPlaceholder: 'Enter a category',
       fiction: 'Fiction', essays: 'Essays', psychology: 'Psychology', design: 'Design',
@@ -125,7 +126,7 @@ export const strings = {
       filterTitle: '篩選',
     },
     facet: { status: '狀態', category: '類別', year: '年份', month: '月份' },
-    status: { toRead: '待閱讀', reading: '閱讀中', finished: '閱讀完畢' },
+    status: { to_read: '待閱讀', reading: '閱讀中', finished: '閱讀完畢' },
     category: {
       none: '無', custom: '自訂…', customPlaceholder: '輸入類別',
       fiction: '小說', essays: '散文', psychology: '心理', design: '設計',

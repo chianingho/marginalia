@@ -5,12 +5,8 @@ import NoteModal from '../components/NoteModal.jsx'
 import NoteList from '../components/NoteList.jsx'
 import { fetchBookById } from '../api/books.js'
 import { getNotesByBook } from '../api/notes.js'
-import { SHELF_DEFS, resolveShelfKey } from '../lib/shelves.js'
+import { resolveShelfKey } from '../lib/shelves.js'
 import { useLocale } from '../i18n/i18n'
-
-function statusLabel(book) {
-  return SHELF_DEFS.find((def) => def.key === resolveShelfKey(book))?.label ?? 'Reading'
-}
 
 // UI 修正批次（總規格項目 7）：「‹」文字字元的字型墨色天生不置中，換成
 // SVG 箭頭用幾何中心對齊，配合 .btn-frosted--circle 的 flex 置中就是真正的
@@ -112,7 +108,7 @@ export default function BookDetail() {
         <div className="book-page-title-hairline" aria-hidden="true" />
         <div className="book-page-meta-grid">
           {book.author && <span className="book-page-meta-item book-page-author meta-text">{book.author}</span>}
-          <span className="book-page-meta-item meta-text">{statusLabel(book)}</span>
+          <span className="book-page-meta-item meta-text">{t(`status.${resolveShelfKey(book)}`)}</span>
           <span className="book-page-meta-item meta-text">{t('book.notesCount', { n: notes.length })}</span>
           <button
             type="button"
