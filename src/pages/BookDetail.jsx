@@ -6,6 +6,7 @@ import NoteList from '../components/NoteList.jsx'
 import { fetchBookById } from '../api/books.js'
 import { getNotesByBook } from '../api/notes.js'
 import { SHELF_DEFS, resolveShelfKey } from '../lib/shelves.js'
+import { useLocale } from '../i18n/i18n'
 
 function statusLabel(book) {
   return SHELF_DEFS.find((def) => def.key === resolveShelfKey(book))?.label ?? 'Reading'
@@ -26,6 +27,7 @@ function ChevronLeftIcon() {
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t } = useLocale()
 
   const [book, setBook] = useState(null)
   const [notes, setNotes] = useState([])
@@ -82,12 +84,12 @@ export default function BookDetail() {
     closeNoteModal()
   }
 
-  if (status === 'loading') return <p className="bookshelf-status">載入中…</p>
-  if (status === 'error') return <p className="bookshelf-status form-error">載入失敗：{error}</p>
+  if (status === 'loading') return <p className="bookshelf-status">{t('common.loading')}</p>
+  if (status === 'error') return <p className="bookshelf-status form-error">{t('common.loadError', { error })}</p>
 
   return (
     <div className="book-page">
-      <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label="回首頁">
+      <Link to="/" className="book-page-back btn-frosted btn-frosted--circle" aria-label={t('common.backHome')}>
         <ChevronLeftIcon />
       </Link>
 
@@ -111,13 +113,13 @@ export default function BookDetail() {
         <div className="book-page-meta-grid">
           {book.author && <span className="book-page-meta-item book-page-author meta-text">{book.author}</span>}
           <span className="book-page-meta-item meta-text">{statusLabel(book)}</span>
-          <span className="book-page-meta-item meta-text">{notes.length} notes</span>
+          <span className="book-page-meta-item meta-text">{t('book.notesCount', { n: notes.length })}</span>
           <button
             type="button"
             className="book-page-meta-item book-page-edit-btn meta-text"
             onClick={() => setShowEditBook(true)}
           >
-            Edit
+            {t('book.edit')}
           </button>
         </div>
       </div>
@@ -126,7 +128,7 @@ export default function BookDetail() {
 
       <button type="button" className="add-book-btn btn-frosted" onClick={openNewNote}>
         <span className="add-book-btn-icon">＋</span>
-        New Note
+        {t('book.addNote')}
       </button>
 
       {showEditBook && (

@@ -7,6 +7,7 @@ import { formatFullDate } from '../lib/format.js'
 import NoteImageLightbox from '../components/NoteImageLightbox.jsx'
 import NoteModal from '../components/NoteModal.jsx'
 import HighlightLabel from '../components/HighlightLabel.jsx'
+import { useLocale } from '../i18n/i18n'
 
 // UI 修正批次（總規格項目 7）：跟 BookDetail 的返回鍵共用同一顆 SVG 箭頭，
 // 不用文字字元「‹」，避免字型墨色不置中的問題。
@@ -27,6 +28,7 @@ export default function NoteDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useLocale()
 
   const [note, setNote] = useState(null)
   const [book, setBook] = useState(null)
@@ -88,7 +90,7 @@ export default function NoteDetail() {
   }
 
   if (status === 'notfound') return <Navigate to="/" replace />
-  if (status === 'loading' || !note) return <p className="bookshelf-status">載入中…</p>
+  if (status === 'loading' || !note) return <p className="bookshelf-status">{t('common.loading')}</p>
 
   return (
     <div className="note-detail-screen">
@@ -96,7 +98,7 @@ export default function NoteDetail() {
         <button
           type="button"
           className="note-detail-back btn-frosted--circle btn-frosted--glass"
-          aria-label="返回"
+          aria-label={t('common.back')}
           onClick={handleBack}
         >
           <ChevronLeftIcon />
@@ -108,7 +110,7 @@ export default function NoteDetail() {
             className="note-detail-annotate-btn btn-frosted--sm btn-frosted--glass"
             onClick={() => setShowAnnotator(true)}
           >
-            ✎ Edit annotation
+            ✎ {t('noteDetail.editAnnotation')}
           </button>
         )}
       </header>
@@ -127,7 +129,7 @@ export default function NoteDetail() {
               highlightClassName="note-detail-page-highlight"
               labelClassName="note-detail-page meta-text"
             >
-              p. {note.page}
+              {t('notes.pagePrefix', { n: note.page })}
             </HighlightLabel>
             <span className="note-detail-date meta-text">{formatFullDate(note.created_at)}</span>
           </div>
@@ -141,7 +143,7 @@ export default function NoteDetail() {
         {note.content && <p className="note-detail-content">{note.content}</p>}
 
         <button type="button" className="note-detail-edit-btn" onClick={() => setShowEditModal(true)}>
-          ✎ Edit
+          ✎ {t('noteDetail.edit')}
         </button>
       </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { searchBooks } from '../api/googleBooks.js'
 import { createBook } from '../api/books.js'
 import { useScrollLock } from '../lib/scrollLock.js'
+import { useLocale } from '../i18n/i18n'
 
 const CUSTOM_CATEGORY_VALUE = '__custom__'
 
@@ -25,6 +26,7 @@ const initialState = {
 }
 
 export default function AddBookModal({ onClose, onCreated }) {
+  const { t } = useLocale()
   const [state, setState] = useState(initialState)
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
@@ -74,7 +76,7 @@ export default function AddBookModal({ onClose, onCreated }) {
     e.preventDefault()
     const title = state.manualTitle.trim()
     if (!title) {
-      update({ formError: 'Please enter a title' })
+      update({ formError: t('error.enterTitle') })
       return
     }
 
@@ -104,8 +106,8 @@ export default function AddBookModal({ onClose, onCreated }) {
     <div className="add-modal-backdrop" onClick={onClose}>
       <div className="add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="add-modal-title">Add Book</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+          <h2 className="add-modal-title">{t('addBook.title')}</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label={t('common.close')}>
             ✕
           </button>
         </div>
@@ -113,16 +115,16 @@ export default function AddBookModal({ onClose, onCreated }) {
         <div className="add-modal-search">
           <input
             type="text"
-            placeholder="Search by title…"
+            placeholder={t('addBook.searchPlaceholder')}
             value={state.query}
             onChange={(e) => update({ query: e.target.value })}
             style={{ fontSize: '16px' }}
           />
         </div>
 
-        {state.searching && <p className="form-error">Searching…</p>}
+        {state.searching && <p className="form-error">{t('addBook.searching')}</p>}
         {!state.searching && state.hasSearched && state.results.length === 0 && (
-          <p className="form-error">No books found</p>
+          <p className="form-error">{t('addBook.noResults')}</p>
         )}
 
         {state.results.length > 0 && (
@@ -149,10 +151,10 @@ export default function AddBookModal({ onClose, onCreated }) {
         )}
 
         <form onSubmit={handleSubmit} className="add-modal-form">
-          <h3 className="add-modal-section-title">Details</h3>
+          <h3 className="add-modal-section-title">{t('addBook.details')}</h3>
 
           <label className="add-modal-label">
-            Title
+            {t('field.title')}
             <input
               type="text"
               value={state.manualTitle}
@@ -163,7 +165,7 @@ export default function AddBookModal({ onClose, onCreated }) {
           </label>
 
           <label className="add-modal-label">
-            Author (optional)
+            {t('field.authorOptional')}
             <input
               type="text"
               value={state.manualAuthor}
@@ -173,7 +175,7 @@ export default function AddBookModal({ onClose, onCreated }) {
           </label>
 
           <label className="add-modal-label">
-            Status
+            {t('field.status')}
             <select
               value={state.manualStatus}
               onChange={(e) => update({ manualStatus: e.target.value })}
@@ -187,20 +189,20 @@ export default function AddBookModal({ onClose, onCreated }) {
           </label>
 
           <label className="add-modal-label">
-            Category (optional)
+            {t('field.categoryOptional')}
             <select value={state.manualCategory} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
-              <option value="">None</option>
+              <option value="">{t('category.none')}</option>
               {CATEGORY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
               ))}
-              <option value={CUSTOM_CATEGORY_VALUE}>Custom…</option>
+              <option value={CUSTOM_CATEGORY_VALUE}>{t('category.custom')}</option>
             </select>
             {state.manualCategory === CUSTOM_CATEGORY_VALUE && (
               <input
                 type="text"
-                placeholder="Enter a category"
+                placeholder={t('category.customPlaceholder')}
                 value={state.manualCustomCategory}
                 onChange={(e) => update({ manualCustomCategory: e.target.value })}
                 style={{ fontSize: '16px' }}
@@ -210,14 +212,14 @@ export default function AddBookModal({ onClose, onCreated }) {
 
           <div className="add-modal-field">
             <label htmlFor="add-modal-file-input" className="add-modal-label-text">
-              Upload cover (optional, replaces search result)
+              {t('field.uploadCoverOptional')}
             </label>
             <div className="add-modal-file-row">
               <label htmlFor="add-modal-file-input" className="add-modal-file-btn">
-                Choose file
+                {t('field.chooseFile')}
               </label>
               <span className="add-modal-file-name">
-                {state.coverFile ? state.coverFile.name : 'No file chosen'}
+                {state.coverFile ? state.coverFile.name : t('field.noFile')}
               </span>
             </div>
             <input
@@ -233,14 +235,14 @@ export default function AddBookModal({ onClose, onCreated }) {
 
           <div className="modal-actions">
             <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="add-page-btn btn-frosted"
               disabled={state.submitStatus === 'submitting'}
             >
-              {state.submitStatus === 'submitting' ? 'Adding…' : 'Add Book'}
+              {state.submitStatus === 'submitting' ? t('addBook.submitting') : t('addBook.submit')}
             </button>
           </div>
         </form>

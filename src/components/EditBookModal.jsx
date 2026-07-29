@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { updateBook, deleteBook } from '../api/books.js'
 import { resolveShelfKey } from '../lib/shelves.js'
+import { useLocale } from '../i18n/i18n'
 
 const CUSTOM_CATEGORY_VALUE = '__custom__'
 
@@ -24,6 +25,7 @@ function buildInitialState(book) {
 }
 
 export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
+  const { t } = useLocale()
   const [state, setState] = useState(() => buildInitialState(book))
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
@@ -44,7 +46,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
     e.preventDefault()
     const title = state.title.trim()
     if (!title) {
-      update({ formError: 'Please enter a title' })
+      update({ formError: t('error.enterTitle') })
       return
     }
 
@@ -66,7 +68,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this book? This cannot be undone.')) return
+    if (!confirm(t('confirm.deleteBook'))) return
     try {
       await deleteBook(book.id)
       onDeleted()
@@ -79,15 +81,15 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
     <div className="add-modal-backdrop" onClick={onClose}>
       <div className="add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Edit Book</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+          <h2>{t('editBook.title')}</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label={t('common.close')}>
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="add-modal-form">
           <label className="add-modal-label">
-            Title
+            {t('field.title')}
             <input
               type="text"
               value={state.title}
@@ -98,7 +100,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
           </label>
 
           <label className="add-modal-label">
-            Author (optional)
+            {t('field.authorOptional')}
             <input
               type="text"
               value={state.author}
@@ -108,7 +110,7 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
           </label>
 
           <label className="add-modal-label">
-            Status
+            {t('field.status')}
             <select
               value={state.status}
               onChange={(e) => update({ status: e.target.value })}
@@ -122,20 +124,20 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
           </label>
 
           <label className="add-modal-label">
-            Category (optional)
+            {t('field.categoryOptional')}
             <select value={state.category} onChange={handleCategoryChange} style={{ fontSize: '16px' }}>
-              <option value="">None</option>
+              <option value="">{t('category.none')}</option>
               {CATEGORY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>
               ))}
-              <option value={CUSTOM_CATEGORY_VALUE}>Custom…</option>
+              <option value={CUSTOM_CATEGORY_VALUE}>{t('category.custom')}</option>
             </select>
             {state.category === CUSTOM_CATEGORY_VALUE && (
               <input
                 type="text"
-                placeholder="Enter a category"
+                placeholder={t('category.customPlaceholder')}
                 value={state.customCategory}
                 onChange={(e) => update({ customCategory: e.target.value })}
                 style={{ fontSize: '16px' }}
@@ -145,14 +147,14 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
 
           <div className="add-modal-field">
             <label htmlFor="edit-modal-file-input" className="add-modal-label-text">
-              Upload cover (optional, replaces current cover)
+              {t('field.uploadCoverOptional')}
             </label>
             <div className="add-modal-file-row">
               <label htmlFor="edit-modal-file-input" className="add-modal-file-btn">
-                Choose file
+                {t('field.chooseFile')}
               </label>
               <span className="add-modal-file-name">
-                {state.coverFile ? state.coverFile.name : 'No file chosen'}
+                {state.coverFile ? state.coverFile.name : t('field.noFile')}
               </span>
             </div>
             <input
@@ -168,19 +170,19 @@ export default function EditBookModal({ book, onClose, onSaved, onDeleted }) {
 
           <div className="modal-actions">
             <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="add-page-btn btn-frosted"
               disabled={state.submitStatus === 'submitting'}
             >
-              {state.submitStatus === 'submitting' ? 'Saving…' : 'Save'}
+              {state.submitStatus === 'submitting' ? t('common.saving') : t('common.save')}
             </button>
           </div>
 
           <button type="button" className="edit-modal-delete" onClick={handleDelete}>
-            Delete this book
+            {t('editBook.delete')}
           </button>
         </form>
       </div>

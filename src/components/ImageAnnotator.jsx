@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useScrollLock } from '../lib/scrollLock.js'
+import { useLocale } from '../i18n/i18n'
 
 // 截圖標注：純 canvas + pointer events，不引入任何繪圖套件。
 // 唯一工具＝螢光筆，常駐啟用，沒有其他工具可切換；F-8 起筆色可從 4 顆色票切換。
@@ -71,6 +72,7 @@ function ClearIcon() {
 }
 
 export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, onCancel }) {
+  const { t } = useLocale()
   const canvasRef = useRef(null)
   const baseImageRef = useRef(null)
   const historyRef = useRef(buildInitialHistory(normalizeInitialStrokes(initialStrokes))) // 快照 stack；最上面一份 = 目前狀態
@@ -190,11 +192,11 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
     <div className="annotator-overlay" onClick={(e) => e.stopPropagation()}>
       <div className="annotator-header">
         <button type="button" className="annotator-cancel" onClick={handleExit}>
-          Cancel
+          {t('annotator.cancel')}
         </button>
         <div className="annotator-spacer" />
         <button type="button" className="annotator-done" onClick={handleDone}>
-          Done
+          {t('annotator.done')}
         </button>
       </div>
 
@@ -207,7 +209,7 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
               className={`annotator-swatch ${selectedColor === color ? 'selected' : ''}`}
               style={{ background: color }}
               onClick={() => setSelectedColor(color)}
-              aria-label={`螢光筆顏色 ${color}`}
+              aria-label={t('annotator.penColor', { color })}
               aria-pressed={selectedColor === color}
             />
           ))}
@@ -217,11 +219,11 @@ export default function ImageAnnotator({ imageUrl, initialStrokes = [], onDone, 
           className="annotator-undo"
           onClick={handleUndo}
           disabled={historyRef.current.length <= 1}
-          aria-label="Undo"
+          aria-label={t('annotator.undo')}
         >
           <UndoIcon />
         </button>
-        <button type="button" className="annotator-clear" onClick={handleClear} disabled={strokeCount === 0} aria-label="Clear">
+        <button type="button" className="annotator-clear" onClick={handleClear} disabled={strokeCount === 0} aria-label={t('annotator.clear')}>
           <ClearIcon />
         </button>
       </div>

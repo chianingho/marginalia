@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import { formatTimelineDate, formatTimelineTime } from '../lib/format.js'
 import HighlightLabel from './HighlightLabel.jsx'
+import { useLocale } from '../i18n/i18n'
 
 // 依本地日期（年/月/日）分組——notes 已經是 created_at 由舊到新排序，同一天一定
 // 連續出現，直接照順序累加分組即可，不需要另外排序。分組純粹是顯示層的事，
@@ -105,13 +106,14 @@ function NoteThumbnail({ note }) {
 // 項目 3 提到「頁碼與標題同行、對齊標題基線」對不上現有資料模型（沒有標題），
 // 頁碼這裡先維持獨立一行放在內文上方，此落差另外回報，不在這裡自行加欄位。
 export default function NoteList({ notes }) {
+  const { t } = useLocale()
   const navigate = useNavigate()
 
   if (notes.length === 0) {
     return (
       <div className="note-timeline-empty">
-        <p>No notes yet</p>
-        <p className="meta-text">點下方 + NEW NOTE 記下第一個想法</p>
+        <p>{t('notes.empty')}</p>
+        <p className="meta-text">{t('notes.emptyHint')}</p>
       </div>
     )
   }
@@ -133,11 +135,13 @@ export default function NoteList({ notes }) {
             >
               {getOriginalImageKey(note) && <NoteThumbnail note={note} />}
               <div className="note-timeline-card-body">
-                {note.page != null && note.page !== '' && <p className="note-timeline-page">p. {note.page}</p>}
+                {note.page != null && note.page !== '' && (
+                  <p className="note-timeline-page">{t('notes.pagePrefix', { n: note.page })}</p>
+                )}
                 {note.content && <NoteContent text={note.content} />}
                 <div className="note-timeline-card-hairline" aria-hidden="true" />
                 <p className="note-timeline-card-meta meta-text">
-                  {formatTimelineTime(note.created_at)} · {getOriginalImageKey(note) ? 'Photo' : 'Text'}
+                  {formatTimelineTime(note.created_at)} · {getOriginalImageKey(note) ? t('notes.badgePhoto') : t('notes.badgeText')}
                 </p>
               </div>
             </button>

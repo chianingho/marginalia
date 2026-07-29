@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, isExternalUrl } from '../lib/supabaseClient.js'
+import { useLocale, LocaleToggle } from '../i18n/i18n'
 
 // 登入體驗批次（2026-07-23）第 5 節：頭像 + 登出下拉。
 // sizeRefTarget 是書櫃頁相鄰 .pill-btn 的 ref——頭像直徑用 getBoundingClientRect()
 // 量測那顆按鈕的實際高度，不寫死 px（.pill-btn 本身是橢圓，寬高不同，量高度
 // 是因為頭像是圓形，跟旁邊按鈕對齊的是同一條水平視覺高度）。
 export default function AvatarMenu({ session, sizeRefTarget }) {
+  const { t } = useLocale()
   const [open, setOpen] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [size, setSize] = useState(null)
@@ -56,7 +58,7 @@ export default function AvatarMenu({ session, sizeRefTarget }) {
         className="avatar-trigger"
         style={size ? { width: size, height: size } : undefined}
         onClick={() => setOpen((o) => !o)}
-        aria-label="帳號選單"
+        aria-label={t('common.accountMenu')}
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -70,9 +72,10 @@ export default function AvatarMenu({ session, sizeRefTarget }) {
       {open && (
         <div className="avatar-dropdown" role="menu">
           <p className="avatar-dropdown-email meta-text">{email}</p>
+          <LocaleToggle className="avatar-dropdown-email meta-text" />
           <div className="avatar-dropdown-divider" />
           <button type="button" className="avatar-dropdown-logout" onClick={handleLogout} role="menuitem">
-            登出
+            {t('common.signOut')}
           </button>
         </div>
       )}

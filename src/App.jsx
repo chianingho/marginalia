@@ -8,6 +8,7 @@ import Splash from './components/Splash.jsx'
 import { hasSupabaseConfig } from './lib/supabaseClient.js'
 import { useAuthSession } from './lib/useAuthSession.js'
 import { isGuestMode, enterGuestMode, exitGuestMode } from './lib/guestMode.js'
+import { useLocale } from './i18n/i18n'
 
 // 這幾個路由自己控制版面（白底、自帶 header），不套用全域 app-header 跟 app-main 的 padding
 function isFlushRoute(pathname) {
@@ -24,6 +25,7 @@ export default function App() {
   const location = useLocation()
   const isFlush = isFlushRoute(location.pathname)
   const { session, loading } = useAuthSession()
+  const { t } = useLocale()
   const [guestMode, setGuestMode] = useState(() => isGuestMode())
   // 訪客是點擊觸發的進站（不像 OAuth 那樣整頁重新導向），Splash 不會自動重新
   // 掛載——用 key 強制在這個時間點重新掛載一次 Splash，讓開場動畫在「登入頁
@@ -39,6 +41,10 @@ export default function App() {
       setGuestMode(false)
     }
   }, [session])
+
+  useEffect(() => {
+    document.title = t('common.appDocTitle')
+  }, [t])
 
   function handleGuest() {
     enterGuestMode()
@@ -62,16 +68,9 @@ export default function App() {
         <header className="app-header">
           <Link to="/" className="app-title">
             <span className="app-name">Marginalia</span>
-            <span className="app-subtitle">閱讀筆記</span>
+            <span className="app-subtitle">{t('common.subtitle')}</span>
           </Link>
         </header>
-      )}
-
-      {!isFlush && !hasSupabaseConfig && (
-        <div className="local-mode-banner">
-          目前以「本機預覽模式」執行：資料暫存在這個瀏覽器的 localStorage，重灌瀏覽器或清除快取會消失。
-          設定好 Supabase 並填入 <code>.env.local</code> 後即可自動切回雲端儲存。
-        </div>
       )}
 
       <main className={`app-main ${isFlush ? 'app-main--flush' : ''}`}>

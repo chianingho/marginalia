@@ -10,6 +10,7 @@ import { useOnboarding } from '../onboarding/useOnboarding.js'
 import { hasSupabaseConfig, supabase } from '../lib/supabaseClient.js'
 import { useAuthSession } from '../lib/useAuthSession.js'
 import { isGuestMode } from '../lib/guestMode.js'
+import { useLocale } from '../i18n/i18n'
 
 function chunk(list, size) {
   const out = []
@@ -76,9 +77,10 @@ function FilterIcon() {
 // prefers-reduced-motion：auto-animate 預設就會偵測並自動停用動畫，這裡
 // 沒有傳 disrespectUserMotionPreference，維持預設行為，不用另外處理。
 function WrapShelf({ books }) {
+  const { t } = useLocale()
   const rowsOf4 = chunk(books, 4)
   return (
-    <div className="wrap-shelf" aria-label="書籍列表">
+    <div className="wrap-shelf" aria-label={t('shelf.booksAria')}>
       <div className="wrap-shelf-rows">
         {rowsOf4.map((group, index) => (
           <div className="wrap-shelf-row" key={index}>
@@ -139,10 +141,10 @@ function FilterGroup({ facet, label, rows, expanded, onToggleExpand, isActive, o
 // 修正批次（加入月份自動記錄）：Status/Category 維持原本可複選；Year/Month
 // 改單選（multi:false）——選同一個 facet 裡的新值會直接取代舊值，不是疊加。
 const FACETS = [
-  { facet: 'status', label: 'Status', multi: true },
-  { facet: 'category', label: 'Category', multi: true },
-  { facet: 'year', label: 'Year', multi: false },
-  { facet: 'month', label: 'Month', multi: false },
+  { facet: 'status', multi: true },
+  { facet: 'category', multi: true },
+  { facet: 'year', multi: false },
+  { facet: 'month', multi: false },
 ]
 
 export default function Bookshelf() {
@@ -156,6 +158,7 @@ export default function Bookshelf() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const { session } = useAuthSession()
+  const { t } = useLocale()
   const filterBtnRef = useRef(null)
 
   useEffect(() => {
@@ -261,7 +264,7 @@ export default function Bookshelf() {
                 type="button"
                 className="pill-btn"
                 onClick={toggleSearch}
-                aria-label={searchOpen ? '關閉搜尋' : '搜尋書櫃'}
+                aria-label={searchOpen ? t('shelf.searchClose') : t('shelf.searchOpen')}
                 aria-expanded={searchOpen}
               >
                 <SearchIcon />
@@ -271,14 +274,14 @@ export default function Bookshelf() {
                 className="pill-btn"
                 ref={filterBtnRef}
                 onClick={() => setFilterOpen(true)}
-                aria-label="篩選"
+                aria-label={t('shelf.filterAria')}
               >
                 <FilterIcon />
               </button>
               {hasSupabaseConfig && session && <AvatarMenu session={session} sizeRefTarget={filterBtnRef} />}
               {hasSupabaseConfig && !session && isGuestMode() && (
                 <button type="button" className="guest-signin-btn" onClick={handleGuestSignIn}>
-                  Sign in
+                  {t('common.signIn')}
                 </button>
               )}
             </div>
@@ -286,7 +289,7 @@ export default function Bookshelf() {
         />
 
         <div className="bookshelf-filterrow">
-          <p className="bookshelf-count">{visibleBooks.length} books</p>
+          <p className="bookshelf-count">{t('shelf.count', { n: visibleBooks.length })}</p>
           {activeFilters.length > 0 && (
             <div className="filter-pills-row">
               {activeFilters.map((f) => (
@@ -309,7 +312,7 @@ export default function Bookshelf() {
             <input
               type="text"
               autoFocus
-              placeholder="搜尋書名或作者"
+              placeholder={t('shelf.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{ fontSize: '16px' }}
@@ -318,15 +321,15 @@ export default function Bookshelf() {
         )}
       </header>
 
-      {status === 'loading' && <p className="bookshelf-status">載入中…</p>}
-      {status === 'error' && <p className="bookshelf-status form-error">載入失敗：{error}</p>}
+      {status === 'loading' && <p className="bookshelf-status">{t('common.loading')}</p>}
+      {status === 'error' && <p className="bookshelf-status form-error">{t('common.loadError', { error })}</p>}
 
       {status === 'ready' && books.length === 0 && (
-        <p className="bookshelf-status empty-hint meta-text">書櫃還是空的 — 點下方 ADD BOOK 加入第一本書</p>
+        <p className="bookshelf-status empty-hint meta-text">{t('shelf.emptyAll')}</p>
       )}
 
       {status === 'ready' && books.length > 0 && activeFilters.length > 0 && visibleBooks.length === 0 && (
-        <p className="bookshelf-status empty-hint">沒有符合篩選條件的書。</p>
+        <p className="bookshelf-status empty-hint">{t('shelf.emptyFiltered')}</p>
       )}
 
       {status === 'ready' && visibleBooks.length > 0 && (
@@ -342,7 +345,7 @@ export default function Bookshelf() {
         onClick={() => setShowAddModal(true)}
       >
         <span className="add-book-btn-icon">＋</span>
-        Add Book
+        {t('shelf.addBook')}
       </button>
 
       {showAddModal && <AddBookModal onClose={() => setShowAddModal(false)} onCreated={handleCreated} />}
@@ -350,12 +353,12 @@ export default function Bookshelf() {
       {filterOpen && (
         <div className="action-sheet-backdrop" onClick={closeFilterSheet}>
           <div className="action-sheet" onClick={(e) => e.stopPropagation()}>
-            <p className="action-sheet-title">Filter</p>
-            {FACETS.map(({ facet, label, multi }) => (
+            <p className="action-sheet-title">{t('shelf.filterTitle')}</p>
+            {FACETS.map(({ facet, multi }) => (
               <FilterGroup
                 key={facet}
                 facet={facet}
-                label={label}
+                label={t(`facet.${facet}`)}
                 rows={buildShelfRows(books, facet)}
                 expanded={expandedFacets.has(facet)}
                 onToggleExpand={() => toggleFacetExpanded(facet)}
@@ -364,7 +367,7 @@ export default function Bookshelf() {
               />
             ))}
             <button type="button" className="action-sheet-cancel" onClick={closeFilterSheet}>
-              Done
+              {t('common.done')}
             </button>
           </div>
         </div>

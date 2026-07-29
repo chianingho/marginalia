@@ -4,6 +4,7 @@ import { compressImage, deleteNoteImage, noteOriginalImageKey, saveNoteImage } f
 import { getNoteDisplayBlob, getOriginalImageKey } from '../lib/noteAnnotation.js'
 import { useScrollLock } from '../lib/scrollLock.js'
 import ImageAnnotator from './ImageAnnotator.jsx'
+import { useLocale } from '../i18n/i18n'
 
 // New Note 跟 Edit Note 共用同一顆 modal（note 有值 = 編輯模式，帶 Delete；沒有 = 新增模式）。
 // modal 外殼（尺寸、背景滾動鎖定、內部自捲）直接重用 Add Book modal 的 .add-modal* CSS，不重寫。
@@ -11,6 +12,7 @@ import ImageAnnotator from './ImageAnnotator.jsx'
 // 選圖前後高度差太大，modal 重新置中時就會看起來在「晃」。
 // 日期欄位已移除：note_date 由資料層依 created_at 自動帶入，不再讓使用者手動輸入。
 export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted }) {
+  const { t } = useLocale()
   const [content, setContent] = useState(note?.content || '')
   const [page, setPage] = useState(note?.page != null ? String(note.page) : '')
   const [imageFile, setImageFile] = useState(null)
@@ -84,7 +86,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
   async function handleSubmit(e) {
     e.preventDefault()
     if (!hasImage && !content.trim()) {
-      setFormError('請至少上傳截圖或寫點筆記')
+      setFormError(t('error.noteEmpty'))
       return
     }
 
@@ -126,7 +128,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this note? This cannot be undone.')) return
+    if (!confirm(t('confirm.deleteNote'))) return
     try {
       await deleteNote(note.id)
       onDeleted()
@@ -139,8 +141,8 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
     <div className="add-modal-backdrop" onClick={onClose}>
       <div className="add-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{note ? 'Edit Note' : 'New Note'}</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+          <h2>{note ? t('note.editTitle') : t('note.newTitle')}</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label={t('common.close')}>
             ✕
           </button>
         </div>
@@ -148,7 +150,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
         <form onSubmit={handleSubmit} className="add-modal-form">
           <div className="add-modal-field">
             <label htmlFor="note-image-input" className="add-modal-label-text">
-              Screenshot (optional)
+              {t('note.screenshotOptional')}
             </label>
             {previewUrl ? (
               <div className="note-image-selected-row">
@@ -158,13 +160,13 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
                   className="note-image-annotate-link"
                   onClick={() => setShowAnnotator(true)}
                 >
-                  Annotate
+                  {t('note.annotate')}
                 </button>
                 <button
                   type="button"
                   className="note-image-remove-sm"
                   onClick={handleRemoveImage}
-                  aria-label="Remove image"
+                  aria-label={t('note.removeImage')}
                 >
                   ✕
                 </button>
@@ -172,9 +174,9 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
             ) : (
               <div className="add-modal-file-row">
                 <label htmlFor="note-image-input" className="add-modal-file-btn">
-                  Choose photo
+                  {t('note.choosePhoto')}
                 </label>
-                <span className="add-modal-file-name">No file chosen</span>
+                <span className="add-modal-file-name">{t('field.noFile')}</span>
               </div>
             )}
             <input
@@ -188,7 +190,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
           </div>
 
           <label className="add-modal-label">
-            Page (optional)
+            {t('note.pageFieldOptional')}
             <input
               type="number"
               inputMode="numeric"
@@ -200,10 +202,10 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
           </label>
 
           <label className="add-modal-label">
-            Note (optional)
+            {t('note.fieldOptional')}
             <textarea
               rows={3}
-              placeholder="Write your note…"
+              placeholder={t('note.placeholder')}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               style={{ fontSize: '16px' }}
@@ -214,20 +216,20 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
 
           <div className="modal-actions">
             <button type="button" className="add-page-btn add-page-btn-secondary--green" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className="add-page-btn btn-frosted"
               disabled={submitStatus === 'submitting' || !canSave}
             >
-              {submitStatus === 'submitting' ? 'Saving…' : 'Save'}
+              {submitStatus === 'submitting' ? t('common.saving') : t('common.save')}
             </button>
           </div>
 
           {note && (
             <button type="button" className="edit-modal-delete" onClick={handleDelete}>
-              Delete this note
+              {t('note.delete')}
             </button>
           )}
         </form>
