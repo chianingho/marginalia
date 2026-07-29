@@ -117,4 +117,18 @@
   --space-24: 24px;
   --space-28: 28px;
   --space-32: 32px;
+
+  /* type scale */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-body: var(--text-sm);
+  /* display / brand (Fraunces, fluid) */
+  --text-wordmark: 46px;
+  --text-brand-over: clamp(30px, 9vw, 38px);
+  --text-brand-hero: clamp(50px, 15.5vw, 68px);
+  --text-brand-splash: clamp(48px, 15vw, 88px);
 }
