@@ -41,7 +41,7 @@ button {
   border: 1px solid var(--color-green);
   background: transparent;
   color: var(--color-green);
-  padding: 10px 22px;
+  padding: var(--space-10) var(--space-22);
   font-size: 0.92rem;
   letter-spacing: 0.02em;
   transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
@@ -67,7 +67,7 @@ button.icon-btn {
   border: none;
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
-  padding: 4px 8px;
+  padding: var(--space-4) var(--space-8);
   font-size: 1rem;
 }
 
@@ -81,7 +81,7 @@ input,
 textarea,
 select {
   font: inherit;
-  padding: 9px 12px;
+  padding: var(--space-10) var(--space-12);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -99,17 +99,17 @@ select:focus {
 label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-6);
   font-size: 0.88rem;
   color: var(--color-text-muted);
-  margin-bottom: 14px;
+  margin-bottom: var(--space-14);
 }
 
 /* Header */
 .app-header {
   display: flex;
   justify-content: center;
-  padding: 26px 32px;
+  padding: var(--space-24) var(--space-32);
   background: var(--color-shell-bg);
   box-shadow: 0 1px 0 rgba(var(--ink-rgb), 0.08);
 }
@@ -117,7 +117,7 @@ label {
 .app-title {
   display: inline-flex;
   align-items: baseline;
-  gap: 12px;
+  gap: var(--space-12);
   text-decoration: none;
 }
 
@@ -146,7 +146,7 @@ label {
   align-items: center;
   justify-content: center;
   background: var(--color-shell-bg);
-  padding: 24px;
+  padding: var(--space-24);
 }
 
 .login-card {
@@ -166,7 +166,7 @@ label {
   font-size: 46px;
   line-height: 1.1;
   color: var(--color-green);
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-4);
 }
 
 .login-subtitle {
@@ -199,10 +199,10 @@ button.login-google-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 11px;
+  gap: var(--space-10);
   font-family: var(--font-serif);
   font-size: 0.95rem;
-  padding: 0 22px;
+  padding: 0 var(--space-22);
   box-shadow: none;
 }
 
@@ -235,7 +235,7 @@ button.login-google-btn:hover:not(:disabled) {
   width: 100%;
   display: flex;
   align-items: center;
-  margin: 22px 0;
+  margin: var(--space-22) 0;
 }
 
 .login-divider-line {
@@ -245,7 +245,7 @@ button.login-google-btn:hover:not(:disabled) {
 }
 
 .login-divider-label {
-  margin: 0 12px;
+  margin: 0 var(--space-12);
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
@@ -255,13 +255,13 @@ button.login-google-btn:hover:not(:disabled) {
 button.login-guest-btn {
   border: none;
   background: none;
-  padding: 4px 0;
+  padding: var(--space-4) 0;
   font-family: var(--font-serif);
   font-optical-sizing: none;
   font-variation-settings: 'opsz' 24;
   font-size: 15px;
   color: rgba(var(--teal-rgb), 0.65);
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-8);
 }
 
 button.login-guest-btn:hover:not(:disabled) {
@@ -335,7 +335,7 @@ button.login-guest-btn:hover:not(:disabled) {
   background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card-hover);
-  padding: 14px 16px;
+  padding: var(--space-14) var(--space-16);
 }
 
 .avatar-dropdown-email {
@@ -348,7 +348,7 @@ button.login-guest-btn:hover:not(:disabled) {
 .avatar-dropdown-divider {
   height: 1px;
   background: var(--color-hairline);
-  margin: 12px 0;
+  margin: var(--space-12) 0;
 }
 
 button.avatar-dropdown-logout {
@@ -374,7 +374,7 @@ button.avatar-dropdown-logout:hover {
 button.guest-signin-btn {
   border: none;
   background: none;
-  padding: 7px 4px;
+  padding: var(--space-6) var(--space-4);
   color: var(--color-green);
   font-size: 0.9rem;
 }
@@ -393,21 +393,21 @@ button.guest-signin-btn:hover {
   background: color-mix(in srgb, var(--mustard) 16%, var(--color-bg));
   color: color-mix(in srgb, var(--mustard) 55%, var(--color-ink));
   font-size: 0.83rem;
-  padding: 10px 32px;
+  padding: var(--space-10) var(--space-32);
   line-height: 1.6;
   border-bottom: 1px solid var(--color-hairline);
 }
 
 .local-mode-banner code {
   background: rgba(var(--ink-rgb), 0.06);
-  padding: 1px 6px;
+  padding: var(--space-2) var(--space-6);
   border-radius: var(--radius-sm);
 }
 
 .app-main {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 48px 32px 80px;
+  padding: 48px var(--space-32) 80px;
 }
 
 .app-main--flush {
@@ -444,13 +444,13 @@ button.guest-signin-btn:hover {
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
+  gap: var(--space-10);
+  margin-top: var(--space-8);
 }
 
 .search-results {
   list-style: none;
-  margin: 0 0 24px;
+  margin: 0 0 var(--space-24);
   padding: 0;
   max-height: 280px;
   overflow-y: auto;
@@ -460,8 +460,8 @@ button.guest-signin-btn:hover {
 
 .search-result {
   display: flex;
-  gap: 12px;
-  padding: 10px;
+  gap: var(--space-12);
+  padding: var(--space-10);
   border-bottom: 1px solid var(--color-hairline);
   cursor: pointer;
   transition: background 0.15s ease;
@@ -512,7 +512,7 @@ button.guest-signin-btn:hover {
 
 .search-result-author,
 .search-result-date {
-  margin: 3px 0 0;
+  margin: var(--space-4) 0 0;
   font-size: 0.78rem;
   color: var(--color-text-muted);
 }
@@ -554,7 +554,7 @@ button.guest-signin-btn:hover {
   position: relative;
   display: flex;
   justify-content: center;
-  padding: calc(var(--safe-top) + 58px) var(--content-left) 32px;
+  padding: calc(var(--safe-top) + 58px) var(--content-left) var(--space-32);
   background: var(--poster-backdrop);
 }
 
@@ -598,7 +598,7 @@ button.guest-signin-btn:hover {
    Prince」）——裁示是接受中英文書名各自用各自的字體渲染（英文落 Fraunces、
    中文落 Noto Serif TC），不再要求兩者字重統一。 */
 .book-page-titleblock {
-  padding: 20px var(--content-left) 0;
+  padding: var(--space-20) var(--content-left) 0;
 }
 
 .book-page-title {
@@ -613,7 +613,7 @@ button.guest-signin-btn:hover {
 .book-page-title-hairline {
   height: 1px;
   background: var(--color-hairline);
-  margin: 14px 0;
+  margin: var(--space-14) 0;
 }
 
 /* meta 四欄：作者｜狀態｜N notes｜Edit，統一小字網格，space-between 一行排開。
@@ -622,7 +622,7 @@ button.guest-signin-btn:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .book-page-meta-item {
@@ -646,7 +646,7 @@ button.guest-signin-btn:hover {
 .book-page-edit-btn {
   background: transparent;
   border: none;
-  padding: 15px 4px;
+  padding: var(--space-14) var(--space-4);
   text-decoration: underline;
 }
 
@@ -678,9 +678,9 @@ button.book-page-edit-btn:hover {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-14);
   background: var(--color-bg);
-  padding: calc(var(--safe-top) + 18px) var(--content-left) 18px;
+  padding: calc(var(--safe-top) + 18px) var(--content-left) var(--space-18);
   border-bottom: 1px solid var(--color-hairline);
 }
 
@@ -744,13 +744,13 @@ button.btn-frosted--glass:hover {
 /* 段三：紙面內文區 */
 .note-detail-paper {
   flex: 1;
-  padding: 20px 24px 60px;
+  padding: var(--space-20) var(--space-24) 60px;
 }
 
 .note-detail-meta-row {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .note-detail-meta-row--no-page {
@@ -802,7 +802,7 @@ button.btn-frosted--glass:hover {
 }
 
 .note-detail-content {
-  margin: 14px 0 0;
+  margin: var(--space-14) 0 0;
   font-size: 14px;
   line-height: 1.75;
   color: var(--color-note-content);
@@ -813,11 +813,11 @@ button.btn-frosted--glass:hover {
 .note-detail-edit-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 14px;
+  gap: var(--space-4);
+  margin-top: var(--space-14);
   background: transparent;
   border: none;
-  padding: 10px 0;
+  padding: var(--space-10) 0;
   font-size: 12px;
   font-weight: 600;
   color: var(--color-green);
@@ -833,18 +833,18 @@ button.note-detail-edit-btn:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 4px var(--content-left) 140px;
+  padding: var(--space-4) var(--content-left) 140px;
 }
 
 .note-timeline-day-group + .note-timeline-day-group {
-  margin-top: 8px;
+  margin-top: var(--space-8);
 }
 
 .note-timeline-day-header {
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin: 20px 0 14px;
+  margin: var(--space-20) 0 var(--space-14);
 }
 
 .note-timeline-day-highlight {
@@ -882,7 +882,7 @@ button.note-detail-edit-btn:hover {
 }
 
 .note-timeline-card + .note-timeline-card {
-  margin-top: 16px;
+  margin-top: var(--space-16);
 }
 
 button.note-timeline-card:hover {
@@ -898,7 +898,7 @@ button.note-timeline-card:hover {
 }
 
 .note-timeline-card-body {
-  padding: 14px 16px 12px;
+  padding: var(--space-14) var(--space-16) var(--space-12);
 }
 
 /* 項目 3：頁碼純文字小字，無裝飾。原規格指定 Cormorant，這個字體已被多輪
@@ -912,7 +912,7 @@ button.note-timeline-card:hover {
 }
 
 .note-timeline-content {
-  margin: 10px 0 0;
+  margin: var(--space-10) 0 0;
   font-size: 14px;
   line-height: 1.75;
   color: var(--color-note-content);
@@ -934,7 +934,7 @@ button.note-timeline-card:hover {
 .note-timeline-card-hairline {
   height: 1px;
   background: var(--color-hairline);
-  margin: 12px 0 8px;
+  margin: var(--space-12) 0 var(--space-8);
 }
 
 .note-timeline-card-meta {
@@ -943,7 +943,7 @@ button.note-timeline-card:hover {
 }
 
 .note-timeline-empty {
-  padding: 12px var(--content-left) 140px;
+  padding: var(--space-12) var(--content-left) 140px;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
@@ -953,7 +953,7 @@ button.note-timeline-card:hover {
 }
 
 .note-timeline-empty p + p {
-  margin-top: 6px;
+  margin-top: var(--space-6);
 }
 
 /* ---- Bookshelf (mobile, 390px baseline) ---- */
@@ -970,14 +970,14 @@ button.note-timeline-card:hover {
 
 .bookshelf-header {
   flex-shrink: 0;
-  padding: 28px var(--content-left) 0;
+  padding: var(--space-28) var(--content-left) 0;
 }
 
 /* 橫幅文字是活文字（見 BrandBanner.jsx），不是點陣圖，不用算 icon 疊圖定位。
    Patch 01 P-1：標題字體統一回 --font-serif（Fraunces），移除 Apple Garamond；
    font-optical-sizing/font-variation-settings 修正大字級時 Fraunces 的 s 字形。 */
 .brand-hero {
-  padding: 0 0 0 3px;
+  padding: 0 0 0 var(--space-4);
 }
 
 .brand-title-over {
@@ -987,7 +987,7 @@ button.note-timeline-card:hover {
   line-height: 1.1;
   color: var(--color-green);
   letter-spacing: -0.045em;
-  margin: 0 0 2px;
+  margin: 0 0 var(--space-2);
   font-optical-sizing: none;
   font-variation-settings: 'opsz' 40;
 }
@@ -1011,11 +1011,11 @@ button.note-timeline-card:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .shelf-illo {
-  margin: 8px -4px 0;
+  margin: var(--space-8) -4px 0;
   display: block;
   width: calc(100% + 8px);
   height: auto;
@@ -1064,8 +1064,8 @@ button.note-timeline-card:hover {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px 10px;
-  padding: 20px 0 4px;
+  gap: var(--space-8) var(--space-10);
+  padding: var(--space-20) 0 var(--space-4);
 }
 
 /* 書量文字，刻意用斜體 serif——跟 .meta-text（日期標頭/頁碼等 metadata
@@ -1083,7 +1083,7 @@ button.note-timeline-card:hover {
 .bookshelf-filterrow-icons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 /* 已選篩選膠囊列，只在有作用中的篩選時渲染，可換行；靠右對齊、必要時自己
@@ -1093,17 +1093,17 @@ button.note-timeline-card:hover {
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   margin-left: auto;
 }
 
 .filter-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   border: 1.2px solid var(--color-green);
   border-radius: var(--radius-pill);
-  padding: 6px 14px;
+  padding: var(--space-6) var(--space-14);
   font-family: var(--font-sans);
   font-size: 14px;
   color: var(--color-green);
@@ -1128,7 +1128,7 @@ button.filter-pill:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 18px;
+  padding: var(--space-6) var(--space-18);
   border-radius: var(--radius-pill);
   border: 1.2px solid var(--color-green);
   background: transparent;
@@ -1156,7 +1156,7 @@ button.pill-btn:focus-visible {
 /* 跟 .bookshelf-filterrow 同理：.bookshelf-header 已經有一層 --content-left，
    這裡不再重複，避免搜尋框比書封格線多縮進一倍。 */
 .bookshelf-search-row {
-  margin-top: 14px;
+  margin-top: var(--space-14);
 }
 
 /* UI 修正批次（總規格項目 4）：搜尋框外框改用全域標準色的淺色 hairline
@@ -1166,13 +1166,13 @@ button.pill-btn:focus-visible {
   width: 100%;
   border: 1.5px solid var(--color-hairline);
   border-radius: var(--radius-pill);
-  padding: 10px 18px;
+  padding: var(--space-10) var(--space-18);
 }
 
 .bookshelf-status {
   position: relative;
   z-index: 2;
-  padding: 8px var(--content-left) 0;
+  padding: var(--space-8) var(--content-left) 0;
   font-size: 0.9rem;
 }
 
@@ -1182,8 +1182,8 @@ button.pill-btn:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 8px 0 170px;
+  gap: var(--space-22);
+  padding: var(--space-8) 0 170px;
 }
 
 /* 書架層板：頂面（梯形，做出景深感）+ 前緣（垂直長條）+ 投影，
@@ -1217,8 +1217,8 @@ button.pill-btn:focus-visible {
 .wrap-shelf-rows {
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  padding: 0 var(--content-left) 24px;
+  gap: var(--space-24);
+  padding: 0 var(--content-left) var(--space-24);
 }
 
 .wrap-shelf-row {
@@ -1232,9 +1232,9 @@ button.pill-btn:focus-visible {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: end;
-  gap: 12px;
+  gap: var(--space-12);
   min-height: 134px;
-  padding-bottom: 14px;
+  padding-bottom: var(--space-14);
 }
 
 .wrap-shelf-book {
@@ -1309,8 +1309,8 @@ button.pill-btn:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 14px 28px;
+  gap: var(--space-6);
+  padding: var(--space-14) var(--space-28);
   border: none;
   border-radius: var(--radius-pill);
   background: var(--color-ink);
@@ -1341,7 +1341,7 @@ button.add-book-btn:active {
    pill 形狀跟字級規格，顏色交給基礎 .btn-frosted。 */
 .add-book-btn.btn-frosted {
   border-radius: var(--radius-pill);
-  padding: 15px 30px;
+  padding: var(--space-14) var(--space-28);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
@@ -1400,8 +1400,8 @@ button.btn-frosted:hover {
 .btn-frosted--sm {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 13px;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-14);
   font-size: 11px;
   font-weight: 600;
   border-radius: var(--radius-pill);
@@ -1441,7 +1441,7 @@ button.btn-frosted:hover {
   background: var(--color-bg);
   color: var(--color-ink);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: var(--space-22);
   box-shadow: var(--shadow-card-hover);
 }
 
@@ -1458,7 +1458,7 @@ button.btn-frosted:hover {
   background: var(--color-surface);
   border: 1px solid rgba(var(--ink-rgb), 0.35);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
+  padding: var(--space-10) var(--space-14);
   color: var(--color-ink);
   font-family: inherit;
 }
@@ -1491,7 +1491,7 @@ button.btn-frosted:hover {
 }
 
 .add-modal-search {
-  margin: 12px 0 14px;
+  margin: var(--space-12) 0 var(--space-14);
 }
 
 /* Patch 02 P2-2：「Details」副標改 teal，只影響 AddBookModal（唯一用到這個 class 的地方）。 */
@@ -1500,7 +1500,7 @@ button.btn-frosted:hover {
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--color-green);
-  margin: 2px 0 10px;
+  margin: var(--space-2) 0 var(--space-10);
 }
 
 /* Patch 02 P2-2：「Add Book」標題改 teal。用專屬 class（不是共用的 .modal-header h2），
@@ -1519,15 +1519,15 @@ button.btn-frosted:hover {
 .add-modal-label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-4);
   font-size: 0.88rem;
   color: var(--color-text-secondary);
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
   width: 100%;
 }
 
 .add-modal-field {
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
   width: 100%;
 }
 
@@ -1535,14 +1535,14 @@ button.btn-frosted:hover {
   display: block;
   font-size: 0.88rem;
   color: var(--color-text-secondary);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-4);
 }
 
 /* 選圖後改成壓扁的單行列（縮圖 ≤72px），不要撐開一大塊，避免選圖前後 modal 高度差太多 */
 .note-image-selected-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .note-image-thumb-sm {
@@ -1612,8 +1612,8 @@ button.note-image-remove-sm:hover {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: calc(var(--safe-top) + 10px) 10px 10px;
+  gap: var(--space-6);
+  padding: calc(var(--safe-top) + 10px) var(--space-10) var(--space-10);
 }
 
 /* 總規格項目 5（修訂：Cancel 取代 X）：畫面上不再有 X 或 ‹，離開一律走這顆
@@ -1624,7 +1624,7 @@ button.note-image-remove-sm:hover {
   border: 1px solid rgba(var(--paper-rgb), 0.4);
   border-radius: var(--radius-pill);
   color: var(--color-bg);
-  padding: 9px 18px;
+  padding: var(--space-10) var(--space-18);
   font-size: 0.78rem;
   font-weight: 600;
 }
@@ -1645,14 +1645,14 @@ button.annotator-cancel:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 4px 10px 14px;
+  gap: var(--space-14);
+  padding: var(--space-4) var(--space-10) var(--space-14);
 }
 
 .annotator-swatches {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .annotator-swatch {
@@ -1709,7 +1709,7 @@ button.annotator-undo:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: var(--space-8);
   overflow: hidden;
 }
 
@@ -1728,7 +1728,7 @@ button.annotator-undo:disabled {
   border: none;
   border-radius: var(--radius-pill);
   color: var(--color-ink);
-  padding: 9px 18px;
+  padding: var(--space-10) var(--space-18);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -1754,7 +1754,7 @@ input.add-modal-file-input {
 .add-modal-file-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 /* M-2：跟 Cancel 同語言（綠字綠框透明底） */
@@ -1764,7 +1764,7 @@ input.add-modal-file-input {
   align-items: center;
   border: 1px solid var(--color-green);
   border-radius: var(--radius-md);
-  padding: 10px 16px;
+  padding: var(--space-10) var(--space-16);
   font-size: 0.88rem;
   color: var(--color-green);
   background: transparent;
@@ -1786,7 +1786,7 @@ input.add-modal-file-input {
 
 .add-page-btn {
   border-radius: var(--radius-pill);
-  padding: 14px 28px;
+  padding: var(--space-14) var(--space-28);
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -1814,7 +1814,7 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
    不再自己覆蓋一份實色 teal＋無 blur 的版本。 */
 .add-page-btn.btn-frosted {
   border-radius: var(--radius-pill);
-  padding: 15px 30px;
+  padding: var(--space-14) var(--space-28);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
@@ -1837,7 +1837,7 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
   width: 100%;
   background: var(--color-bg);
   border-radius: 20px 20px 0 0;
-  padding: 10px 20px calc(20px + var(--safe-bottom));
+  padding: var(--space-10) var(--space-20) calc(20px + var(--safe-bottom));
   box-shadow: 0 -8px 30px rgba(var(--ink-rgb), 0.15);
 }
 
@@ -1848,7 +1848,7 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
-  margin: 8px 0 6px;
+  margin: var(--space-8) 0 var(--space-6);
 }
 
 .action-sheet-option {
@@ -1860,7 +1860,7 @@ button.add-page-btn-secondary--green:hover:not(:disabled) {
   border: none;
   border-radius: 0;
   border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  padding: 14px 4px;
+  padding: var(--space-14) var(--space-4);
   font-size: 1rem;
   color: var(--color-ink);
   text-align: left;
@@ -1885,7 +1885,7 @@ button.action-sheet-option:hover {
    三組標題全部失去分隔線，所以拿掉，統一都畫底線（含 Done 前最後一項），
    是可接受的小幅簡化。 */
 .action-sheet-sublist {
-  padding-left: 16px;
+  padding-left: var(--space-16);
 }
 
 /* P3-2：選項樣式統一 --sans 16px。 */
@@ -1897,7 +1897,7 @@ button.action-sheet-option:hover {
   background: transparent;
   border: none;
   border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  padding: 12px 4px;
+  padding: var(--space-12) var(--space-4);
   font-family: var(--font-sans);
   font-size: 16px;
   color: var(--color-ink);
@@ -1917,11 +1917,11 @@ button.action-sheet-suboption:hover {
 .action-sheet-cancel {
   display: block;
   width: 100%;
-  margin-top: 12px;
+  margin-top: var(--space-12);
   background: var(--color-surface);
   border: 1.5px solid var(--color-green);
   border-radius: var(--radius-lg);
-  padding: 14px;
+  padding: var(--space-14);
   font-size: 1rem;
   font-weight: 600;
   color: var(--color-green);
@@ -1943,11 +1943,11 @@ button.action-sheet-cancel:hover {
    危險動作連結，NoteModal 也在用，保留並改用 --color-danger token。 */
 .edit-modal-delete {
   display: block;
-  margin: 18px auto 0;
+  margin: var(--space-18) auto 0;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 6px;
+  padding: var(--space-6);
   font-size: 0.82rem;
   font-weight: 400;
   color: var(--color-danger);
@@ -1975,7 +1975,7 @@ button.action-sheet-cancel:hover {
   background: var(--cream);
   color: var(--color-ink-accent);
   border-radius: var(--radius-lg);
-  padding: 18px 20px;
+  padding: var(--space-18) var(--space-20);
   box-shadow: var(--shadow-float);
   max-width: 280px;
 }
@@ -2012,11 +2012,11 @@ button.action-sheet-cancel:hover {
 }
 
 .marginalia-tour .driver-popover-footer {
-  margin-top: 16px;
+  margin-top: var(--space-16);
 }
 
 .marginalia-tour .driver-popover-navigation-btns {
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .marginalia-tour .driver-popover-next-btn,
@@ -2025,7 +2025,7 @@ button.action-sheet-cancel:hover {
   box-sizing: border-box;
   cursor: pointer;
   border-radius: var(--radius-pill);
-  padding: 9px 18px;
+  padding: var(--space-10) var(--space-18);
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
