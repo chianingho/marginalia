@@ -434,6 +434,22 @@ padding/margin/gap:數量龐大(index.css 全檔超過 150 處宣告 padding/mar
 
 **C · Add Book 按鈕英文換行:** `shelf.addBook` 字典值由「Add a book」縮短為「Add book」(uppercase 後為 ADD BOOK,較短)。`.add-book-btn` 加 `white-space: nowrap` 作為多語言長度保險——此 class 由首頁「Add Book」跟書籍詳情頁「New Note」共用,兩顆按鈕都套用。
 
+### Ruling 9 · 語言鈕改版:從書櫃列移入帳號選單  2026-07-30
+
+**裁決:** Ruling 8-A 把語言鈕放進書櫃頁 `.bookshelf-filterrow-icons` 當第三顆 pill,本批(0728-v2)改版裁定改放帳號選單(頭像下拉),理由是三顆 icon 擠壓版面、且語言設定語意上更接近帳號設定而非書櫃工具列。B(狀態文字 i18n)、C(Add Book 按鈕英文換行)已於 Ruling 8 到位,本批核對現況後維持不動。
+
+**結構位置:** `Bookshelf.jsx` 移除 `.bookshelf-filterrow-icons` 裡的 `<LocaleToggle>` 掛載(元件檔 `LocaleToggle` 保留在 `i18n.jsx`,但改由 `AvatarMenu.jsx` 直接用 `useLocale()` 的 `locale`/`setLocale` 實作膠囊開關,不沿用 `LocaleToggle` 的單鈕樣式)。掛在 `.avatar-dropdown` 內、Sign out 列(`.avatar-dropdown-logout`)下方,新增一條 `.avatar-dropdown-divider`(跟 email→Sign out 之間那條共用同一個 class,樣式一致)+ `.avatar-dropdown-language-row`。
+
+**列高/內距:** 語言列本身不額外加左右內距,跟 Sign out 列一樣吃 `.avatar-dropdown` 容器的 `padding: var(--space-14) var(--space-16)`;列高由內容(label 行高 + 膠囊按鈕)撐開,未寫死高度,同 Sign out 列作法。
+
+**左側標籤:** `.avatar-dropdown-language-label`,字典 key `settings.language`(en "Language" / zh "語言"),`color: var(--color-green)`,`font-size: var(--text-sm)`,`font-weight: 600`——選單內原無明確「強調字重」可比照(Sign out 列本身未設 font-weight,吃預設值),`600` 取自全站既有的強調字重慣例(`.avatar-fallback`/`.search-result-title`/`.add-book-btn` 等處一致使用),非新發明數值。
+
+**右側 ZH/EN 膠囊(`.locale-pill` + `.locale-pill-seg`):** 外框 `1px solid var(--color-green)`、`border-radius: var(--radius-pill)`,`overflow: hidden` 讓內部兩顆分段按鈕的直角被裁成膠囊。分段按鈕 `padding: var(--space-4) var(--space-12)`、`font-size: var(--text-xs)`。當前語言段(`.is-active`):`background: var(--color-green)`、`color: var(--cream)`;非當前段:透明底、`color: var(--color-green)`。點任一段呼叫既有 `setLocale`,行為與原 `LocaleToggle` 一致,localStorage 記憶邏輯(`i18n.jsx` 的 `STORAGE_KEY`)未變動。
+
+**未登入畫面:** 未動,維持 `localStorage → 瀏覽器語言 → en` 初始邏輯,登入頁不放語言切換。
+
+**驗收缺口:** 本批未接入瀏覽器自動化工具,無法產出 iPhone Safari 實機截圖,已用 `npm run build` 確認編譯通過、程式碼審視確認掛載點與樣式對應規格;實機視覺驗收待人工補做。
+
 ### 治理里程碑
 
 顏色(Ruling 1/4)、圓角(Ruling 5)、間距(Ruling 6)、字級(Ruling 7)四個 token 系統,以及 i18n 執行時切換(主批 + Ruling 8 收尾)至此全數完成。狀態/類別的資料模型收斂留待 D7 批;tour 文案另開批處理。

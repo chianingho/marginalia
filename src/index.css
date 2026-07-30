@@ -370,6 +370,52 @@ button.avatar-dropdown-logout:hover {
   text-decoration: underline;
 }
 
+/* i18n 收尾批次（2026-07-30 v2）：語言列，接在 Sign out 下方，跟它共用同一條
+   .avatar-dropdown-divider，左右內距/列高不額外加值，交給 .avatar-dropdown
+   的 padding 撐開（跟 Sign out 列同一套做法）。 */
+.avatar-dropdown-language-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.avatar-dropdown-language-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+.locale-pill {
+  display: flex;
+  border: 1px solid var(--color-green);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+button.locale-pill-seg {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-green);
+  padding: var(--space-4) var(--space-12);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+button.locale-pill-seg:hover {
+  background: transparent;
+  color: var(--color-green);
+  box-shadow: none;
+  transform: none;
+}
+
+button.locale-pill-seg.is-active,
+button.locale-pill-seg.is-active:hover {
+  background: var(--color-green);
+  color: var(--cream);
+}
+
 /* 訪客模式：頭像位置改顯示純文字 Sign in 入口，導覽按鈕階層的最低階，
    跟登入頁的 Continue as guest 同一視覺語言（無邊框/底線/背景）。 */
 button.guest-signin-btn {

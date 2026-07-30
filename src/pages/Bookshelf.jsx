@@ -10,7 +10,7 @@ import { useOnboarding } from '../onboarding/useOnboarding.js'
 import { hasSupabaseConfig, supabase } from '../lib/supabaseClient.js'
 import { useAuthSession } from '../lib/useAuthSession.js'
 import { isGuestMode } from '../lib/guestMode.js'
-import { useLocale, LocaleToggle } from '../i18n/i18n'
+import { useLocale } from '../i18n/i18n'
 
 function chunk(list, size) {
   const out = []
@@ -279,7 +279,6 @@ export default function Bookshelf() {
               >
                 <FilterIcon />
               </button>
-              <LocaleToggle className="pill-btn" />
               {hasSupabaseConfig && session && <AvatarMenu session={session} sizeRefTarget={filterBtnRef} />}
               {hasSupabaseConfig && !session && isGuestMode() && (
                 <button type="button" className="guest-signin-btn" onClick={handleGuestSignIn}>

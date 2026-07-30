@@ -7,7 +7,7 @@ import { useLocale } from '../i18n/i18n'
 // 量測那顆按鈕的實際高度，不寫死 px（.pill-btn 本身是橢圓，寬高不同，量高度
 // 是因為頭像是圓形，跟旁邊按鈕對齊的是同一條水平視覺高度）。
 export default function AvatarMenu({ session, sizeRefTarget }) {
-  const { t } = useLocale()
+  const { t, locale, setLocale } = useLocale()
   const [open, setOpen] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [size, setSize] = useState(null)
@@ -76,6 +76,26 @@ export default function AvatarMenu({ session, sizeRefTarget }) {
           <button type="button" className="avatar-dropdown-logout" onClick={handleLogout} role="menuitem">
             {t('common.signOut')}
           </button>
+          <div className="avatar-dropdown-divider" />
+          <div className="avatar-dropdown-language-row">
+            <span className="avatar-dropdown-language-label">{t('settings.language')}</span>
+            <div className="locale-pill" role="group">
+              <button
+                type="button"
+                className={`locale-pill-seg${locale === 'zh' ? ' is-active' : ''}`}
+                onClick={() => setLocale('zh')}
+              >
+                ZH
+              </button>
+              <button
+                type="button"
+                className={`locale-pill-seg${locale === 'en' ? ' is-active' : ''}`}
+                onClick={() => setLocale('en')}
+              >
+                EN
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

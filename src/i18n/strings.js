@@ -44,6 +44,7 @@ export const strings = {
     },
     facet: { status: 'Status', category: 'Category', year: 'Year', month: 'Month' },
     status: { to_read: 'To read', reading: 'Reading', finished: 'Finished' },
+    settings: { language: 'Language' },
     category: {
       none: 'None', custom: 'Custom…', customPlaceholder: 'Enter a category',
       fiction: 'Fiction', essays: 'Essays', psychology: 'Psychology', design: 'Design',
@@ -127,6 +128,7 @@ export const strings = {
     },
     facet: { status: '狀態', category: '類別', year: '年份', month: '月份' },
     status: { to_read: '待閱讀', reading: '閱讀中', finished: '閱讀完畢' },
+    settings: { language: '語言' },
     category: {
       none: '無', custom: '自訂…', customPlaceholder: '輸入類別',
       fiction: '小說', essays: '散文', psychology: '心理', design: '設計',
