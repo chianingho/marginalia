@@ -1,7 +1,7 @@
 // IndexedDB（用 idb-keyval）圖片存取的唯一入口：全 app 需要讀/寫/刪圖片 blob，
 // 一律走這裡，不要直接 import idb-keyval。不進 localStorage —— notes 記錄只存
 // key 參照，避免圖片把 localStorage 的容量上限（通常 5~10MB）塞爆。
-import { get, set, del } from 'idb-keyval'
+import { get, set, del, update } from 'idb-keyval'
 
 // 標注非破壞性改版：一則筆記的截圖現在有兩把 IndexedDB key——
 // 原圖（noteOriginalImageKey，標注前，永不覆寫）跟顯示快取
@@ -19,6 +19,11 @@ export function noteDisplayImageKey(noteId) {
 
 export async function saveNoteImage(key, blob) {
   await set(key, blob)
+}
+
+// 還原快取只補缺圖；使用者在下載期間另選的圖片也不能被覆寫。
+export async function restoreNoteImage(key, blob) {
+  await update(key, (existing) => existing || blob)
 }
 
 export async function getNoteImage(key) {

@@ -9,14 +9,8 @@ function localModeStore() {
   return isGuestMode() ? guestStore : localStore
 }
 
-// DB 的 notes 表沒有 image_original/image_display/note_date 這幾個欄位（定案 schema
-// 只有 image_path，決策 C 也講明 note_date 不入庫）。但 NoteList/NoteDetail/
-// NoteImageLightbox/noteAnnotation.js 這些既有顯示元件都是靠 note.image_original
-// 判斷「有沒有截圖」、當 IndexedDB 的 key 去撈原圖 blob——這些元件本次不動。
-// 這裡把從 Supabase 撈回來的 row 補一個合成欄位：image_original 直接用
-// noteOriginalImageKey(id) 算回本機 IndexedDB 那把 key（不是 image_path 的值，
-// 兩者命名空間完全不同，image_path 是 Storage 路徑，image_original 是 IndexedDB
-// key），只要原圖曾經在這台裝置上傳過，本機快取還在，既有元件就能直接讀到圖。
+// DB 保存 Storage 路徑；顯示元件使用既有 IndexedDB key。
+// 缺少本機圖片時，noteAnnotation.js 會讀取私有 Storage 並補入快取。
 function toClientNote(row) {
   return {
     ...row,
@@ -112,7 +106,7 @@ export async function deleteNote(noteId) {
 
 async function uploadNoteImage(userId, noteId, imageKey) {
   const blob = await getNoteImage(imageKey)
-  if (!blob) return null
+  if (!blob) throw new Error('找不到要上傳的圖片，請重新選擇照片。')
 
   const path = `${userId}/${noteId}.jpg`
   const { error } = await supabase.storage.from(NOTE_IMAGES_BUCKET).upload(path, blob, {

@@ -16,7 +16,7 @@ import BirdDoodle from './BirdDoodle.jsx'
 // 這是 app 內的入場動畫，跟 public/ 的 PWA manifest 靜態 splash 是兩回事，
 // 不動 manifest。原型右下角「重播」鈕不進正式版。
 const SPLASH_STORAGE_KEY = 'marginalia_splash_seen'
-const WORD = 'Marginalia'
+const WORD = 'Pages'
 
 // 時間軸（相對於「開始打字」那一刻，即 fonts.ready 後再等 POST_FONTS_DELAY_MS）：
 const TYPE_START_MS = 150

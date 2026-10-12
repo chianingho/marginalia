@@ -72,6 +72,7 @@ function NoteThumbnail({ note }) {
   const [url, setUrl] = useState(null)
 
   useEffect(() => {
+    setUrl(null)
     let objectUrl
     let cancelled = false
     getNoteDisplayBlob(note).then((blob) => {
@@ -84,7 +85,7 @@ function NoteThumbnail({ note }) {
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [note.id])
+  }, [note])
 
   if (!url) return null
 

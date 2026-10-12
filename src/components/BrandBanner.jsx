@@ -13,7 +13,7 @@ export default function BrandBanner({ actions }) {
   return (
     <div className="brand-hero">
       <div className="brand-hero-row">
-        <p className="brand-title-over">Marginalia</p>
+        <p className="brand-title-over">Pages</p>
         {actions}
       </div>
       <h1 className="brand-title">Books</h1>

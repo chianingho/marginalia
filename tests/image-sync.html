@@ -1,0 +1,23 @@
+<!doctype html><html><body><div id="root"></div><script type="module">
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {MemoryRouter, Routes, Route} from 'react-router-dom';
+import {LocaleProvider} from '/src/i18n/i18n.jsx';
+import NoteList from '/src/components/NoteList.jsx';
+import NoteDetail from '/src/pages/NoteDetail.jsx';
+import NoteImageLightbox from '/src/components/NoteImageLightbox.jsx';
+import * as notes from '/src/api/notes.js';
+import * as images from '/src/lib/imageStore.js';
+import * as annotation from '/src/lib/noteAnnotation.js';
+import {supabase} from '/src/lib/supabaseClient.js';
+if (!supabase || !supabase.supabaseUrl.startsWith('http://127.0.0.1:')) throw new Error('測試必須使用本機 Supabase mock URL');
+let userId='test-user';
+supabase.auth.getSession=async()=>({data:{session:userId?{user:{id:userId},access_token:'test-token'}:null}});
+const root=createRoot(document.getElementById('root'));
+const wrap=child=>React.createElement(LocaleProvider,null,React.createElement(MemoryRouter,null,child));
+window.testApi={notes,images,annotation,setUser:id=>{userId=id},
+ mountList:items=>root.render(wrap(React.createElement(NoteList,{notes:items}))),
+ mountDetail:id=>root.render(React.createElement(LocaleProvider,null,React.createElement(MemoryRouter,{initialEntries:[`/note/${id}`],key:id},React.createElement(Routes,null,React.createElement(Route,{path:'/note/:id',element:React.createElement(NoteDetail)}))))),
+ mountAnnotator:note=>root.render(wrap(React.createElement(NoteImageLightbox,{note,onClose:()=>{},onAnnotated:()=>{}}))),
+};
+</script></body></html>

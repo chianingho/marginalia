@@ -1,6 +1,6 @@
 {
-  "name": "Marginalia · 閱讀筆記",
-  "short_name": "Marginalia",
+  "name": "Pages · 閱讀筆記",
+  "short_name": "Pages",
   "description": "個人讀書筆記與畫線收藏",
   "start_url": "/",
   "display": "standalone",

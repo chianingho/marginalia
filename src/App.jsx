@@ -67,7 +67,7 @@ export default function App() {
       {!isFlush && (
         <header className="app-header">
           <Link to="/" className="app-title">
-            <span className="app-name">Marginalia</span>
+            <span className="app-name">Pages</span>
             <span className="app-subtitle">{t('common.subtitle')}</span>
           </Link>
         </header>

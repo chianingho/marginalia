@@ -7,7 +7,7 @@
 export const strings = {
   en: {
     common: {
-      appDocTitle: 'Marginalia — Reading Notes',
+      appDocTitle: 'Pages — Reading Notes',
       subtitle: 'reading notes',
       accountMenu: 'Account menu',
       signOut: 'Sign out',
@@ -91,7 +91,7 @@ export const strings = {
 
   zh: {
     common: {
-      appDocTitle: 'Marginalia · 閱讀筆記',
+      appDocTitle: 'Pages · 閱讀筆記',
       subtitle: '閱讀筆記',
       accountMenu: '帳號選單',
       signOut: '登出',

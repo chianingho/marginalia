@@ -64,6 +64,7 @@ export default function NoteDetail() {
   }, [id])
 
   useEffect(() => {
+    setImageUrl(null)
     if (!getOriginalImageKey(note)) return
     let objectUrl
     let cancelled = false
@@ -77,7 +78,7 @@ export default function NoteDetail() {
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [note?.id])
+  }, [note])
 
   // 深連結直開（沒有 in-app 上一頁）就 fallback 回所屬 /book/:id，
   // 否則走瀏覽器 history back（React Router 初始那筆 history entry 的 key 固定是 'default'）。
@@ -103,7 +104,7 @@ export default function NoteDetail() {
         >
           <ChevronLeftIcon />
         </button>
-        <h1 className="note-detail-title">{book?.title || 'Marginalia'}</h1>
+        <h1 className="note-detail-title">{book?.title || 'Pages'}</h1>
         {imageUrl && (
           <button
             type="button"

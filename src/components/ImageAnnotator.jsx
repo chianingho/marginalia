@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useScrollLock } from '../lib/scrollLock.js'
 import { useLocale } from '../i18n/i18n'
+import { drawNoteStroke as drawStroke } from '../lib/noteAnnotation.js'
 
 // 截圖標注：純 canvas + pointer events，不引入任何繪圖套件。
 // 唯一工具＝螢光筆，常駐啟用，沒有其他工具可切換；F-8 起筆色可從 4 顆色票切換。
@@ -10,7 +11,6 @@ import { useLocale } from '../i18n/i18n'
 // 本質上只是 push 了一份 []）。完成（Done）時把目前畫面 flatten 匯出成一張新圖，
 // 同時把目前的 strokes（正規化座標）一起回傳——呼叫端負責重新壓縮、存成顯示快取，
 // 並把 strokes 寫回 note 記錄，原圖（imageUrl 對應的來源）完全不動。
-const HIGHLIGHT_WIDTH_RATIO = 0.045 // 圖寬的 4.5%
 
 const SWATCH_COLORS = ['#F2FF00', '#FF9EC4', '#7FD8FF', '#8CFF9E']
 const DEFAULT_COLOR = SWATCH_COLORS[0]
@@ -24,22 +24,6 @@ function normalizeInitialStrokes(initialStrokes) {
   return initialStrokes.map((stroke) =>
     Array.isArray(stroke) ? { color: DEFAULT_COLOR, points: stroke } : stroke,
   )
-}
-
-// pixelPoints：畫布像素座標（不是正規化座標）
-function drawStroke(ctx, pixelPoints, canvasWidth, color) {
-  if (pixelPoints.length < 2) return
-  ctx.save()
-  ctx.globalCompositeOperation = 'multiply'
-  ctx.strokeStyle = color
-  ctx.lineWidth = Math.max(4, canvasWidth * HIGHLIGHT_WIDTH_RATIO)
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  ctx.beginPath()
-  ctx.moveTo(pixelPoints[0].x, pixelPoints[0].y)
-  for (let i = 1; i < pixelPoints.length; i++) ctx.lineTo(pixelPoints[i].x, pixelPoints[i].y)
-  ctx.stroke()
-  ctx.restore()
 }
 
 // 進入時把 initialStrokes 逐筆疊成快照 stack：[[], [s1], [s1,s2], ...]，

@@ -31,7 +31,7 @@ export default function Login({ onGuest }) {
   return (
     <div className="login-page">
       <div className="login-card">
-        <p className="login-wordmark">Marginalia</p>
+        <p className="login-wordmark">Pages</p>
         <p className="login-subtitle">{t('login.tagline')}</p>
 
         <div className="login-cta-block">

@@ -28,6 +28,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
 
   // 編輯模式：把既有截圖（顯示快取，有標注就是標注後版本）從 IndexedDB 撈出來做預覽縮圖
   useEffect(() => {
+    setExistingPreviewUrl(null)
     if (!getOriginalImageKey(note)) return
     let objectUrl
     let cancelled = false
@@ -41,7 +42,7 @@ export default function NoteModal({ bookId, note, onClose, onSaved, onDeleted })
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [note])
 
   // 新選的檔案：另外管自己的 object URL 生命週期
   useEffect(() => {
