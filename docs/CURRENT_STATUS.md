@@ -1,6 +1,7 @@
 # Pages 目前狀態與分支差異
 
 **目前由誰作業**：無（開工時改為 Codex／CC 與日期，收工改回「無」）
+**工具交接**：Codex 已暫停訂閱（2026-11-18 起），目前由 CC 負責。
 
 | 工作樹 | 文件整理前狀態 | 獨有提交 |
 |---|---|---|
@@ -23,3 +24,8 @@
 - **整合提案**：取得授權後，在獨立工作樹以候選分支為基準，比對並納入 `e6c060f`，人工核對 `strings.js`。逐項確認主工作樹未提交內容，僅挑入經核准且候選分支尚缺的修改。先跑 build 和現有模擬測試，再以專用帳號做雙裝置驗收，完成後再決定是否開 PR。
 
 [測試及限制](pages-image-sync-fix-qa.md)
+
+## 待辦（記錄於 2026-11-18，尚未執行）
+
+- [ ] `release/pages-sync` 與 `jessica_agent/main` 尚未整合（含 `e6c060f`），整合需另行授權。
+- [ ] `ecom-scraper/` 遷出 `~/Desktop/jessica_agent`，同時更新 CC scrape-store skill 的路徑（`SKILL.md`、`scripts/store_common.py` 的 `DEFAULT_OUT`）與 CC 記憶檔。
