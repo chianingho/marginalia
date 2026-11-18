@@ -1,3 +1,13 @@
+# Pages 現行架構（release/pages-sync）
+
+本節描述發行候選分支。下方原始備忘保留早期本機模式的設計脈絡；其中尚未接上 Supabase 的描述屬歷史。
+
+`src/main.jsx` 啟動 React，`src/App.jsx` 管理路由與畫面。React 18.3.1、Vite 5.4.21、Supabase JS 2.107.0 版本來自鎖檔。書架、書籍與筆記詳情位於 `src/pages/`，書籍和筆記讀寫集中在 `src/api/books.js` 與 `src/api/notes.js`。
+
+登入流程為「瀏覽器 → Google OAuth → Supabase session → 書籍與筆記」。配置完整時使用 Supabase，訪客與本機路徑依程式設定使用瀏覽器儲存。文字及資料欄位保存在 Postgres；筆記原圖透過 Storage 保存，`src/lib/noteAnnotation.js` 在本機缺圖時下載原圖，依遠端筆畫重建並使用 IndexedDB。書籍封面可來自 Google Books 或 Storage。跨裝置覆蓋與色彩限制詳見 [目前狀態](CURRENT_STATUS.md)。
+
+## 原始架構備忘
+
 # Marginalia 架構備忘
 
 技術交接用的精簡附件。更新原則：每次大改版（新增畫面、資料模型變動、共用機制變動）
