@@ -5,8 +5,8 @@
 
 | 工作樹 | 文件整理前狀態 | 獨有提交 |
 |---|---|---|
-| `/Users/chianiny/Projects/pages-release` | `release/pages-sync` 乾淨，與遠端一致 | `924521d` 更名 Pages、更新 README、修補跨裝置圖片、加入隔離 QA 測試 |
-| `/Users/chianiny/Projects/pages` | `main` 領先遠端一筆，已有未提交工作 | `e6c060f` 統一新增／編輯書籍的分類選項，使用語意鍵與 i18n 顯示，並更新書架過濾與 UI 文件 |
+| `/Users/chianiny/Desktop/Projects/pages-release` | `release/pages-sync` 乾淨，與遠端一致 | `924521d` 更名 Pages、更新 README、修補跨裝置圖片、加入隔離 QA 測試 |
+| `/Users/chianiny/Desktop/Projects/pages` | `main` 領先遠端一筆，已有未提交工作 | `e6c060f` 統一新增／編輯書籍的分類選項，使用語意鍵與 i18n 顯示，並更新書架過濾與 UI 文件 |
 
 兩者共用同一個 Git repository，分支共同基準及遠端預設分支為 `main` 的 `bd7f4ab`。盤點時兩邊均無未解 Git 衝突。
 
@@ -28,4 +28,4 @@
 ## 待辦（記錄於 2026-11-18，尚未執行）
 
 - [ ] `release/pages-sync` 與 `pages/main` 尚未整合（含 `e6c060f`），整合需另行授權。
-- [x] `ecom-scraper/` 已遷至 `~/Projects/ecom-scraper`，scrape-store skill 路徑、CC／Codex 捷徑與 CC 記憶檔已更新，虛擬環境已重建（2026-11-18）。`jessica-portfolio.html`、`scrape-store-skill.zip` 移至 `~/Projects/_archive/`。
+- [x] `ecom-scraper/` 已遷至 `~/Desktop/Projects/ecom-scraper`，scrape-store skill 路徑、CC／Codex 捷徑與 CC 記憶檔已更新，虛擬環境已重建（2026-11-18）。`jessica-portfolio.html`、`scrape-store-skill.zip` 移至 `~/Desktop/Projects/_archive/`。

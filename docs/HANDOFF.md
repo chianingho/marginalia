@@ -1,6 +1,6 @@
 # Pages 交接
 
-工作目錄 `/Users/chianiny/Projects/pages-release`，基準 `release/pages-sync`。另一個工作目錄 `/Users/chianiny/Projects/pages` 的 `main` 有獨有提交及未提交改動，承接前先看 [兩邊差異](CURRENT_STATUS.md)。下一步優先以模擬環境重跑 `tests/image-sync.mjs`，測試入口和 mock 設定見 [QA](pages-image-sync-fix-qa.md)。
+工作目錄 `/Users/chianiny/Desktop/Projects/pages-release`，基準 `release/pages-sync`。另一個工作目錄 `/Users/chianiny/Desktop/Projects/pages` 的 `main` 有獨有提交及未提交改動，承接前先看 [兩邊差異](CURRENT_STATUS.md)。下一步優先以模擬環境重跑 `tests/image-sync.mjs`，測試入口和 mock 設定見 [QA](pages-image-sync-fix-qa.md)。
 
 ## 共用工作流程
 
