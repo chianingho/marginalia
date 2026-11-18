@@ -5,16 +5,16 @@
 
 | 工作樹 | 文件整理前狀態 | 獨有提交 |
 |---|---|---|
-| `/Users/chianiny/Desktop/codex/pages-release-candidate` | `release/pages-sync` 乾淨，與遠端一致 | `924521d` 更名 Pages、更新 README、修補跨裝置圖片、加入隔離 QA 測試 |
-| `/Users/chianiny/Desktop/jessica_agent` | `main` 領先遠端一筆，已有未提交工作 | `e6c060f` 統一新增／編輯書籍的分類選項，使用語意鍵與 i18n 顯示，並更新書架過濾與 UI 文件 |
+| `/Users/chianiny/Projects/pages-release` | `release/pages-sync` 乾淨，與遠端一致 | `924521d` 更名 Pages、更新 README、修補跨裝置圖片、加入隔離 QA 測試 |
+| `/Users/chianiny/Projects/pages` | `main` 領先遠端一筆，已有未提交工作 | `e6c060f` 統一新增／編輯書籍的分類選項，使用語意鍵與 i18n 顯示，並更新書架過濾與 UI 文件 |
 
 兩者共用同一個 Git repository，分支共同基準及遠端預設分支為 `main` 的 `bd7f4ab`。盤點時兩邊均無未解 Git 衝突。
 
-### `jessica_agent/main` 未提交內容
+### `pages/main` 未提交內容（原 `jessica_agent`）
 
 - 已追蹤的 16 個修改檔含 `README.md`、`index.html`、`public/manifest.json`、`src/App.jsx`、`src/api/notes.js`、`src/components/` 的 BrandBanner、ImageAnnotator、NoteImageLightbox、NoteList、NoteModal、Splash，另有 `src/i18n/strings.js`、`src/lib/imageStore.js`、`src/lib/noteAnnotation.js`、`src/pages/Login.jsx`、`src/pages/NoteDetail.jsx`。另有一筆 MP4 的本機刪除紀錄。
 - 未追蹤項含 `.cache/`、案例草稿、`docs/pages-image-sync-fix-qa.md`、`ecom-scraper/`、兩份 i18n 草稿、`jessica-portfolio.html`、影片分鏡、`scrape-store-skill.zip` 與 `tests/`。
-- 逐檔對照候選提交的 19 項變更，主工作樹有 18 項內容相同（含 README、圖片修補、測試與 QA），`src/i18n/strings.js` 不同。CC 於 2026-11-18 核對：差異僅為 `e6c060f` 新增的 `categories.essay`（英文 Essay、中文「散文」）兩行，無品牌文字差異，整合時納入 `e6c060f` 即可對齊。影片刪除、草稿、快取與混入的其他專案留待原工作目錄處理。
+- 逐檔對照候選提交的 19 項變更，主工作樹有 18 項內容相同（含 README、圖片修補、測試與 QA），`src/i18n/strings.js` 不同。CC 於 2026-11-18 核對：差異僅為 `e6c060f` 新增的 `categories.essay`（英文 Essay、中文「散文」）兩行，無品牌文字差異，整合時納入 `e6c060f` 即可對齊。影片刪除、草稿與快取留待原工作目錄處理。
 
 ### 驗證與後續
 
@@ -27,5 +27,5 @@
 
 ## 待辦（記錄於 2026-11-18，尚未執行）
 
-- [ ] `release/pages-sync` 與 `jessica_agent/main` 尚未整合（含 `e6c060f`），整合需另行授權。
-- [ ] `ecom-scraper/` 遷出 `~/Desktop/jessica_agent`，同時更新 CC scrape-store skill 的路徑（`SKILL.md`、`scripts/store_common.py` 的 `DEFAULT_OUT`）與 CC 記憶檔。
+- [ ] `release/pages-sync` 與 `pages/main` 尚未整合（含 `e6c060f`），整合需另行授權。
+- [x] `ecom-scraper/` 已遷至 `~/Projects/ecom-scraper`，scrape-store skill 路徑、CC／Codex 捷徑與 CC 記憶檔已更新，虛擬環境已重建（2026-11-18）。`jessica-portfolio.html`、`scrape-store-skill.zip` 移至 `~/Projects/_archive/`。
